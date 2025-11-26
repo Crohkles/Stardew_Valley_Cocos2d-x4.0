@@ -1,0 +1,228 @@
+name: Build Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  linux-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          git \
+          libx11-dev \
+          libxmu-dev \
+          libxi-dev \
+          libgl1-mesa-dev \
+          libglu1-mesa-dev \
+          libasound2-dev \
+          libpulse-dev \
+          libopenal-dev \
+          libvorbis-dev \
+          libflac-dev \
+          libxss1 \
+          libgconf-2-4 \
+          libxrandr2 \
+          libasound2-dev \
+          libpandoc-dev \
+          libgtk-3-dev \
+          libwebkit2gtk-4.0-dev \
+          python2 \
+          python2-dev
+    
+    - name: Setup Python 2.7 for dependency download
+      run: |
+        sudo ln -sf /usr/bin/python2 /usr/bin/python
+        python --version
+    
+    - name: Download Cocos2d-x dependencies
+      run: |
+        cd cocos2d
+        python download-deps.py --remove-download=yes
+    
+    - name: Create build directory
+      run: mkdir build
+    
+    - name: Configure CMake
+      run: |
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release \
+                 -DLINUX=ON
+    
+    - name: Build project
+      run: |
+        cd build
+        make -j$(nproc)
+    
+    - name: Check build artifacts
+      run: |
+        cd build
+        ls -la
+        if [ -f "bin/Stardew_Valley_Cocos2d-x4.0" ]; then
+          echo "✓ Linux build successful - executable found"
+          file bin/Stardew_Valley_Cocos2d-x4.0
+        else
+          echo "✗ Linux build failed - executable not found"
+          exit 1
+        fi
+
+  windows-build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Setup Python 2.7
+      uses: actions/setup-python@v4
+      with:
+        python-version: '2.7'
+    
+    - name: Setup Visual Studio Build Tools
+      uses: microsoft/setup-msbuild@v1
+    
+    - name: Download Cocos2d-x dependencies
+      shell: cmd
+      run: |
+        cd cocos2d
+        python download-deps.py --remove-download=yes
+    
+    - name: Create build directory
+      run: mkdir build
+    
+    - name: Configure CMake for Windows
+      shell: cmd
+      run: |
+        cd build
+        cmake .. -G "Visual Studio 17 2022" -A x64 ^
+                 -DWINDOWS=ON
+    
+    - name: Build project
+      shell: cmd
+      run: |
+        cd build
+        cmake --build . --config Release --parallel
+    
+    - name: Check build artifacts
+      shell: powershell
+      run: |
+        cd build
+        Get-ChildItem -Recurse -Name "*.exe"
+        $executable = Get-ChildItem -Recurse -Filter "*.exe" | Where-Object { $_.Name -like "*Stardew*" }
+        if ($executable) {
+          Write-Host "✓ Windows build successful - executable found: $($executable.Name)"
+          Write-Host "File info:"
+          Get-ItemProperty $executable.FullName | Select-Object Name, Length, LastWriteTime
+        } else {
+          Write-Host "✗ Windows build failed - executable not found"
+          Write-Host "Available files:"
+          Get-ChildItem -Recurse
+          exit 1
+        }
+
+  android-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Setup Java 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+    
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
+      with:
+        api-level: 30
+        ndk-version: 21.4.7075529
+        cmake-version: 3.10.2.4988404
+    
+    - name: Setup Python 2.7 for dependency download
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python2 python2-dev
+        sudo ln -sf /usr/bin/python2 /usr/bin/python
+    
+    - name: Download Cocos2d-x dependencies
+      run: |
+        cd cocos2d
+        python download-deps.py --remove-download=yes
+    
+    - name: Build Android APK
+      run: |
+        cd proj.android
+        chmod +x gradlew
+        ./gradlew assembleRelease
+    
+    - name: Check Android build artifacts
+      run: |
+        find proj.android -name "*.apk" -type f
+        if find proj.android -name "*.apk" -type f | grep -q .; then
+          echo "✓ Android build successful - APK found"
+          find proj.android -name "*.apk" -type f -exec ls -la {} \;
+        else
+          echo "✗ Android build failed - APK not found"
+          exit 1
+        fi
+
+  build-summary:
+    needs: [linux-build, windows-build, android-build]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Build Summary
+      run: |
+        echo "## Build Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ needs.linux-build.result }}" == "success" ]; then
+          echo "✅ **Linux Build**: PASSED" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Linux Build**: FAILED" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [ "${{ needs.windows-build.result }}" == "success" ]; then
+          echo "✅ **Windows Build**: PASSED" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Windows Build**: FAILED" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [ "${{ needs.android-build.result }}" == "success" ]; then
+          echo "✅ **Android Build**: PASSED" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Android Build**: FAILED" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "For detailed logs, check individual job outputs above." >> $GITHUB_STEP_SUMMARY
+        
+        # Fail if any build failed
+        if [ "${{ needs.linux-build.result }}" != "success" ] || \
+           [ "${{ needs.windows-build.result }}" != "success" ] || \
+           [ "${{ needs.android-build.result }}" != "success" ]; then
+          echo "One or more builds failed. Please check the logs and fix the issues."
+          exit 1
+        fi
+        
+        echo "🎉 All builds passed successfully!"
