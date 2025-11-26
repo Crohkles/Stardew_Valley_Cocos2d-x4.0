@@ -1,0 +1,114 @@
+# Focused Windows build workflow for Stardew Valley Cocos2d-x 4.0
+# This matches your described build process more closely
+name: Windows Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  windows-vs2022-win32:
+    name: "Windows VS2022 Win32"
+    runs-on: windows-2022
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          
+      - name: Setup Python 2.7
+        uses: actions/setup-python@v4
+        with:
+          python-version: '2.7'
+          
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          vs-version: '17.0'
+          
+      - name: Download Cocos2d-x dependencies
+        run: |
+          Write-Host "Downloading Cocos2d-x dependencies..."
+          python cocos2d/download-deps.py --r no
+        shell: powershell
+        
+      - name: Run Cocos2d-x setup (if exists)
+        run: |
+          if (Test-Path "cocos2d/setup.py") {
+            Write-Host "Running Cocos2d-x setup..."
+            echo "y" | python cocos2d/setup.py
+          } else {
+            Write-Host "No setup.py found, skipping..."
+          }
+        shell: powershell
+        continue-on-error: true
+        
+      - name: Create build directory and configure CMake
+        run: |
+          Write-Host "Creating build directory..."
+          if (Test-Path "build") { Remove-Item -Recurse -Force build }
+          mkdir build
+          cd build
+          
+          Write-Host "Configuring CMake for Visual Studio 2022 Win32..."
+          cmake .. -G "Visual Studio 17 2022" -A Win32
+        shell: powershell
+        
+      - name: Build project (Release)
+        run: |
+          cd build
+          Write-Host "Building project in Release mode..."
+          cmake --build . --config Release --parallel
+        shell: powershell
+        
+      - name: Build project (Debug)
+        run: |
+          cd build
+          Write-Host "Building project in Debug mode..."
+          cmake --build . --config Debug --parallel
+        shell: powershell
+        continue-on-error: true
+        
+      - name: List build outputs
+        run: |
+          Write-Host "=== Build Output Structure ==="
+          if (Test-Path "build/bin") {
+            Write-Host "Contents of build/bin:"
+            Get-ChildItem -Recurse build/bin
+          }
+          if (Test-Path "build/Release") {
+            Write-Host "Contents of build/Release:"
+            Get-ChildItem -Recurse build/Release
+          }
+          if (Test-Path "build/Debug") {
+            Write-Host "Contents of build/Debug:"
+            Get-ChildItem -Recurse build/Debug
+          }
+        shell: powershell
+        continue-on-error: true
+        
+      - name: Upload build artifacts (Release)
+        uses: actions/upload-artifact@v3
+        with:
+          name: stardew-valley-windows-win32-release
+          path: |
+            build/bin/Release/
+            build/Release/
+            build/*.sln
+            build/*.vcxproj
+          retention-days: 14
+          if-no-files-found: warn
+          
+      - name: Upload build artifacts (Debug)
+        uses: actions/upload-artifact@v3
+        with:
+          name: stardew-valley-windows-win32-debug
+          path: |
+            build/bin/Debug/
+            build/Debug/
+          retention-days: 7
+          if-no-files-found: ignore
