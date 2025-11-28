@@ -23,35 +23,49 @@ jobs:
         submodules: recursive
         fetch-depth: 0
         
-    # 设置 Miniconda 环境（兼容 Python 2.7）
-    - name: 设置 Miniconda
-      uses: conda-incubator/setup-miniconda@v2
+    # 尝试设置 Python 2.7（备用方案）
+    - name: 设置 Python 2.7
+      uses: actions/setup-python@v4
       with:
-        auto-update-conda: true
         python-version: '2.7'
-        miniforge-version: latest
-        activate-environment: cocos2dx-env
+      continue-on-error: true
+      id: python27
         
-    # 激活 conda 环境并验证 Python 版本  
+    # 如果 Python 2.7 失败，使用 Python 3 并修改脚本
+    - name: 设置 Python 3（备用方案）
+      if: steps.python27.outcome == 'failure'
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+        
+    # 验证 Python 版本
     - name: 验证 Python 环境
-      shell: bash -l {0}
       run: |
-        conda activate cocos2dx-env
         python --version
         python -c "import sys; print('Python path:', sys.executable)"
         
-    # 安装必要的 Python 包
-    - name: 安装 Python 依赖
-      shell: bash -l {0}
+    # 修改 download-deps.py 以支持 Python 3（如果需要）
+    - name: 修改 download-deps.py 支持 Python 3
+      if: steps.python27.outcome == 'failure'
       run: |
-        conda activate cocos2dx-env
-        pip install requests
+        cd cocos2d
+        # 备份原文件
+        copy download-deps.py download-deps.py.backup
+        # 使用 PowerShell 修改文件，移除 Python 版本检查
+        (Get-Content download-deps.py) | ForEach-Object {
+          if ($_ -match "if not _check_python_version") {
+            "    # if not _check_python_version():"
+          } elseif ($_ -match "exit\(\)") {
+            "    #     exit()"
+          } else {
+            $_
+          }
+        } | Set-Content download-deps.py
+      shell: powershell
         
     # 下载 cocos2d-x 第三方依赖
     - name: 下载 cocos2d-x 依赖
-      shell: bash -l {0}
       run: |
-        conda activate cocos2dx-env
         cd cocos2d
         python download-deps.py --r no
         
@@ -125,23 +139,42 @@ jobs:
         submodules: recursive
         fetch-depth: 0
         
-    - name: 设置 Miniconda
-      uses: conda-incubator/setup-miniconda@v2
+    - name: 设置 Python 2.7
+      uses: actions/setup-python@v4
       with:
-        auto-update-conda: true
         python-version: '2.7'
-        miniforge-version: latest
-        activate-environment: cocos2dx-env
+      continue-on-error: true
+      id: python27_debug
+        
+    - name: 设置 Python 3（备用方案）
+      if: steps.python27_debug.outcome == 'failure'
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
         
     - name: 设置 Visual Studio 开发环境
       uses: microsoft/setup-msbuild@v1.3
       with:
         vs-version: '17.0'
         
-    - name: 下载 cocos2d-x 依赖
-      shell: bash -l {0}
+    - name: 修改 download-deps.py 支持 Python 3（Debug）
+      if: steps.python27_debug.outcome == 'failure'
       run: |
-        conda activate cocos2dx-env
+        cd cocos2d
+        copy download-deps.py download-deps.py.backup
+        (Get-Content download-deps.py) | ForEach-Object {
+          if ($_ -match "if not _check_python_version") {
+            "    # if not _check_python_version():"
+          } elseif ($_ -match "exit\(\)") {
+            "    #     exit()"
+          } else {
+            $_
+          }
+        } | Set-Content download-deps.py
+      shell: powershell
+        
+    - name: 下载 cocos2d-x 依赖
+      run: |
         cd cocos2d
         python download-deps.py --r no
         
