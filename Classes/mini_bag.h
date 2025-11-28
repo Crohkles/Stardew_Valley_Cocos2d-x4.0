@@ -3,9 +3,11 @@
 #include "cocos2d.h"  
 #include "Inventory.h"  
 #include "AppDelegate.h"
-class mini_bag : public cocos2d::Layer {
+#include "GameStateObserver.h"
+class mini_bag : public cocos2d::Layer, public GameStateObserver {
 public:
     virtual bool init ( Inventory* inventory);
+    virtual ~mini_bag();
 
     static mini_bag* create ( Inventory* inventory);
 
@@ -14,6 +16,9 @@ public:
     void Itemblock ( Inventory* inventory );
 
     void updateDisplay (); // 更新显示内容  
+    
+    // Observer接口实现
+    virtual void onInventoryStateChanged() override;
 
     int getSelectedSlot () { return _selectedSlot; }
 

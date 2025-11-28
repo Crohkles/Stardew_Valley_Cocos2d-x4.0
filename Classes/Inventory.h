@@ -3,11 +3,12 @@
 #include<memory>
 #include<map>
 #include"Item.h"
+#include"GameStateObserver.h"
 
 const int kRowSize = 12;
 const int kDefaultSize = kRowSize * 2;
 
-class Inventory {
+class Inventory : public GameStateSubject {
 private:
 	//±³°üÈÝÁ¿
 	int capacity;

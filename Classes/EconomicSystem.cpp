@@ -21,6 +21,8 @@ void EconomicSystem::addGold ( int amount ) {
     if (amount > 0) {
         goldAmount += amount;
         CCLOG ( "Added %d gold. Total: %d gold." , amount , goldAmount );
+        // 通知所有观察者金钱状态变化
+        notifyEconomicStateChanged(goldAmount, amount);
     }
     else {
         CCLOG ( "Amount to add must be positive." );
@@ -32,6 +34,8 @@ void EconomicSystem::subtractGold ( int amount ) {
     if (amount > 0 && amount <= goldAmount) {
         goldAmount -= amount;
         CCLOG ( "Subtracted %d gold. Total: %d gold." , amount , goldAmount );
+        // 通知所有观察者金钱状态变化
+        notifyEconomicStateChanged(goldAmount, -amount);
     }
     else {
         if (amount > goldAmount) {

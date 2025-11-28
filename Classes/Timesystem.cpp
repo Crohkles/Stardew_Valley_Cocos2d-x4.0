@@ -2,6 +2,7 @@
 #include "ui/CocosGUI.h"  
 #include "Item.h"  
 #include "DailyRecordUI.h"
+#include "EnergySystem.h"
 
 USING_NS_CC;
 
@@ -112,8 +113,11 @@ bool Timesystem::init( std::string place ) {
         timer_label_day->setString("Day: " + std::to_string(day));
         timer_label_hour->setString(std::to_string(remainingTime / 1800) + ":00");
         timer_label_season->setString(Season);
-        currency_num->setString ( std::to_string ( GoldAmount ) );
+        // currency_num的更新现在通过Observer模式处理
         }, 0.01f, "updatetime");
+    
+    // 注册为体力系统的观察者
+    EnergySystem::getInstance()->addObserver(this);
 
     return true;
 }
@@ -130,4 +134,26 @@ Timesystem* Timesystem::create( std::string place ) {
 
 void Timesystem::UpdateEnergy () {
     TimeUI->energy_bar->setScaleY ( strength / 100.0 * 16.5f );
+}
+
+// Observer接口实现
+void Timesystem::onEconomicStateChanged(int newGoldAmount, int delta) {
+    // 更新金钱显示
+    if (currency_num) {
+        currency_num->setString(std::to_string(newGoldAmount));
+    }
+}
+
+void Timesystem::onEnergyStateChanged(int newEnergy, int maxEnergy) {
+    // 更新体力条显示
+    if (energy_bar) {
+        float scale = (float)newEnergy / (float)maxEnergy * 16.5f;
+        energy_bar->setScaleY(scale);
+    }
+}
+
+// 析构函数实现
+Timesystem::~Timesystem() {
+    // 从体力系统中移除自己作为观察者
+    EnergySystem::getInstance()->removeObserver(this);
 }

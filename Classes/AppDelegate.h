@@ -43,6 +43,7 @@
 #include "EconomicSystem.h"
 #include "SkillTree.h"
 #include <memory>
+#include "EnergySystem.h"
 
 #define Daytime 43200
 
