@@ -307,12 +307,11 @@ bool farm::init ()
 
 
     // 更新物品栏
-    schedule ( [=]( float deltaTime ) {
-        if (inventory->is_updated == true) {
-            miniBag->updateDisplay ();
-            inventory->is_updated = false;
-        }
-        } , 0.1f , "item_update_key" );
+    // 使用Observer模式自动更新物品栏（无需轮询）
+    // 注册观察者
+    if (inventory && miniBag) {
+        inventory->addObserver(miniBag);
+    }
 
     return true;
 }

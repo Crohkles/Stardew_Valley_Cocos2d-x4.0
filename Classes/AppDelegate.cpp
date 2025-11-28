@@ -15,6 +15,7 @@
 #include "Barn.h"
 //#include "supermarket.h"
 #include "CreateCharacterUI.h"
+#include "EnergySystem.h"
 
 // #define USE_AUDIO_ENGINE 1   // 如果需要使用音频引擎，可以取消注释这一行
 
@@ -192,6 +193,10 @@ void AppDelegate::runScene(cocos2d::Director* director) {
 }
 
 void AppDelegate::Initialize () {
+    // 初始化Observer系统
+    // 设置初始体力值
+    EnergySystem::getInstance()->setEnergy(strength);
+    EnergySystem::getInstance()->setMaxEnergy(100);
 
     // 初始化存储作物信息的数组
     cropbasicinformation.insert({ "Wheat_Seeds", wheat });

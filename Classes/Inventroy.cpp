@@ -12,6 +12,7 @@ bool Inventory::AddItem ( const Item& item ) {
 			&& pair.second.second < item.max_count_in_one_grid) {
 			++pair.second.second;
 			is_updated = true;
+			notifyInventoryStateChanged();
 			return true;
 		}
 	}
@@ -27,6 +28,7 @@ bool Inventory::AddItem ( const Item& item ) {
 		}
 		package[index] = std::make_pair ( item.GetCopy () , 1 );
 		is_updated = true;
+		notifyInventoryStateChanged();
 		return true;
 	}
 
@@ -66,7 +68,11 @@ bool Inventory::AddItem ( const Item& item , const int& add_num ) {
 			return true;
 		}
 	}
-	is_updated = remaining < add_num ? true : false;
+	bool changed = remaining < add_num;
+	is_updated = changed;
+	if (changed) {
+		notifyInventoryStateChanged();
+	}
 	return remaining <= 0;
 }
 
@@ -74,6 +80,7 @@ int Inventory::RemoveItem ( const int& position , const int& remove_num ) {
 	auto it = package.find ( position );
 	if (it != package.end ()) {
 		is_updated = true;
+		notifyInventoryStateChanged();
 		if (it->second.second > remove_num) {
 			it->second.second -= remove_num;
 			return 0;
@@ -89,6 +96,7 @@ bool Inventory::ClearGrid ( const int& position ) {
 	if (it != package.end ()) {
 		package.erase ( it );
 		is_updated = true;
+		notifyInventoryStateChanged();
 		return true;
 	}
 	return false;

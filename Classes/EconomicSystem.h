@@ -4,10 +4,11 @@
 #include <string>  
 #include "Item.h"
 #include "Inventory.h"
+#include "GameStateObserver.h"
 
 using namespace std;
 
-class EconomicSystem {
+class EconomicSystem : public GameStateSubject {
 public:
     // 构造函数和析构函数  
     EconomicSystem ( Inventory* mybag , Inventory* goods);

@@ -34,12 +34,16 @@ void NpcRelationship::setRelationship(const std::string& npcA, const std::string
 void NpcRelationship::increaseRelationship(const std::string& npcA, const std::string& npcB, double amount) {
     double newValue = getRelationship(npcA, npcB) + amount;
     setRelationship(npcA, npcB, newValue);
+    // 通知观察者关系状态变化
+    notifyRelationshipStateChanged(npcB, newValue);
 }
 
 // 减少 NPC 之间的关系  
 void NpcRelationship::decreaseRelationship(const std::string& npcA, const std::string& npcB, double amount) {
     double newValue = getRelationship(npcA, npcB) - amount;
     setRelationship(npcA, npcB, newValue);
+    // 通知观察者关系状态变化
+    notifyRelationshipStateChanged(npcB, newValue);
 }
 
 // 获取 NPC 之间的关系  

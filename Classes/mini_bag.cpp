@@ -24,10 +24,10 @@ void mini_bag::backgroundcreate () {
     }
     else
     {
-        // 获取原始图片的宽高
+        // 获取原始图片的宽�?
         float originalWidth = bag->getContentSize ().width;
         float originalHeight = bag->getContentSize ().height;
-        // 根据屏幕宽度和图片原始宽高计算比例
+        // 根据屏幕宽度和图片原始宽高计算比�?
         float scaleX = visibleSize.width / originalWidth;
         float scaleY = visibleSize.height / originalHeight;
         // 选择最小的缩放比例，以保证图片完全显示在屏幕上且不变形
@@ -49,10 +49,10 @@ void mini_bag::Itemblock ( Inventory* inventory ) {
     for (int i = 0; i < kRowSize; ++i) {
         auto slot = Sprite::create ( "UIresource/beibao/itemblock.png" );
         auto bag = getChildByTag ( 101 );
-        // 获取原始图片的宽高
+        // 获取原始图片的宽�?
         float originalWidth = slot->getContentSize ().width;
         float originalHeight = slot->getContentSize ().height;
-        // 根据屏幕宽度和图片原始宽高计算比例
+        // 根据屏幕宽度和图片原始宽高计算比�?
         float scaleX = visibleSize.width / originalWidth;
         float scaleY = visibleSize.height / originalHeight;
         // 选择最小的缩放比例，以保证图片完全显示在屏幕上且不变形
@@ -61,7 +61,7 @@ void mini_bag::Itemblock ( Inventory* inventory ) {
         float bagWidth = bag->getContentSize ().width;
         float bagHeight = bag->getContentSize ().height;
         slot->setPosition ( 0 - bagWidth * 0.57 + (originalWidth * scale / 16.5 + 5) * i , 0 - visibleSize.height * 0.485 + bagHeight * 1.73 / 3.643 ); // 计算槽位位置  
-        slot->setTag ( i + 1 ); // 设置槽位的标签  
+        slot->setTag ( i + 1 ); // 设置槽位的标�?  
         this->addChild ( slot , 2 );
 
         _itemSlots.pushBack ( slot );
@@ -96,22 +96,22 @@ mini_bag* mini_bag::create ( Inventory* inventory ) {
 
 void mini_bag::updateDisplay () {
     if (!_inventory) {
-        return; // 退出方法  
+        return; // 退出方�?  
     }
 
     // 获取当前选择的物品的槽位  
     for (int i = 0; i < kRowSize; ++i) {
         int serial_number = i;
         auto slot = _itemSlots.at ( serial_number );
-        slot->setVisible ( true ); // 确保显示所有槽位  
+        slot->setVisible ( true ); // 确保显示所有槽�?  
 
         // 获取槽位物品  
-        auto item = _inventory->GetItemAt ( serial_number + 1 ); // 获取特定槽位的物品，注意槽位从1开始 
+        auto item = _inventory->GetItemAt ( serial_number + 1 ); // 获取特定槽位的物品，注意槽位�?1开�? 
 
         // 获取物品数量   
         int itemCount = _inventory->GetItemCountAt ( serial_number + 1 ); // 获取该槽位的物品数量  
 
-        // 如果需要获取特定槽位的物品，使用 GetItemAt(int position) 定义新函数  
+        // 如果需要获取特定槽位的物品，使�? GetItemAt(int position) 定义新函�?  
 
         // 更新槽位视觉表现  
         if (item) {
@@ -125,8 +125,8 @@ void mini_bag::updateDisplay () {
                 itemSprite->setScale ( 0.7f );
                 slot->addChild ( itemSprite , 3 );
             }
-            // 根据 item 里的数量来设置数量标签（如果需要）。  
-            // 可以在这里创建一个 Label 显示数量  
+            // 根据 item 里的数量来设置数量标签（如果需要）�?  
+            // 可以在这里创建一�? Label 显示数量  
             auto countLabel = static_cast<Label*>(slot->getChildByTag ( 200 + serial_number )); // 使用槽位的标签生成数量标签的唯一ID  
             if (!countLabel) {
                 // 如果标签不存在，创建新的标签  
@@ -137,7 +137,7 @@ void mini_bag::updateDisplay () {
                 slot->addChild ( countLabel , 4 ); // 添加到层级中  
             }
             else {
-                // 如果标签存在，更新数量  
+                // 如果标签存在，更新数�?  
                 countLabel->setString ( std::to_string ( itemCount ) );
             }
 
@@ -154,7 +154,7 @@ void mini_bag::updateDisplay () {
                     countLabel->setScale ( 1.5f );
                 }
                 else if (slot && itemSprite != currentItemSprite) {
-                    itemSprite->setScale ( 0.7f ); // 恢复原大小
+                    itemSprite->setScale ( 0.7f ); // 恢复原大�?
                     countLabel->setScale ( 1.0f );
                 }
                 };
@@ -167,7 +167,7 @@ void mini_bag::updateDisplay () {
                 // 检查鼠标是否点击了 slot  
                 if (slot->getBoundingBox ().containsPoint ( mousePos )) {
                     if (!isClick) {
-                        currentItemSprite = itemSprite; // 记录当前选择的物品
+                        currentItemSprite = itemSprite; // 记录当前选择的物�?
                         _selectedSlot = serial_number + 1;
                     }
                     else {
@@ -213,7 +213,7 @@ void mini_bag::updateDisplay () {
     }
 
     // 更新物品信息标签（用于调试）  
-    //if (_itemLabel) { // 检查 _itemLabel 是否为 nullptr  
+    //if (_itemLabel) { // 检�? _itemLabel 是否�? nullptr  
     //    if (auto selectedItem = _inventory->GetSelectedItem ()) {
     //        _itemLabel->setString ( "Selected: " + selectedItem->GetName () );
     //    }
@@ -223,6 +223,13 @@ void mini_bag::updateDisplay () {
     //}
 }
 
+// Observer�ӿ�ʵ��
+void mini_bag::onInventoryStateChanged() {
+    // ����״̬�仯ʱ�Զ�������ʾ
+    this->updateDisplay();
+}
+
+
 
 void mini_bag::getSelectBack () {
     _selectedSlot = 0;
@@ -230,15 +237,15 @@ void mini_bag::getSelectBack () {
 }
 
 
-// 复制并返回当前选中的物品（Item）
+// 复制并返回当前选中的物品（Item�?
 std::shared_ptr<Item> mini_bag::getSelectedItem () {
-    // 确保选中了槽位
+    // 确保选中了槽�?
     if (_selectedSlot == 0) {
         return nullptr;  // 如果没有选中任何槽位，返回空
     }
 
-    // 获取当前选中的槽位索引
-    int serial_number = _selectedSlot - 1;  // 假设槽位从1开始，索引从0开始
+    // 获取当前选中的槽位索�?
+    int serial_number = _selectedSlot - 1;  // 假设槽位�?1开始，索引�?0开�?
 
     // 从库存中获取物品实例
     std::shared_ptr<Item> itemPtr = _inventory->GetItemAt ( serial_number + 1 );  // 获取 shared_ptr
@@ -252,4 +259,12 @@ std::shared_ptr<Item> mini_bag::getSelectedItem () {
         return nullptr;
     }
 
+}
+
+// 析构函数实现
+mini_bag::~mini_bag() {
+    // 从背包系统中移除自己作为观察者
+    if (_inventory != nullptr) {
+        _inventory->removeObserver(this);
+    }
 }

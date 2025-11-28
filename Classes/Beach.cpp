@@ -155,7 +155,7 @@ bool Beach::init ()
         else if (key_code == EventKeyboard::KeyCode::KEY_H) {
             if (!this->getChildByName ( "FishingGameLayer" ) && strength >= 10) {
                 strength -= 10;
-                TimeUI->UpdateEnergy();
+                EnergySystem::getInstance()->setEnergy(strength);
                 //将钓鱼游戏界面加入场景中
                 auto fishing_game = FishingGame::create ( player1->getPosition () );
                 this->addChild ( fishing_game , 10 , "FishingGameLayer" );
@@ -210,13 +210,11 @@ bool Beach::init ()
     }
 
 
-    // 更新物品栏
-    schedule ( [=]( float deltaTime ) {
-        if (inventory->is_updated == true) {
-            miniBag->updateDisplay ();
-            inventory->is_updated = false;
-        }
-        } , 0.1f , "item_update_key" );
+    // 使用Observer模式自动更新物品栏（无需轮询）
+    // 注册观察者
+    if (inventory && miniBag) {
+        inventory->addObserver(miniBag);
+    }
 
     if (Festival == "Fishing Festival") {
         string cloth = Season;

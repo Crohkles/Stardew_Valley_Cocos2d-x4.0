@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <string>
+#include "GameStateObserver.h"
 // #include "AppDelegate.h"
 
 class AppDelegate;
@@ -9,7 +10,7 @@ extern int day;
 
 using namespace std;
 
-class NpcRelationship {
+class NpcRelationship : public GameStateSubject {
 public:
 	// 构造函数和析构函数
 	NpcRelationship();
