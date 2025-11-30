@@ -18,6 +18,7 @@
 #include "../Systems/EnergySystem.h"
 #include "InputManager.h"
 #include "../Scenes/InputTestScene.h"
+#include "../Items/Generaltem.h"  // 引入flyweight物品系统
 
 // #define USE_AUDIO_ENGINE 1   // 如果需要使用音频引擎，可以取消注释这一行
 
@@ -165,8 +166,8 @@ void AppDelegate::runScene(cocos2d::Director* director) {
 
     // 运行农场
 	player1 = Player::create ();
-    auto farm = farm::create ();
-    director->runWithScene ( farm );
+    // auto farm = farm::create ();
+    // director->runWithScene ( farm );
 
     //运行海滩场景
      //auto beach = Beach::create ();
@@ -185,8 +186,8 @@ void AppDelegate::runScene(cocos2d::Director* director) {
     //director->runWithScene(testScene);
     
     // 运行商店的场景（原有代码，暂时注释）
-     //auto test = supermarket::create();
-     //director->runWithScene(test);
+    auto test = supermarket::create();
+    director->runWithScene(test);
 
     // 运行Cave
      //auto test = Cave::create();
@@ -290,7 +291,7 @@ void AppDelegate::Initialize () {
         "Summer"  // 截至日期  
     );
     task1.npcName = "Abigail"; // 发布任务的 NPC 名字  
-    task1.requiredItems.push_back ( Bean_Starter ); // 需要的物品  
+    task1.requiredItems.push_back ( *GetBeanStarter() ); // 需要的物品  
     task1.rewardCoins = 500; // 奖励金币  
     task1.relationshipPoints = 10; // NPC 好感度  
 
@@ -301,7 +302,7 @@ void AppDelegate::Initialize () {
         "Summer" , // 初始日期  
         "Autumn"  // 截至日期  
     );
-    task2.requiredItems.push_back ( emerald ); // 需要的物品  
+    task2.requiredItems.push_back ( *GetEmerald() ); // 需要的物品  
     task2.rewardCoins = 30; // 奖励金币  
 
     TaskManagement::Task task3 (
@@ -311,7 +312,7 @@ void AppDelegate::Initialize () {
         "Winter" , // 初始日期  
         "Summer"  // 截至日期  
     );
-    task3.specialRewards.push_back ( Gold_Hoe );   // 特殊奖励  
+    task3.specialRewards.push_back ( *GetGoldHoe() );   // 特殊奖励  
     task3.relationshipPoints = 5; // 与所有人的好感度  
 
     // 将任务添加到任务管理器  

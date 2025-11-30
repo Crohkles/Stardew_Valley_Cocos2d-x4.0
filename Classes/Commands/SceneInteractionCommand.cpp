@@ -5,6 +5,7 @@
 #include "../Systems/FishingGame.h"
 #include "../Core/AppDelegate.h"
 #include "../Systems/EnergySystem.h"
+#include "../Items/Generaltem.h"  // 引入flyweight物品系统
 
 // ==================== SceneTransitionCommand 实现 ====================
 
@@ -254,16 +255,16 @@ void MiningCommand::execute() {
             // 根据矿物类型添加物品
             if (ore->GetName() == "Emerald") {
                 if (GoldMaskfirst) {
-                    inventory->AddItem(GoldMask);
+                    inventory->AddItem(*GetGoldMask());
                     GoldMaskfirst = false;
                 }
-                inventory->AddItem(emerald);
+                inventory->AddItem(*GetEmerald());
             }
             else if (ore->GetName() == "Ruby") {
-                inventory->AddItem(ruby);
+                inventory->AddItem(*GetRuby());
             }
             else {
-                inventory->AddItem(amethyst);
+                inventory->AddItem(*GetAmethyst());
             }
             
             // 角色挖矿动画
@@ -370,7 +371,7 @@ void LoggingCommand::execute() {
             
             // 如果树被完全砍倒
             if (tree->removetimes <= 0) {
-                inventory->AddItem(Wood);
+                inventory->AddItem(*GetWood());
                 
                 // 升级经验
                 skill_tree->AddExperience(foraging_skill, 10);

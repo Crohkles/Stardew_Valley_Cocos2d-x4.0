@@ -36,6 +36,16 @@ if(XCODE)
 endif()
 
 if(NOT DEFINED BUILD_ENGINE_DONE) # to test Stardew_Valley_Cocos2d-x4.0 into root project
+    # 设置全局警告抑制
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+    
+    # 为MSVC设置警告级别
+    if(MSVC)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W0")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
+    endif()
+    
     set(COCOS2DX_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cocos2d)
     set(CMAKE_MODULE_PATH ${COCOS2DX_ROOT_PATH}/cmake/Modules/)
 
@@ -85,6 +95,7 @@ list(APPEND GAME_SOURCE
      Classes/Items/Food.cpp
      Classes/Items/Generaltem.cpp
      Classes/Items/Item.cpp
+     Classes/Items/ItemFlyweight.cpp
      Classes/Items/Ore.cpp
      Classes/Items/Wool.cpp
      
@@ -157,6 +168,7 @@ list(APPEND GAME_HEADER
      Classes/Items/Food.h
      Classes/Items/Generaltem.h
      Classes/Items/Item.h
+     Classes/Items/ItemFlyweight.h
      Classes/Items/Ore.h
      Classes/Items/Wool.h
      
@@ -272,8 +284,28 @@ target_include_directories(${APP_NAME}
 if(MSVC)
     # 设置UTF-8编码支持
     target_compile_options(${APP_NAME} PRIVATE /utf-8)
-    # 禁用C4819警告（文件编码问题）
-    target_compile_options(${APP_NAME} PRIVATE /wd4819)
+    # 禁用所有警告
+    target_compile_options(${APP_NAME} PRIVATE /w)
+    # 设置警告级别为最低
+    target_compile_options(${APP_NAME} PRIVATE /W0)
+    # 禁用特定常见警告
+    target_compile_options(${APP_NAME} PRIVATE /wd4819) # 文件编码问题
+    target_compile_options(${APP_NAME} PRIVATE /wd4996) # 已弃用函数
+    target_compile_options(${APP_NAME} PRIVATE /wd4244) # 类型转换可能丢失数据
+    target_compile_options(${APP_NAME} PRIVATE /wd4267) # size_t到int的转换
+    target_compile_options(${APP_NAME} PRIVATE /wd4800) # 强制转换为bool
+    target_compile_options(${APP_NAME} PRIVATE /wd4005) # 宏重定义
+    target_compile_options(${APP_NAME} PRIVATE /wd4018) # 有符号/无符号不匹配
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # GCC和Clang警告抑制
+    target_compile_options(${APP_NAME} PRIVATE -w)
+    target_compile_options(${APP_NAME} PRIVATE -Wno-all)
+    target_compile_options(${APP_NAME} PRIVATE -Wno-deprecated)
+    target_compile_options(${APP_NAME} PRIVATE -Wno-deprecated-declarations)
+    target_compile_options(${APP_NAME} PRIVATE -Wno-unused-variable)
+    target_compile_options(${APP_NAME} PRIVATE -Wno-unused-parameter)
+    target_compile_options(${APP_NAME} PRIVATE -Wno-sign-compare)
+    target_compile_options(${APP_NAME} PRIVATE -Wno-conversion)
 endif()
 
 # mark app resources

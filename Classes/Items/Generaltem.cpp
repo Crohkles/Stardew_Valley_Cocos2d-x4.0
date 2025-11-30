@@ -1,117 +1,188 @@
 #include "Generaltem.h"
 
-// 动物设定为购买后直接加入牧场，在背包中不可见
+// Flyweight模式实现 - 按需获取物品，节省内存
 
-// 动物  
-Item AnimalChicken("AnimalChicken", "Item/Surpermarket/Animal/Brown_Chicken.png", 500, 99);
-Item AnimalDuck("AnimalDuck", "Item/Surpermarket/Animal/Duck.png", 1200, 99);
-Item AnimalGoat("AnimalGoat", "Item/Surpermarket/Animal/Goat.png", 1000, 99);
-Item AnimalPig("AnimalPig", "Item/Surpermarket/Animal/Pig.png", 16000, 99);
-Item AnimalRabbit("AnimalRabbit", "Item/Surpermarket/Animal/Rabbit.png", 800, 99);
-Item AnimalSheep("AnimalSheep", "Item/Surpermarket/Animal/Sheep.png", 1000, 99);
-Item AnimalCow("AnimalCow", "Item/Surpermarket/Animal/White_Cow.png", 800, 99);
+// 内部辅助函数
+static bool initialized = false;
 
-// 春季种子物品列表  
-Item Bean_Starter ( "Bean_Starter" , "Item/Surpermarket/Spring/Bean_Starter.png" , 60 , 99 );
-Item Carrot_Seeds ( "Carrot_Seeds" , "Item/Surpermarket/Spring/Carrot_Seeds.png" , 100 , 99 );
-Item Cauliflower_Seeds ( "Cauliflower_Seeds" , "Item/Surpermarket/Spring/Cauliflower_Seeds.png" , 100 , 99 );
-Item Coffee_Bean ( "Coffee_Bean" , "Item/Surpermarket/Spring/Coffee_Bean.png" , 250 , 99 );
-Item Garlic_Seeds ( "Garlic_Seeds" , "Item/Surpermarket/Spring/Garlic_Seeds.png" , 40 , 99 );
-Item Jazz_Seeds ( "Jazz_Seeds" , "Item/Surpermarket/Spring/Jazz_Seeds.png" , 100 , 99 );
-Item Kale_Seeds ( "Kale_Seeds" , "Item/Surpermarket/Spring/Kale_Seeds.png" , 70 , 99 );
-Item Parsnip_Seeds ( "Parsnip_Seeds" , "Item/Surpermarket/Spring/Parsnip_Seeds.png" , 20 , 99 );
-Item Potato_Seeds ( "Potato_Seeds" , "Item/Surpermarket/Spring/Potato_Seeds.png" , 50 , 99 );
-Item Rhubarb_Seeds ( "Rhubarb_Seeds" , "Item/Surpermarket/Spring/Rhubarb_Seeds.png" , 100 , 99 );
-Item Rice_Shoot ( "Rice_Shoot" , "Item/Surpermarket/Spring/Rice_Shoot.png" , 20 , 99 );
-Item Strawberry_Seeds ( "Strawberry_Seeds" , "Item/Surpermarket/Spring/Strawberry_Seeds.png" , 100 , 99 );
-Item Tulip_Bulb ( "Tulip_Bulb" , "Item/Surpermarket/Spring/Tulip_Bulb.png" , 20 , 99 );
+// ItemManager命名空间实现
+namespace ItemManager {
+    void InitializeItems() {
+        if (!initialized) {
+            ItemFlyweightFactory::getInstance().preloadAllItems();
+            initialized = true;
+        }
+    }
+    
+    std::shared_ptr<Item> GetItem(const std::string& itemName) {
+        InitializeItems();
+        return ItemFlyweightFactory::getInstance().getFlyweight(itemName);
+    }
+    
+    template<typename T>
+    std::shared_ptr<T> GetTypedItem(const std::string& itemName) {
+        auto item = GetItem(itemName);
+        return std::static_pointer_cast<T>(item);
+    }
+    
+    std::vector<std::shared_ptr<Item>> GetAnimalItems() {
+        InitializeItems();
+        auto flyweights = ItemFlyweightFactory::getInstance().getItemsByCategory(ItemCategory::ANIMAL);
+        std::vector<std::shared_ptr<Item>> result;
+        for (auto& fw : flyweights) {
+            result.push_back(std::static_pointer_cast<Item>(fw));
+        }
+        return result;
+    }
+    
+    std::vector<std::shared_ptr<Item>> GetSeedItems() {
+        InitializeItems();
+        auto result = GetAnimalItems(); // 复用逻辑
+        result.clear();
+        
+        auto spring = ItemFlyweightFactory::getInstance().getItemsByCategory(ItemCategory::SPRING_SEED);
+        auto summer = ItemFlyweightFactory::getInstance().getItemsByCategory(ItemCategory::SUMMER_SEED);
+        auto winter = ItemFlyweightFactory::getInstance().getItemsByCategory(ItemCategory::WINTER_SEED);
+        
+        for (auto& fw : spring) result.push_back(std::static_pointer_cast<Item>(fw));
+        for (auto& fw : summer) result.push_back(std::static_pointer_cast<Item>(fw));
+        for (auto& fw : winter) result.push_back(std::static_pointer_cast<Item>(fw));
+        
+        return result;
+    }
+    
+    std::vector<std::shared_ptr<Item>> GetToolItems() {
+        InitializeItems();
+        auto flyweights = ItemFlyweightFactory::getInstance().getItemsByCategory(ItemCategory::TOOL);
+        std::vector<std::shared_ptr<Item>> result;
+        for (auto& fw : flyweights) {
+            result.push_back(std::static_pointer_cast<Item>(fw));
+        }
+        return result;
+    }
+    
+    std::vector<std::shared_ptr<Item>> GetGemItems() {
+        InitializeItems();
+        auto flyweights = ItemFlyweightFactory::getInstance().getItemsByCategory(ItemCategory::GEM);
+        std::vector<std::shared_ptr<Item>> result;
+        for (auto& fw : flyweights) {
+            result.push_back(std::static_pointer_cast<Item>(fw));
+        }
+        return result;
+    }
+}
 
-// 夏季种子物品列表  
-Item Amaranth_Seeds ( "Amaranth_Seeds" , "Item/Surpermarket/Summer/Amaranth_Seeds.png" , 70 , 99 );
-Item Artichoke_Seeds ( "Artichoke_Seeds" , "Item/Surpermarket/Summer/Artichoke_Seeds.png" , 30 , 99 );
-Item Beet_Seeds ( "Beet_Seeds" , "Item/Surpermarket/Summer/Beet_Seeds.png" , 100 , 99 );
-Item Blueberry_Seeds ( "Blueberry_Seeds" , "Item/Surpermarket/Summer/Blueberry_Seeds.png" , 80 , 99 );
-Item Bok_Choy_Seeds ( "Bok_Choy_Seeds" , "Item/Surpermarket/Summer/Bok_Choy_Seeds.png" , 50 , 99 );
-Item Broccoli_Seeds ( "Broccoli_Seeds" , "Item/Surpermarket/Summer/Broccoli_Seeds.png" , 80 , 99 );
-Item Corn_Seeds ( "Corn_Seeds" , "Item/Surpermarket/Summer/Corn_Seeds.png" , 100 , 99 );
-Item Cranberry_Seeds ( "Cranberry_Seeds" , "Item/Surpermarket/Summer/Cranberry_Seeds.png" , 240 , 99 );
-Item Eggplant_Seeds ( "Eggplant_Seeds" , "Item/Surpermarket/Summer/Eggplant_Seeds.png" , 20 , 99 );
-Item Fairy_Seeds ( "Fairy_Seeds" , "Item/Surpermarket/Summer/Fairy_Seeds.png" , 100 , 99 );
-Item Grape_Starter ( "Grape_Starter" , "Item/Surpermarket/Summer/Grape_Starter.png" , 60 , 99 );
-Item Hops_Starter ( "Hops_Starter" , "Item/Surpermarket/Summer/Hops_Starter.png" , 100 , 99 );
-Item Melon_Seeds ( "Melon_Seeds" , "Item/Surpermarket/Summer/Melon_Seeds.png" , 80 , 99 );
-Item Pepper_Seeds ( "Pepper_Seeds" , "Item/Surpermarket/Summer/Pepper_Seeds.png" , 40 , 99 );
-Item Poppy_Seeds ( "Poppy_Seeds" , "Item/Surpermarket/Summer/Poppy_Seeds.png" , 100 , 99 );
-Item Pumpkin_Seeds ( "Pumpkin_Seeds" , "Item/Surpermarket/Summer/Pumpkin_Seeds.png" , 100 , 99 );
-Item Radish_Seeds ( "Radish_Seeds" , "Item/Surpermarket/Summer/Radish_Seeds.png" , 40 , 99 );
-Item Red_Cabbage_Seeds ( "Red_Cabbage_Seeds" , "Item/Surpermarket/Summer/Red_Cabbage_Seeds.png" , 100 , 99 );
-Item Spangle_Seeds ( "Spangle_Seeds" , "Item/Surpermarket/Summer/Spangle_Seeds.png" , 100 , 99 );
-Item Starfruit_Seeds ( "Starfruit_Seeds" , "Item/Surpermarket/Summer/Starfruit_Seeds.png" , 400 , 99 );
-Item Summer_Squash_Seeds ( "Summer_Squash_Seeds" , "Item/Surpermarket/Summer/Summer_Squash_Seeds.png" , 50 , 99 );
-Item Sunflower_Seeds ( "Sunflower_Seeds" , "Item/Surpermarket/Summer/Sunflower_Seeds.png" , 200 , 99 );
-Item Tomato_Seeds ( "Tomato_Seeds" , "Item/Surpermarket/Summer/Tomato_Seeds.png" , 50 , 99 );
-Item Wheat_Seeds ( "Wheat_Seeds" , "Item/Surpermarket/Summer/Wheat_Seeds.png" , 100 , 99 );
-Item Yam_Seeds ( "Yam_Seeds" , "Item/Surpermarket/Summer/Yam_Seeds.png" , 60 , 99 );
+// 向后兼容的全局访问函数 - 动物类
 
-// 冬季种子物品列表  
-Item Powdermelon_Seeds ( "Powdermelon_Seeds" , "Item/Surpermarket/Summer/Powdermelon_Seeds.png" , 1 , 99 ); // 请注意，游戏中没有冬季种子这个物品  
+std::shared_ptr<Item> GetAnimalChicken() { return ItemManager::GetItem("AnimalChicken"); }
+std::shared_ptr<Item> GetAnimalDuck() { return ItemManager::GetItem("AnimalDuck"); }
+std::shared_ptr<Item> GetAnimalGoat() { return ItemManager::GetItem("AnimalGoat"); }
+std::shared_ptr<Item> GetAnimalPig() { return ItemManager::GetItem("AnimalPig"); }
+std::shared_ptr<Item> GetAnimalRabbit() { return ItemManager::GetItem("AnimalRabbit"); }
+std::shared_ptr<Item> GetAnimalSheep() { return ItemManager::GetItem("AnimalSheep"); }
+std::shared_ptr<Item> GetAnimalCow() { return ItemManager::GetItem("AnimalCow"); }
 
-// 工具列表  
-Item Backpack_36 ( "36_Backpack" , "Item/Surpermarket/Tools/36_Backpack.png" , 2000 , 99 );
-Item Backpack ( "Backpack" , "Item/Surpermarket/Tools/Backpack.png" , 2000 , 99 );
-Item Advanced_Iridium_Rod ( "Advanced_Iridium_Rod" , "Item/Surpermarket/Tools/Advanced_Iridium_Rod.png" , 2000 , 99 );
-Item Axe ( "Axe" , "Item/Surpermarket/Tools/Axe.png" , 200 , 99 );
-Item Bamboo_Pole ( "Bamboo_Pole" , "Item/Surpermarket/Tools/Bamboo_Pole.png" , 200 , 99 );
-Item Copper_Axe ( "Copper_Axe" , "Item/Surpermarket/Tools/Copper_Axe.png" , 900 , 99 );
-Item Copper_Hoe ( "Copper_Hoe" , "Item/Surpermarket/Tools/Copper_Hoe.png" , 900 , 99 );
-Item Copper_Pan ( "Copper_Pan" , "Item/Surpermarket/Tools/Copper_Pan.png" , 200 , 99 );
-Item Copper_Pickaxe ( "Copper_Pickaxe" , "Item/Surpermarket/Tools/Copper_Pickaxe.png" , 900 , 99 );
-Item Copper_Watering ( "Copper_Watering" , "Item/Surpermarket/Tools/Copper_Watering.png" , 900 , 99 );
-Item Fiberglass_Rod ( "Fiberglass_Rod" , "Item/Surpermarket/Tools/Fiberglass_Rod.png" , 1800 , 99 );
-Item Gold_Axe ( "Gold_Axe" , "Item/Surpermarket/Tools/Gold_Axe.png" , 4000 , 99 );
-Item Gold_Hoe ( "Gold_Hoe" , "Item/Surpermarket/Tools/Gold_Hoe.png" , 4000 , 99 );
-Item Gold_Pan ( "Gold_Pan" , "Item/Surpermarket/Tools/Gold_Pan.png" , 2000 , 99 );
-Item Gold_Pickaxe ( "Gold_Pickaxe" , "Item/Surpermarket/Tools/Gold_Pickaxe.png" , 4000 , 99 );
-Item Gold_Watering_Can ( "Gold_Watering_Can" , "Item/Surpermarket/Tools/Gold_Watering_Can.png" , 4000 , 99 );
-Item Golden_Scythe ( "Golden_Scythe" , "Item/Surpermarket/Tools/Golden_Scythe.png" , 1000 , 99 );
-Item Hoe ( "Hoe" , "Item/Surpermarket/Tools/Hoe.png" , 200 , 99 );
-Item Pickaxe ( "Pickaxe" , "Item/Surpermarket/Tools/Pickaxe.png" , 200 , 99 );
-Item Milk_Pail ( "Milk_Pail" , "Item/Surpermarket/Tools/Milk_Pail.png" , 200 , 99 );
-Item Scythe ( "Scythe" , "Item/Surpermarket/Tools/Scythe.png" , 200 , 99 );
-Item Steel_Axe ( "Steel_Axe" , "Item/Surpermarket/Tools/Steel_Axe.png" , 2000 , 99 );
-Item Steel_Hoe ( "Steel_Hoe" , "Item/Surpermarket/Tools/Steel_Hoe.png" , 2000 , 99 );
-Item Steel_Pan ( "Steel_Pan" , "Item/Surpermarket/Tools/Steel_Pan.png" , 2000 , 99 );
-Item Steel_Pickaxe ( "Steel_Pickaxe" , "Item/Surpermarket/Tools/Steel_Pickaxe.png" , 2000 , 99 );
-Item Steel_Watering ( "Steel_Watering" , "Item/Surpermarket/Tools/Steel_Watering.png" , 2000 , 99 );
-Item Trash_Can_Copper ( "Trash_Can_Copper" , "Item/Surpermarket/Tools/Trash_Can_Copper.png" , 250 , 99 );
-Item Watering_Can ( "Watering_Can" , "Item/Surpermarket/Tools/Watering_Can.png" , 200 , 99 );
-Item Trash_Can_Steel ( "Trash_Can_Steel" , "Item/Surpermarket/Tools/Trash_Can_Steel.png" , 500 , 99 );
+// 春季种子getter函数
+std::shared_ptr<Item> GetBeanStarter() { return ItemManager::GetItem("Bean_Starter"); }
+std::shared_ptr<Item> GetCarrotSeeds() { return ItemManager::GetItem("Carrot_Seeds"); }
+std::shared_ptr<Item> GetCauliflowerSeeds() { return ItemManager::GetItem("Cauliflower_Seeds"); }
+std::shared_ptr<Item> GetCoffeeBean() { return ItemManager::GetItem("Coffee_Bean"); }
+std::shared_ptr<Item> GetGarlicSeeds() { return ItemManager::GetItem("Garlic_Seeds"); }
+std::shared_ptr<Item> GetJazzSeeds() { return ItemManager::GetItem("Jazz_Seeds"); }
+std::shared_ptr<Item> GetKaleSeeds() { return ItemManager::GetItem("Kale_Seeds"); }
+std::shared_ptr<Item> GetParsnipSeeds() { return ItemManager::GetItem("Parsnip_Seeds"); }
+std::shared_ptr<Item> GetPotatoSeeds() { return ItemManager::GetItem("Potato_Seeds"); }
+std::shared_ptr<Item> GetRhubarbSeeds() { return ItemManager::GetItem("Rhubarb_Seeds"); }
+std::shared_ptr<Item> GetRiceShoot() { return ItemManager::GetItem("Rice_Shoot"); }
+std::shared_ptr<Item> GetStrawberrySeeds() { return ItemManager::GetItem("Strawberry_Seeds"); }
+std::shared_ptr<Item> GetTulipBulb() { return ItemManager::GetItem("Tulip_Bulb"); }
 
-// 树苗列表  
-Item Apple_Sapling ( "Apple_Sapling" , "Item/Surpermarket/Tree/Apple_Sapling.png" , 1000 , 99 );
-Item Apricot_Sapling ( "Apricot_Sapling" , "Item/Surpermarket/Tree/Apricot_Sapling.png" , 2000 , 99 );
-Item Banana_Sapling ( "Banana_Sapling" , "Item/Surpermarket/Tree/Banana_Sapling.png" , 2000 , 99 );
-Item Cherry_Sapling ( "Cherry_Sapling" , "Item/Surpermarket/Tree/Cherry_Sapling.png" , 3000 , 99 );
-Item Mango_Sapling ( "Mango_Sapling" , "Item/Surpermarket/Tree/Mango_Sapling.png" , 2000 , 99 );
-Item Orange_Sapling ( "Orange_Sapling" , "Item/Surpermarket/Tree/Orange_Sapling.png" , 2000 , 99 );
-Item Peach_Sapling ( "Peach_Sapling" , "Item/Surpermarket/Tree/Peach_Sapling.png" , 3000 , 99 );
-Item Pomegranate_Sapling ( "Pomegranate_Sapling" , "Item/Surpermarket/Tree/Pomegranate_Sapling.png" , 3000 , 99 );
+// 夏季种子getter函数
+std::shared_ptr<Item> GetAmaranthSeeds() { return ItemManager::GetItem("Amaranth_Seeds"); }
+std::shared_ptr<Item> GetArtichokeSeeds() { return ItemManager::GetItem("Artichoke_Seeds"); }
+std::shared_ptr<Item> GetBeetSeeds() { return ItemManager::GetItem("Beet_Seeds"); }
+std::shared_ptr<Item> GetBlueberrySeeds() { return ItemManager::GetItem("Blueberry_Seeds"); }
+std::shared_ptr<Item> GetBokChoySeeds() { return ItemManager::GetItem("Bok_Choy_Seeds"); }
+std::shared_ptr<Item> GetBroccoliSeeds() { return ItemManager::GetItem("Broccoli_Seeds"); }
+std::shared_ptr<Item> GetCornSeeds() { return ItemManager::GetItem("Corn_Seeds"); }
+std::shared_ptr<Item> GetCranberrySeeds() { return ItemManager::GetItem("Cranberry_Seeds"); }
+std::shared_ptr<Item> GetEggplantSeeds() { return ItemManager::GetItem("Eggplant_Seeds"); }
+std::shared_ptr<Item> GetFairySeeds() { return ItemManager::GetItem("Fairy_Seeds"); }
+std::shared_ptr<Item> GetGrapeStarter() { return ItemManager::GetItem("Grape_Starter"); }
+std::shared_ptr<Item> GetHopsStarter() { return ItemManager::GetItem("Hops_Starter"); }
+std::shared_ptr<Item> GetMelonSeeds() { return ItemManager::GetItem("Melon_Seeds"); }
+std::shared_ptr<Item> GetPepperSeeds() { return ItemManager::GetItem("Pepper_Seeds"); }
+std::shared_ptr<Item> GetPoppySeeds() { return ItemManager::GetItem("Poppy_Seeds"); }
+std::shared_ptr<Item> GetPumpkinSeeds() { return ItemManager::GetItem("Pumpkin_Seeds"); }
+std::shared_ptr<Item> GetRadishSeeds() { return ItemManager::GetItem("Radish_Seeds"); }
+std::shared_ptr<Item> GetRedCabbageSeeds() { return ItemManager::GetItem("Red_Cabbage_Seeds"); }
+std::shared_ptr<Item> GetSpangleSeeds() { return ItemManager::GetItem("Spangle_Seeds"); }
+std::shared_ptr<Item> GetStarfruitSeeds() { return ItemManager::GetItem("Starfruit_Seeds"); }
+std::shared_ptr<Item> GetSummerSquashSeeds() { return ItemManager::GetItem("Summer_Squash_Seeds"); }
+std::shared_ptr<Item> GetSunflowerSeeds() { return ItemManager::GetItem("Sunflower_Seeds"); }
+std::shared_ptr<Item> GetTomatoSeeds() { return ItemManager::GetItem("Tomato_Seeds"); }
+std::shared_ptr<Item> GetWheatSeeds() { return ItemManager::GetItem("Wheat_Seeds"); }
+std::shared_ptr<Item> GetYamSeeds() { return ItemManager::GetItem("Yam_Seeds"); }
 
-// 宝石
-Item amethyst("Amethyst", "Ore/Amethyst3.png", 1000, 99);
-Item emerald("Emerald", "Ore/Emerald3.png", 1000, 99);
-Item ruby("Ruby", "Ore/Ruby3.png", 1000, 99);
+// 冬季种子getter函数
+std::shared_ptr<Item> GetPowdermelonSeeds() { return ItemManager::GetItem("Powdermelon_Seeds"); }  
 
-// 成熟作物
-Item Wheat("wheat", "crop/wheat4.png", 1000, 99);
-Item Corn("corn", "crop/corn4.png", 1000, 99);
-Item Potato("potato", "crop/Potato4.png", 1000, 99);
-Item Pumpkin("pumpkin", "crop/Pumpkin4.png", 1000, 99);
-Item Blueberry("blueberry", "crop/blueberry4.png", 1000, 99);
-Item Wood("wood", "tree/wood.png", 1000, 99);
+// 工具类getter函数
+std::shared_ptr<Item> GetBackpack36() { return ItemManager::GetItem("Backpack_36"); }
+std::shared_ptr<Item> GetBackpack() { return ItemManager::GetItem("Backpack"); }
+std::shared_ptr<Item> GetAdvancedIridiumRod() { return ItemManager::GetItem("Advanced_Iridium_Rod"); }
+std::shared_ptr<Item> GetAxe() { return ItemManager::GetItem("Axe"); }
+std::shared_ptr<Item> GetBambooPole() { return ItemManager::GetItem("Bamboo_Pole"); }
+std::shared_ptr<Item> GetCopperAxe() { return ItemManager::GetItem("Copper_Axe"); }
+std::shared_ptr<Item> GetCopperHoe() { return ItemManager::GetItem("Copper_Hoe"); }
+std::shared_ptr<Item> GetCopperPan() { return ItemManager::GetItem("Copper_Pan"); }
+std::shared_ptr<Item> GetCopperPickaxe() { return ItemManager::GetItem("Copper_Pickaxe"); }
+std::shared_ptr<Item> GetCopperWatering() { return ItemManager::GetItem("Copper_Watering"); }
+std::shared_ptr<Item> GetFiberglassRod() { return ItemManager::GetItem("Fiberglass_Rod"); }
+std::shared_ptr<Item> GetGoldAxe() { return ItemManager::GetItem("Gold_Axe"); }
+std::shared_ptr<Item> GetGoldHoe() { return ItemManager::GetItem("Gold_Hoe"); }
+std::shared_ptr<Item> GetGoldPan() { return ItemManager::GetItem("Gold_Pan"); }
+std::shared_ptr<Item> GetGoldPickaxe() { return ItemManager::GetItem("Gold_Pickaxe"); }
+std::shared_ptr<Item> GetGoldWateringCan() { return ItemManager::GetItem("Gold_Watering_Can"); }
+std::shared_ptr<Item> GetGoldenScythe() { return ItemManager::GetItem("Golden_Scythe"); }
+std::shared_ptr<Item> GetHoe() { return ItemManager::GetItem("Hoe"); }
+std::shared_ptr<Item> GetPickaxe() { return ItemManager::GetItem("Pickaxe"); }
+std::shared_ptr<Item> GetMilkPail() { return ItemManager::GetItem("Milk_Pail"); }
+std::shared_ptr<Item> GetScythe() { return ItemManager::GetItem("Scythe"); }
+std::shared_ptr<Item> GetSteelAxe() { return ItemManager::GetItem("Steel_Axe"); }
+std::shared_ptr<Item> GetSteelHoe() { return ItemManager::GetItem("Steel_Hoe"); }
+std::shared_ptr<Item> GetSteelPan() { return ItemManager::GetItem("Steel_Pan"); }
+std::shared_ptr<Item> GetSteelPickaxe() { return ItemManager::GetItem("Steel_Pickaxe"); }
+std::shared_ptr<Item> GetSteelWatering() { return ItemManager::GetItem("Steel_Watering"); }
+std::shared_ptr<Item> GetTrashCanCopper() { return ItemManager::GetItem("Trash_Can_Copper"); }
+std::shared_ptr<Item> GetWateringCan() { return ItemManager::GetItem("Watering_Can"); }
+std::shared_ptr<Item> GetTrashCanSteel() { return ItemManager::GetItem("Trash_Can_Steel"); }
 
+// 树苗类getter函数
+std::shared_ptr<Item> GetAppleSapling() { return ItemManager::GetItem("Apple_Sapling"); }
+std::shared_ptr<Item> GetApricotSapling() { return ItemManager::GetItem("Apricot_Sapling"); }
+std::shared_ptr<Item> GetBananaSapling() { return ItemManager::GetItem("Banana_Sapling"); }
+std::shared_ptr<Item> GetCherrySapling() { return ItemManager::GetItem("Cherry_Sapling"); }
+std::shared_ptr<Item> GetMangoSapling() { return ItemManager::GetItem("Mango_Sapling"); }
+std::shared_ptr<Item> GetOrangeSapling() { return ItemManager::GetItem("Orange_Sapling"); }
+std::shared_ptr<Item> GetPeachSapling() { return ItemManager::GetItem("Peach_Sapling"); }
+std::shared_ptr<Item> GetPomegranateSapling() { return ItemManager::GetItem("Pomegranate_Sapling"); }
 
-Item GoldMask("GoldMask","Item/Object/goldmask.png",10000,99);
-Item RainBow("RainBow","Item/Object/rainbow.png",10000,99);
+// 宝石类getter函数
+std::shared_ptr<Item> GetAmethyst() { return ItemManager::GetItem("Amethyst"); }
+std::shared_ptr<Item> GetEmerald() { return ItemManager::GetItem("Emerald"); }
+std::shared_ptr<Item> GetRuby() { return ItemManager::GetItem("Ruby"); }
+
+// 成熟作物getter函数
+std::shared_ptr<Item> GetWheat() { return ItemManager::GetItem("wheat"); }
+std::shared_ptr<Item> GetCorn() { return ItemManager::GetItem("corn"); }
+std::shared_ptr<Item> GetPotato() { return ItemManager::GetItem("potato"); }
+std::shared_ptr<Item> GetPumpkin() { return ItemManager::GetItem("pumpkin"); }
+std::shared_ptr<Item> GetBlueberry() { return ItemManager::GetItem("blueberry"); }
+std::shared_ptr<Item> GetWood() { return ItemManager::GetItem("wood"); }
+
+// 特殊物品getter函数
+std::shared_ptr<Item> GetGoldMask() { return ItemManager::GetItem("GoldMask"); }
+std::shared_ptr<Item> GetRainBow() { return ItemManager::GetItem("RainBow"); }
 
 

@@ -7,6 +7,7 @@
 #include "../Commands/SceneInteractionCommand.h"
 #include "../Commands/UICommand.h"
 #include "../Commands/GameActionCommand.h"
+#include "../Items/Generaltem.h"  // 引入flyweight物品系统
 
 
 USING_NS_CC;
@@ -19,8 +20,8 @@ Beach::~Beach () {
 
 bool Beach::init ()
 {
-    inventory->AddItem ( Fiberglass_Rod );
-    inventory->AddItem ( Fiberglass_Rod );
+    inventory->AddItem ( *GetFiberglassRod() );
+    inventory->AddItem ( *GetFiberglassRod() );
 
     AudioEngine::pauseAll ();
     auto backgroundAudioID = AudioEngine::play2d ( "MUSIC/Mayten.mp3" , true );
