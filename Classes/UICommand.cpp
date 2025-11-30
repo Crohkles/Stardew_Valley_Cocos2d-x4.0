@@ -121,19 +121,21 @@ void ConsumeFoodCommand::execute() {
         CCLOG("EAT FOOD!");
         
         // 恢复体力
-        strength = std::min<int>(100, strength + selected_item->GetEnergy());
+        extern int strength; // 引用全局变量
+        strength = std::min(100, strength + selected_item->GetEnergy());
         
         // 从背包中移除食物
-        // 需要获取背包实例来移除物品
-        // 这里需要通过mini_bag访问其内部的inventory
-        // 由于原代码中有直接访问inventory的逻辑，我们暂时保持这种方式
-        // 在后续重构中可以进一步优化
+        Inventory* inventory = miniBag->getInventory();
+        if (inventory) {
+            inventory->RemoveItem(*selected_item);
+            inventory->DisplayPackageInCCLOG();
+        }
         
         // 更新体力UI显示
-        EnergySystem::getInstance()->setEnergy(strength);
-        
-        // 注意：这里需要访问mini_bag的私有成员inventory来移除物品
-        // 实际实现需要在mini_bag类中添加相应的公共方法
+        extern Timesystem* TimeUI; // 引用全局TimeUI
+        if (TimeUI) {
+            TimeUI->UpdateEnergy();
+        }
     }
 }
 

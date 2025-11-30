@@ -99,6 +99,17 @@ void InputManager::bindCommand(EventKeyboard::KeyCode key, std::shared_ptr<KeyCo
     bindPressCommand(key, command);
 }
 
+void InputManager::unbindPressCommand(EventKeyboard::KeyCode key) {
+    auto it = keyPressCommands.find(key);
+    if (it != keyPressCommands.end()) {
+        keyPressCommands.erase(it);
+        
+        if (loggingEnabled) {
+            CCLOG("InputManager: Unbound all press commands for key %d", static_cast<int>(key));
+        }
+    }
+}
+
 void InputManager::unbindCommand(EventKeyboard::KeyCode key, std::shared_ptr<KeyCommand> command) {
     // 从按键按下命令中移除
     auto itPress = keyPressCommands.find(key);

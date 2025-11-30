@@ -90,6 +90,13 @@ public:
     void bindReleaseCommand(EventKeyboard::KeyCode key, std::shared_ptr<KeyCommand> command);
     
     /**
+     * @brief 解绑按键按下时的命令
+     * 
+     * @param key 键盘按键
+     */
+    void unbindPressCommand(EventKeyboard::KeyCode key);
+    
+    /**
      * @brief 绑定按键到命令（兼容旧接口，默认为按下事件）
      * 
      * @param key 键盘按键

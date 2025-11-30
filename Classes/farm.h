@@ -73,6 +73,11 @@ public:
 
     // 恢复种植
     void AllInitialize_crop ();
+    
+    // Command Pattern相关的公共方法
+    void performPlantAction();
+    void performWaterAction();
+    void performHarvestAction();
 
 private:
 

@@ -706,6 +706,226 @@ void farm::cleanupInputCommands() {
     boundCommands.clear();
 }
 
+void farm::performPlantAction() {
+    Vec2 playerPos = player1->getPosition();
+    
+    // 检查是否在种植区域内
+    if (!plant_area.containsPoint(playerPos)) {
+        return;
+    }
+    
+    int nums = getRegionNumber(Vec2(playerPos.x + 10, playerPos.y - 10));
+    bool Isplant = false;
+    
+    CCLOG("plant nums = %d", nums);
+    
+    // 检查该位置是否已经种植了作物
+    for (auto it = Crop_information.begin(); it != Crop_information.end(); ++it) {
+        if ((*it)->nums == nums) {
+            Isplant = true;
+            break;
+        }
+    }
+    
+    if (Isplant == false) {
+        auto temp = miniBag->getSelectedItem();
+        if (temp != nullptr) {
+            CCLOG("copy item");
+            std::string TypeName = temp->GetName();
+            auto point = cropbasicinformation.find(TypeName);
+            if (point != cropbasicinformation.end()) {
+                CCLOG("find crop");
+                // 判断是否符合种植的季节
+                if (((cropbasicinformation[TypeName].GetSeason() == Season) || (cropbasicinformation[TypeName].GetSeason() == "All")) && strength >= 10) {
+                    inventory->RemoveItem(*temp);
+
+                    if (nums == 13 && RainBowfirst) {
+                        inventory->AddItem(RainBow);
+                        RainBowfirst = false;
+                    }
+
+                    strength -= 10;
+                    TimeUI->UpdateEnergy();
+
+                    Crop_information.push_back(cropbasicinformation[TypeName].GetCropCopy());
+                    Crop_information.back()->plant_day = season[Season] * 7 + day;
+                    Crop_information.back()->nums = nums;
+
+                    if (player1->pic_path == "character1/player_right3.png") {
+                        // 初始设置：设置第一个图片并放大
+                        player1->setTexture("character1/player_plant3.png");
+                        player1->setScale(2.5f);
+
+                        // 延迟0.3秒后切换到第二个图片
+                        player1->scheduleOnce([=](float dt) {
+                            player1->setTexture("character1/player_plant4.png");  // 更换为player_plant2
+                            player1->setScale(2.7f);
+                        }, 0.15f, "change_image1_key");
+
+                        // 延迟0.6秒后切换到第三个图片
+                        player1->scheduleOnce([=](float dt) {
+                            player1->setTexture("character1/player_right3.png"); // 更换为player_left3
+                            player1->setScale(1.5f);
+                            auto temp = Sprite::create(Crop_information.back()->initial_pic);
+                            this->addChild(temp, 15 - nums / 19);
+                            temp->setPosition(500 + ((nums % 19) - 1) * 48, 910 - ((nums / 19) - 1) * 48);
+                            temp->setScale(2.1f);
+                        }, 0.35f, "change_image2_key");
+                    }
+                    else {
+                        // 初始设置：设置第一个图片并放大
+                        player1->setTexture("character1/player_plant1.png");
+                        player1->setScale(2.5f);
+
+                        // 延迟0.3秒后切换到第二个图片
+                        player1->scheduleOnce([=](float dt) {
+                            player1->setTexture("character1/player_plant2.png");  // 更换为player_plant2
+                            player1->setScale(2.7f);
+                        }, 0.15f, "change_image1_key");
+
+                        // 延迟0.6秒后切换到第三个图片
+                        player1->scheduleOnce([=](float dt) {
+                            player1->setTexture("character1/player_left3.png"); // 更换为player_left3
+                            player1->setScale(1.5f);
+                            auto temp = Sprite::create(Crop_information.back()->initial_pic);
+                            this->addChild(temp, 15 - nums / 19);
+                            temp->setPosition(500 + ((nums % 19) - 1) * 48, 910 - ((nums / 19) - 1) * 48);
+                            temp->setScale(2.1f);
+                        }, 0.35f, "change_image2_key");
+                    }
+                }
+            }
+        }
+    }
+}
+
+void farm::performWaterAction() {
+    Vec2 playerPos = player1->getPosition();
+    
+    // 检查是否在种植区域内
+    if (!plant_area.containsPoint(playerPos)) {
+        return;
+    }
+    
+    int nums = getRegionNumber(Vec2(playerPos.x + 30, playerPos.y - 10));
+
+    for (auto it : Crop_information) {
+        if (it->nums == nums) {
+            // 改为已浇水
+            it->watered = true;
+
+            if (player1->pic_path == "character1/player_left3.png") {
+                // 初始设置：设置第一个图片并放大
+                player1->setTexture("character1/player_water4.png");
+                player1->setScale(1.7f);
+
+                // 延迟0.3秒后切换到第二个图片
+                player1->scheduleOnce([=](float dt) {
+                    player1->setTexture("character1/player_water3.png");  // 更换为player_water1
+                    player1->setScale(1.7f);
+                }, 0.15f, "change_image1_key");
+
+                // 延迟0.6秒后切换到第三个图片
+                player1->scheduleOnce([=](float dt) {
+                    player1->setTexture("character1/player_left3.png"); // 更换为player_right3
+                    player1->setScale(1.5f);
+                    // 恢复角色其他的动作权限
+                    player1->moveDown = true;
+                    player1->moveLeft = true;
+                    player1->moveUp = true;
+                    player1->moveRight = true;
+                }, 0.35f, "change_image2_key");
+            }
+            else {
+                // 初始设置：设置第一个图片并放大
+                player1->setTexture("character1/player_water2.png");
+                player1->setScale(1.7f);
+
+                // 延迟0.3秒后切换到第二个图片
+                player1->scheduleOnce([=](float dt) {
+                    player1->setTexture("character1/player_water1.png");  // 更换为player_water1
+                    player1->setScale(1.7f);
+                }, 0.15f, "change_image1_key");
+
+                // 延迟0.6秒后切换到第三个图片
+                player1->scheduleOnce([=](float dt) {
+                    player1->setTexture("character1/player_right3.png"); // 更换为player_right3
+                    player1->setScale(1.5f);
+                    // 恢复角色其他的动作权限
+                    player1->moveDown = true;
+                    player1->moveLeft = true;
+                    player1->moveUp = true;
+                    player1->moveRight = true;
+                }, 0.35f, "change_image2_key");
+            }
+            break; // 找到匹配的作物后退出循环
+        }
+    }
+}
+
+void farm::performHarvestAction() {
+    Vec2 playerPos = player1->getPosition();
+    
+    // 检查是否在种植区域内
+    if (!plant_area.containsPoint(playerPos)) {
+        return;
+    }
+    
+    int nums = getRegionNumber(Vec2(playerPos.x + 10, playerPos.y - 10));
+
+    for (auto it = Crop_information.begin(); it != Crop_information.end(); /* no increment here */) {
+        if ((*it)->nums == nums) {
+            if ((*it)->GetPhase() == Phase::MATURE && strength >= 10) {
+
+                skill_tree->AddExperience(farming_skill, 10);
+
+                auto find_temp = (*it);
+
+                if (find_temp->GetName() == "potato") {
+                    inventory->AddItem(potato);
+                }
+
+                strength -= 10;
+                TimeUI->UpdateEnergy();
+
+                // 覆盖精灵
+                auto test = Sprite::create("farm/tile.png");
+                this->addChild(test, 15 - nums / 19);
+                test->setPosition(495 + ((nums % 19) - 1) * 48, 910 - ((nums / 19) - 1) * 48);
+                test->setScaleX(2.5f);
+                test->setScaleY(1.9f);
+
+                // 删除元素并更新迭代器
+                it = Crop_information.erase(it);  // erase 返回新的迭代器 
+
+                // 初始设置：设置第一个图片并放大
+                player1->setTexture("character1/player_plant1.png");
+                player1->setScale(2.5f);
+
+                // 延迟0.3秒后切换到第二个图片
+                player1->scheduleOnce([=](float dt) {
+                    player1->setTexture("character1/player_plant2.png");  // 更换为player_plant2
+                    player1->setScale(2.7f);
+                }, 0.15f, "change_image1_key");
+
+                // 延迟0.6秒后切换到第三个图片
+                player1->scheduleOnce([=](float dt) {
+                    player1->setTexture("character1/player_left3.png"); // 更换为player_left3
+                    player1->setScale(1.5f);
+                }, 0.35f, "change_image2_key");
+                
+                return; // 成功收获后退出
+            }
+            else {
+                return; // 作物未成熟或体力不足
+            }
+        }
+        else {
+            ++it;  // 继续遍历下一个元素
+        }
+    }
+}
+
 
 
 
