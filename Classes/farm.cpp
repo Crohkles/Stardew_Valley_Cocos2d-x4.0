@@ -11,12 +11,25 @@
 #include "ui/CocosGUI.h"
 #include "vector"
 #include "mailBoxUI.h"
+#include "InputManager.h"
+#include "SceneInteractionCommand.h"
+#include "UICommand.h"
+#include "Myhouse.h"
+#include "Barn.h"
+#include "Cave.h"
+#include "Forest.h"
+#include "HelloWorldScene.h"
+#include "Town.h"
+#include "Beach.h"
+#include "Forest.h"
 
 USING_NS_CC;
 
 farm::farm () {}
 
-farm::~farm () {}
+farm::~farm () {
+    cleanupInputCommands();
+}
 
 bool farm::init ()
 {
@@ -96,6 +109,10 @@ bool farm::init ()
     // 初始化角色并将其添加到场景
     if (player1->getParent () == NULL) {
         this->addChild ( player1 , 17 );
+        // 在添加到场景后设置输入绑定
+        player1->setupInputBindings();
+        // 设置碰撞上下文
+        player1->setCollisionContext(nonTransparentPixels);
         for (auto& pair : F_lastplace) {
             if (pair.second == true) {  // 检查 bool 值是否为 true
                 player1->setPosition ( pair.first.second );
@@ -236,63 +253,10 @@ bool farm::init ()
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , this );
 
-    // 设置键盘监听器
-    auto listenerWithPlayer = EventListenerKeyboard::create ();
-    listenerWithPlayer->onKeyPressed = [this]( EventKeyboard::KeyCode keyCode , Event* event )
-        {
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = true;
-                CCLOG ( "Enter key pressed. " );
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_P) {
-                isPKeyPressed = true;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_W) {
-                isWKeyPressed = true;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_G) {
-                isGKeyPressed = true;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE) {
-                static int isOpen = 0;
-                static InventoryUI* currentInventoryUI = nullptr;  // 保存当前显示的 InventoryUI  
-                // 如果当前没有打开 InventoryUI，则打开它  
-                if (currentInventoryUI == nullptr || isOpen == 0) {
-                    isOpen = 1;
-                    CCLOG ( "Opening inventory." );
-                    currentInventoryUI = InventoryUI::create ( inventory , "farm" );
-                    this->addChild ( currentInventoryUI , 20 );  // 将 InventoryUI 添加到上层  
-                }
-                // 如果已经打开 InventoryUI，则关闭它  
-                else {
-                    isOpen = 0;
-                    CCLOG ( "Closing inventory." );
-                    this->removeChild ( currentInventoryUI , true );  // 从当前场景中移除 InventoryUI  
-                    currentInventoryUI = nullptr;  // 重置指针  
-                }
-            }
-
-        };
-
-    listenerWithPlayer->onKeyReleased = [this]( EventKeyboard::KeyCode keyCode , Event* event )
-        {
-            // 释放 Enter 键时，设置为 false
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = false;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_P) {
-                isPKeyPressed = false;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_W) {
-                isWKeyPressed = false;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_G) {
-                isGKeyPressed = false;
-            }
-        };
-
-    // 将监听器添加到事件分发器中
-    _eventDispatcher->addEventListenerWithSceneGraphPriority ( listenerWithPlayer , this );
+    // 旧的键盘监听器已替换为Command Pattern
+    
+    // 设置Command Pattern输入绑定
+    setupInputCommands();
 
     //界面下的背包显示
     miniBag = mini_bag::create ( inventory );
@@ -512,341 +476,25 @@ void farm::checkPlayerPosition ()
     // 与种植有关的操作
     if (plant_area.containsPoint ( playerPos )) {
 
-        // 是否执行种植
-        if (isPKeyPressed) {
-
-            int nums = getRegionNumber ( Vec2 ( playerPos.x + 10 , playerPos.y - 10 ) );
-
-            bool Isplant = false;
-
-            cocos2d::log ( "plant nums = %d" , nums );
-
-            for (auto it = Crop_information.begin (); it != Crop_information.end (); /* no increment here */) {
-                if ((*it)->nums == nums) {  // 使用 *it 解引用迭代器
-                    Isplant = true;
-                    break;
-                }
-                else {
-                    ++it;
-                }
-            }
-
-            if (Isplant == false) {
-
-                auto temp = miniBag->getSelectedItem ();
-                if (temp != nullptr) {
-                    cocos2d::log ( "copy item" );
-                    std::string TypeName = temp->GetName ();
-                    auto point = cropbasicinformation.find ( TypeName );
-                    if (point != cropbasicinformation.end ()) {
-                        cocos2d::log ( "find crop" );
-                        // 判断是否符合种植的季节
-                        if (((cropbasicinformation[TypeName].GetSeason () == Season) || (cropbasicinformation[TypeName].GetSeason () == "All")) && strength >= 10) {
-                            inventory->RemoveItem ( *temp );
-
-                            if (nums == 13 && RainBowfirst) {
-                                inventory->AddItem(RainBow);
-                                RainBowfirst = false;
-                            }
-
-                            strength -= 10;
-                            TimeUI->UpdateEnergy ();
-
-                            Crop_information.push_back ( cropbasicinformation[TypeName].GetCropCopy () );
-                            Crop_information.back ()->plant_day = season[Season] * 7 + day;
-                            Crop_information.back ()->nums = nums;
-
-                            if (player1->pic_path == "character1/player_right3.png") {
-                                // 初始设置：设置第一个图片并放大
-                                player1->setTexture ( "character1/player_plant3.png" );
-                                player1->setScale ( 2.5f );
-
-                                // 延迟0.3秒后切换到第二个图片
-                                player1->scheduleOnce ( [=]( float dt ) {
-                                    player1->setTexture ( "character1/player_plant4.png" );  // 更换为player_plant2
-                                    player1->setScale ( 2.7f );
-                                    } , 0.15f , "change_image1_key" );
-
-                                // 延迟0.6秒后切换到第三个图片
-                                player1->scheduleOnce ( [=]( float dt ) {
-                                    player1->setTexture ( "character1/player_right3.png" ); // 更换为player_left3
-                                    player1->setScale ( 1.5f );
-                                    auto temp = Sprite::create ( Crop_information.back ()->initial_pic );
-                                    this->addChild ( temp , 15 - nums / 19 );
-                                    temp->setPosition ( 500 + ((nums % 19) - 1) * 48 , 910 - ((nums / 19) - 1) * 48 );
-                                    temp->setScale ( 2.1f );
-                                    } , 0.35f , "change_image2_key" );
-                            }
-                            else {
-                                // 初始设置：设置第一个图片并放大
-                                player1->setTexture ( "character1/player_plant1.png" );
-                                player1->setScale ( 2.5f );
-
-                                // 延迟0.3秒后切换到第二个图片
-                                player1->scheduleOnce ( [=]( float dt ) {
-                                    player1->setTexture ( "character1/player_plant2.png" );  // 更换为player_plant2
-                                    player1->setScale ( 2.7f );
-                                    } , 0.15f , "change_image1_key" );
-
-                                // 延迟0.6秒后切换到第三个图片
-                                player1->scheduleOnce ( [=]( float dt ) {
-                                    player1->setTexture ( "character1/player_left3.png" ); // 更换为player_left3
-                                    player1->setScale ( 1.5f );
-                                    auto temp = Sprite::create ( Crop_information.back ()->initial_pic );
-                                    this->addChild ( temp , 15 - nums / 19 );
-                                    temp->setPosition ( 500 + ((nums % 19) - 1) * 48 , 910 - ((nums / 19) - 1) * 48 );
-                                    temp->setScale ( 2.1f );
-                                    } , 0.35f , "change_image2_key" );
-                            }
-
-                            
-
-                        }
-                    }
-                }
-            }
-        }
-        // 是否执行浇水
-        else if (isWKeyPressed) {
-
-            int nums = getRegionNumber ( Vec2 ( playerPos.x + 30 , playerPos.y - 10 ) );
-
-            for (auto it : Crop_information) {
-                if (it->nums == nums) {
-                    // 改为已浇水
-                    it->watered = true;
-
-                    if (player1->pic_path == "character1/player_left3.png") {
-                        // 初始设置：设置第一个图片并放大
-                        player1->setTexture ( "character1/player_water4.png" );
-                        player1->setScale ( 1.7f );
-
-                        // 延迟0.3秒后切换到第二个图片
-                        player1->scheduleOnce ( [=]( float dt ) {
-                            player1->setTexture ( "character1/player_water3.png" );  // 更换为player_water1
-                            player1->setScale ( 1.7f );
-                            } , 0.15f , "change_image1_key" );
-
-                        // 延迟0.6秒后切换到第三个图片
-                        player1->scheduleOnce ( [=]( float dt ) {
-                            player1->setTexture ( "character1/player_left3.png" ); // 更换为player_right3
-                            player1->setScale ( 1.5f );
-                            // 恢复角色其他的动作权限
-                            player1->moveDown = true;
-                            player1->moveLeft = true;
-                            player1->moveUp = true;
-                            player1->moveRight = true;
-                            } , 0.35f , "change_image2_key" );
-
-                    }
-                    else {
-                        // 初始设置：设置第一个图片并放大
-                        player1->setTexture ( "character1/player_water2.png" );
-                        player1->setScale ( 1.7f );
-
-                        // 延迟0.3秒后切换到第二个图片
-                        player1->scheduleOnce ( [=]( float dt ) {
-                            player1->setTexture ( "character1/player_water1.png" );  // 更换为player_water1
-                            player1->setScale ( 1.7f );
-                            } , 0.15f , "change_image1_key" );
-
-                        // 延迟0.6秒后切换到第三个图片
-                        player1->scheduleOnce ( [=]( float dt ) {
-                            player1->setTexture ( "character1/player_right3.png" ); // 更换为player_right3
-                            player1->setScale ( 1.5f );
-                            // 恢复角色其他的动作权限
-                            player1->moveDown = true;
-                            player1->moveLeft = true;
-                            player1->moveUp = true;
-                            player1->moveRight = true;
-                            } , 0.35f , "change_image2_key" );
-                    }
-
-                }
-            }
-
-        }
-        // 是否执行收获
-        else if (isGKeyPressed) {
-
-            int nums = getRegionNumber ( Vec2 ( playerPos.x + 10 , playerPos.y - 10 ) );
-
-
-            for (auto it = Crop_information.begin (); it != Crop_information.end (); /* no increment here */) {
-                if ((*it)->nums == nums) {  // 使用 *it 解引用迭代器
-                    if ((*it)->GetPhase () == Phase::MATURE && strength >= 10) {
-
-                        skill_tree->AddExperience ( farming_skill , 10 );
-
-                        auto find_temp = (*it);
-
-                        if (find_temp->GetName () == "potato") {
-                            inventory->AddItem ( potato );
-                        }
-
-                        strength -= 10;
-                        TimeUI->UpdateEnergy ();
-
-                        // 覆盖精灵
-                        auto test = Sprite::create ( "farm/tile.png" );
-                        this->addChild ( test , 15 - nums / 19 );
-                        test->setPosition ( 495 + ((nums % 19) - 1) * 48 , 910 - ((nums / 19) - 1) * 48 );
-                        test->setScaleX ( 2.5f );
-                        test->setScaleY ( 1.9f );
-
-                        // 删除元素并更新迭代器
-                        it = Crop_information.erase ( it );  // erase 返回新的迭代器 
-
-                        // 初始设置：设置第一个图片并放大
-                        player1->setTexture ( "character1/player_plant1.png" );
-                        player1->setScale ( 2.5f );
-
-                        // 延迟0.3秒后切换到第二个图片
-                        player1->scheduleOnce ( [=]( float dt ) {
-                            player1->setTexture ( "character1/player_plant2.png" );  // 更换为player_plant2
-                            player1->setScale ( 2.7f );
-                            } , 0.15f , "change_image1_key" );
-
-                        // 延迟0.6秒后切换到第三个图片
-                        player1->scheduleOnce ( [=]( float dt ) {
-                            player1->setTexture ( "character1/player_left3.png" ); // 更换为player_left3
-                            player1->setScale ( 1.5f );
-                            } , 0.35f , "change_image2_key" );
-
-                    }
-                    else {
-                        break;
-                    }
-                }
-                else {
-                    ++it;  // 继续遍历下一个元素
-                }
-            }
-
-        }
+        // 种植逻辑现已通过P键Command处理
+        // 浇水逻辑现已通过W键Command处理
+        // 收获逻辑现已通过G键Command处理
 
     }
 
-    // 是否进入玩家的家
-    if (myhouse_area.containsPoint ( playerPos )) {
-        if (isEnterKeyPressed) {
-            for (auto& pair : F_lastplace) {
-                if (pair.first.first == "myhouse") {
-                    pair.second = true;
-                }
-            }
-            player1->removeFromParent ();
-            auto NextSence = Myhouse::create ();
-            Director::getInstance ()->replaceScene ( NextSence );
-        }
-    }
+    // 进入房屋场景切换现已通过ENTER键Command处理
 
-    // 是否离开农场
-    if (Out_Farm.containsPoint ( playerPos )) {
-        if (isEnterKeyPressed) {
+    // 离开农场场景切换现已通过ENTER键Command处理
 
-        }
-    }
+    // 进入畜棚场景切换现已通过ENTER键Command处理
 
-    // 是否进入畜棚
-    if (barn_area.containsPoint ( playerPos )) {
-        if (isEnterKeyPressed) {
-            for (auto& pair : F_lastplace) {
-                if (pair.first.first == "barn") {  // 检查 bool 值是否为 true
-                    pair.second = true;
-                }
-            }
-            player1->removeFromParent ();
-            auto NextSence = Barn::create ();
-            Director::getInstance ()->replaceScene ( NextSence );
-        }
-    }
+    // 进入山洞场景切换现已通过ENTER键Command处理
 
-    // 是否进入山洞
-    if (cave_area.containsPoint ( playerPos )) {
-        if (isEnterKeyPressed) {
-            for (auto& pair : F_lastplace) {
-                if (pair.first.first == "cave") {  // 检查 bool 值是否为 true
-                    pair.second = true;
-                }
-            }
-            player1->removeFromParent ();
-            auto NextSence = Cave::create ();
-            Director::getInstance ()->replaceScene ( NextSence );
-        }
-    }
+    // 进入森林场景切换现已通过ENTER键Command处理
 
-    // 是否进入森林
-    if (forest_area.containsPoint ( playerPos )) {
-        if (isEnterKeyPressed) {
-            for (auto& pair : F_lastplace) {
-                if (pair.first.first == "forest") {  // 检查 bool 值是否为 true
-                    pair.second = true;
-                }
-            }
-            player1->removeFromParent ();
-            auto NextSence = Forest::create ();
-            Director::getInstance ()->replaceScene ( NextSence );
-        }
-    }
-
-    for (const auto& point : nonTransparentPixels)
-    {
-        // 计算玩家与轮廓点之间的距离
-        float distance = 0;
-
-        Vec2 temp;
-        temp = playerPos;
-        temp.x -= player1->speed;
-        distance = temp.distance ( point );
-        if (distance <= 17) {
-            player1->moveLeft = false;
-        }
-        else {
-            if (player1->leftpressed == false) {
-                player1->moveLeft = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.y -= 10;
-        distance = temp.distance ( point );
-        if (distance <= 15) {
-            player1->moveDown = false;
-        }
-        else {
-            if (player1->downpressed == false) {
-                player1->moveDown = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.y += 10;
-        distance = temp.distance ( point );
-        if (distance <= 15) {
-            player1->moveUp = false;
-        }
-        else {
-            if (player1->uppressed == false) {
-                player1->moveUp = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.x += 10;
-        distance = temp.distance ( point );
-        if (distance <= 15) {
-            player1->moveRight = false;
-        }
-        else {
-            if (player1->rightpressed == false) {
-                player1->moveRight = true;
-            }
-        }
-
-    }
-
-
+    // 碰撞检测逻辑已移到Player类的updateMovementPermissions方法中
+    // 通过setCollisionContext设置碰撞点即可
+    // 碰撞权限会在Player的player1_move()中自动更新
 }
 
 int farm::getRegionNumber ( Vec2 pos ) {
@@ -906,6 +554,156 @@ void farm::updaterain ( float deltaTime ) {
 
         emitter->setEmissionRate ( emitter->getTotalParticles () / emitter->getLife () * 1.3 );
     }
+}
+
+void farm::setupInputCommands() {
+    auto inputManager = InputManager::getInstance();
+
+    // 创建具体的农场命令对象
+    auto plantCommand = std::make_shared<PlantCommand>(this);
+    auto waterCommand = std::make_shared<WaterCommand>(this);
+    auto harvestCommand = std::make_shared<HarvestCommand>(this);
+    auto toggleInventoryCommand = std::make_shared<ToggleInventoryCommand>(
+        this, inventory, "farm"
+    );
+
+    // 创建场景切换命令 - 使用ConditionalSceneTransitionCommand
+    auto exitFarmCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1, 
+        []() -> cocos2d::Scene* { return HelloWorld::create(); },
+        [this]() -> bool { 
+            Vec2 playerPos = player1->getPosition();
+            return Out_Farm.containsPoint(playerPos);
+        },
+        nullptr,
+        "farm_to_world"
+    );
+
+    auto enterHouseCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        [this]() -> cocos2d::Scene* { 
+            // 设置位置状态
+            for (auto& pair : F_lastplace) {
+                if (pair.first.first == "myhouse") {
+                    pair.second = true;
+                }
+            }
+            player1->removeFromParent();
+            return Myhouse::create();
+        },
+        [this]() -> bool {
+            Vec2 playerPos = player1->getPosition();
+            return myhouse_area.containsPoint(playerPos);
+        },
+        nullptr,
+        "farm_to_house"
+    );
+
+    auto enterBarnCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        [this]() -> cocos2d::Scene* {
+            // 设置位置状态
+            for (auto& pair : F_lastplace) {
+                if (pair.first.first == "barn") {
+                    pair.second = true;
+                }
+            }
+            player1->removeFromParent();
+            return Barn::create();
+        },
+        [this]() -> bool {
+            Vec2 playerPos = player1->getPosition();
+            return barn_area.containsPoint(playerPos);
+        },
+        nullptr,
+        "farm_to_barn"
+    );
+
+    auto enterCaveCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        [this]() -> cocos2d::Scene* {
+            // 设置位置状态
+            for (auto& pair : F_lastplace) {
+                if (pair.first.first == "cave") {
+                    pair.second = true;
+                }
+            }
+            player1->removeFromParent();
+            return Cave::create();
+        },
+        [this]() -> bool {
+            Vec2 playerPos = player1->getPosition();
+            return cave_area.containsPoint(playerPos);
+        },
+        nullptr,
+        "farm_to_cave"
+    );
+
+    auto enterForestCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        [this]() -> cocos2d::Scene* {
+            // 设置位置状态
+            for (auto& pair : F_lastplace) {
+                if (pair.first.first == "forest") {
+                    pair.second = true;
+                }
+            }
+            player1->removeFromParent();
+            return Forest::create();
+        },
+        [this]() -> bool {
+            Vec2 playerPos = player1->getPosition();
+            return forest_area.containsPoint(playerPos);
+        },
+        nullptr,
+        "farm_to_forest"
+    );
+
+    // 绑定命令到键盘 - 使用bindPressCommand
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_P, plantCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_W, waterCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_G, harvestCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ESCAPE, toggleInventoryCommand);
+    
+    // ENTER键绑定多个场景转换命令
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, exitFarmCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, exitFarmCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, enterHouseCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, enterHouseCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, enterBarnCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, enterBarnCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, enterCaveCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, enterCaveCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, enterForestCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, enterForestCommand);
+
+    // 保存命令引用以便清理
+    boundCommands.push_back(plantCommand);
+    boundCommands.push_back(waterCommand);
+    boundCommands.push_back(harvestCommand);
+    boundCommands.push_back(toggleInventoryCommand);
+    boundCommands.push_back(exitFarmCommand);
+    boundCommands.push_back(enterHouseCommand);
+    boundCommands.push_back(enterBarnCommand);
+    boundCommands.push_back(enterCaveCommand);
+    boundCommands.push_back(enterForestCommand);
+}
+
+void farm::cleanupInputCommands() {
+    auto inputManager = InputManager::getInstance();
+    
+    // 逐一解绑命令
+    for (auto& command : boundCommands) {
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ESCAPE, command);
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_P, command);
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_W, command);
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_G, command);
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ENTER, command);
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, command);
+    }
+    
+    // 清理命令引用
+    boundCommands.clear();
 }
 
 

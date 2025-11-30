@@ -2,6 +2,7 @@
 #include "Town.h"
 #include "Crop.h"
 #include "Beach.h"
+#include "Forest.h"
 #include "supermarket.h"
 #include "Player.h"
 #include "ui/CocosGUI.h"
@@ -10,7 +11,9 @@ USING_NS_CC;
 
 Town::Town() {}
 
-Town::~Town() {}
+Town::~Town() {
+    cleanupInputCommands();
+}
 
 bool Town::init()
 {
@@ -143,6 +146,10 @@ bool Town::init()
     if (player1->getParent() == NULL) {
         cocos2d::log("player1->get");
         this->addChild(player1, 6);
+        // 在添加到场景后设置输入绑定
+        player1->setupInputBindings();
+        // 设置碰撞上下文
+        player1->setCollisionContext(nonTransparentPixels);
     }
     player1->setScale(1.5f);
     player1->setAnchorPoint(Vec2(0.5f, 0.2f));
@@ -437,51 +444,122 @@ bool Town::init()
         _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , this );
     }
 
-    // 设置键盘监听器
-    auto listenerWithPlayer = EventListenerKeyboard::create();
-    listenerWithPlayer->onKeyPressed = [this]( EventKeyboard::KeyCode keyCode , Event* event )
-        {
-            // 记录 Enter 键被按下
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = true;
+    // 旧的键盘监听器已由Command Pattern替代
 
-                CCLOG ( "Enter key pressed. " );
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE) {
-                CCLOG ( "%d" , GoldAmount );
-                static int isOpen = 0;
-                static InventoryUI* currentInventoryUI = nullptr;  // 保存当前显示的 InventoryUI  
-                // 如果当前没有打开 InventoryUI，则打开它  
-                if (currentInventoryUI == nullptr || isOpen == 0) {
-                    isOpen = 1;
-                    CCLOG ( "Opening inventory." );
-                    currentInventoryUI = InventoryUI::create ( inventory , "Town" );
-                    this->addChild ( currentInventoryUI , 20 );  // 将 InventoryUI 添加到 Town 的上层  
-                }
-                // 如果已经打开 InventoryUI，则关闭它  
-                else {
-                    isOpen = 0;
-                    CCLOG ( "Closing inventory." );
-                    this->removeChild ( currentInventoryUI , true );  // 从当前场景中移除 InventoryUI  
-                    currentInventoryUI = nullptr;  // 重置指针  
-                }
-            }
-
-        };
-
-    listenerWithPlayer->onKeyReleased = [this](EventKeyboard::KeyCode keyCode, Event* event)
-        {
-            // 释放 Enter 键时，设置为 false
-            if (keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = false;
-                CCLOG("Enter key released. ");
-            }
-        };
-
-    // 将监听器添加到事件分发器中
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listenerWithPlayer, this);
+    // 设置输入命令绑定
+    setupInputCommands();
 
     return true;
+}
+
+void Town::setupInputCommands()
+{
+    auto inputManager = InputManager::getInstance();
+    // inventory是全局变量，在AppDelegate.h中声明
+    
+    // 创建条件场景切换命令 - 种子商店（超市）
+    auto supermarketCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        []() { 
+            AudioEngine::pauseAll();
+            auto backgroundAudioID = AudioEngine::play2d("MUSIC/MayYouBeHappyAndProsperous.mp3", true);
+            return supermarket::create(); 
+        },
+        [this]() { 
+            Vec2 playerPos = player1->getPosition();
+            return Region_supermarket.containsPoint(playerPos); 
+        },
+        [this]() {
+            // 预切换回调：更新lastplace状态
+            for (auto& pair : T_lastplace) {
+                if (pair.first.first == "seedshop") {
+                    pair.second = true;
+                }
+            }
+        },
+        "supermarket"
+    );
+    
+    // 创建条件场景切换命令 - 森林
+    auto forestCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        []() { return Forest::create(); },
+        [this]() { 
+            Vec2 playerPos = player1->getPosition();
+            return Region_forest.containsPoint(playerPos); 
+        },
+        [this]() {
+            // 预切换回调：更新lastplace状态
+            for (auto& pair : T_lastplace) {
+                if (pair.first.first == "forest") {
+                    pair.second = true;
+                }
+            }
+        },
+        "Forest"
+    );
+    
+    // 创建条件场景切换命令 - 海滩
+    auto beachCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        []() { return Beach::create(); },
+        [this]() { 
+            Vec2 playerPos = player1->getPosition();
+            return Region_beach.containsPoint(playerPos); 
+        },
+        [this]() {
+            // 预切换回调：更新lastplace状态
+            for (auto& pair : T_lastplace) {
+                if (pair.first.first == "beach") {
+                    pair.second = true;
+                }
+            }
+        },
+        "Beach"
+    );
+    
+    // 创建UI切换命令 - 背包
+    auto inventoryCommand = std::make_shared<ToggleInventoryCommand>(
+        this,
+        inventory,
+        "Town"
+    );
+    
+    // 绑定命令到按键 - 所有场景切换命令都绑定到ENTER键
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, supermarketCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, forestCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, beachCommand);
+    
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, supermarketCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, forestCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, beachCommand);
+    
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ESCAPE, inventoryCommand);
+    
+    // 保存绑定的命令，方便清理
+    boundCommands.push_back(supermarketCommand);
+    boundCommands.push_back(forestCommand);
+    boundCommands.push_back(beachCommand);
+    boundCommands.push_back(inventoryCommand);
+}
+
+void Town::cleanupInputCommands()
+{
+    auto inputManager = InputManager::getInstance();
+    
+    // 清理绑定的命令 - 解绑ENTER键和ESCAPE键的命令
+    for (auto& command : boundCommands) {
+        if (auto toggleCmd = std::dynamic_pointer_cast<ToggleInventoryCommand>(command)) {
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ESCAPE, command);
+        } else {
+            // 场景切换命令绑定在ENTER键上
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ENTER, command);
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, command);
+        }
+    }
+    
+    // 清空命令列表
+    boundCommands.clear();
 }
 
 Town* Town::create()
@@ -653,118 +731,24 @@ void Town::checkPlayerPosition ()
         emitter->setPositionY ( currenty + 350 );
     }
     // 检查玩家是否进入目标区域，并且按下 Enter 键
-    if (Region_supermarket.containsPoint ( playerPos )) {
-        // 玩家进入目标区域
-        opendoor->setVisible ( true );
-        opendoor->setPosition ( playerPos.x + 110 , playerPos.y + 30 );
-        CCLOG ( "Player in target area" );
-
-        if (isEnterKeyPressed) {
-            for (auto& pair : T_lastplace) {
-                if (pair.first.first == "seedshop") {  // 检查 bool 值是否为 true
-                    pair.second = true;
-                }
-            }
-            // 打印调试信息，检查 Enter 键的状态
-            CCLOG ( "Player in target area, isEnterKeyPressed: %d" , isEnterKeyPressed );
-            // 调用场景切换逻辑
-            player1->removeFromParent ();
-            AudioEngine::pauseAll ();
-            auto backgroundAudioID = AudioEngine::play2d ( "MUSIC/MayYouBeHappyAndProsperous.mp3" , true );
-            auto seedshop = supermarket::create ();
-            // miniBag->removeFromParent();
-            Director::getInstance ()->replaceScene ( seedshop );
-        }
-
+    // 场景切换逻辑现在由ConditionalSceneTransitionCommand处理
+    // 这里只保留UI反馈逻辑
+    if (Region_supermarket.containsPoint(playerPos)) {
+        // 玩家进入目标区域，显示开门提示
+        opendoor->setVisible(true);
+        opendoor->setPosition(playerPos.x + 110, playerPos.y + 30);
+        CCLOG("Player in supermarket transition area");
     }
     else {
-        opendoor->setVisible ( false );
+        opendoor->setVisible(false);
     }
+    
+    // 其他区域的切换逻辑已由Command Pattern处理
+    // 可以在这里添加其他区域的UI提示逻辑
 
-    if (Region_forest.containsPoint ( playerPos )) {
-        if (isEnterKeyPressed) {
-            for (auto& pair : T_lastplace) {
-                if (pair.first.first == "forest") {
-                    pair.second = true;
-                }
-            }
-            // 调用场景切换逻辑
-            player1->removeFromParent ();
-            auto nextscene = Forest::create ();
-            Director::getInstance ()->replaceScene ( nextscene );
-        }
-
-    }
-
-    if (Region_beach.containsPoint ( playerPos )) {
-        if (isEnterKeyPressed) {
-            for (auto& pair : T_lastplace) {
-                if (pair.first.first == "beach") {
-                    pair.second = true;
-                }
-            }
-            // 调用场景切换逻辑
-            player1->removeFromParent ();
-            auto nextscene = Beach::create ();
-            Director::getInstance ()->replaceScene ( nextscene );
-        }
-    }
-
-    for (const auto& point : nonTransparentPixels)
-    {
-        // 计算玩家与轮廓点之间的距离
-        float distance = 0;
-
-        Vec2 temp;
-        temp = playerPos;
-        temp.x -= player1->speed;
-        distance = temp.distance ( point );
-        if (distance <= 17) {
-            player1->moveLeft = false;
-        }
-        else {
-            if (player1->leftpressed == false) {
-                player1->moveLeft = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.y -= 10;
-        distance = temp.distance ( point );
-        if (distance <= 15) {
-            player1->moveDown = false;
-        }
-        else {
-            if (player1->downpressed == false) {
-                player1->moveDown = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.y += 10;
-        distance = temp.distance ( point );
-        if (distance <= 15) {
-            player1->moveUp = false;
-        }
-        else {
-            if (player1->uppressed == false) {
-                player1->moveUp = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.x += 10;
-        distance = temp.distance ( point );
-        if (distance <= 15) {
-            player1->moveRight = false;
-        }
-        else {
-            if (player1->rightpressed == false) {
-                player1->moveRight = true;
-            }
-        }
-
-    }
+    // 碰撞检测逻辑已移到Player类的updateMovementPermissions方法中
+    // 通过setCollisionContext设置碰撞点即可
+    // 碰撞权限会在Player的player1_move()中自动更新
 }
 
 void Town::createRainEffect() {

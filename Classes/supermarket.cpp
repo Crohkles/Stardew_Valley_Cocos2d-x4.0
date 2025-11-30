@@ -5,6 +5,10 @@
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
 #include "StoreUI.h"
+#include "KeyCommand.h"
+#include "InputManager.h"
+#include "SceneInteractionCommand.h"
+#include "UICommand.h"
 
 USING_NS_CC;
 
@@ -16,7 +20,9 @@ extern Inventory* inventory;
 
 supermarket::supermarket() {}
 
-supermarket::~supermarket() {}
+supermarket::~supermarket() {
+    cleanupInputCommands();
+}
 
 bool supermarket::init()
 {
@@ -291,6 +297,10 @@ bool supermarket::init()
 
     // 初始化角色并将其添加到场景
     this->addChild(player1, 5);
+    // 在添加到场景后设置输入绑定
+    player1->setupInputBindings();
+    // 设置碰撞上下文
+    player1->setCollisionContext(nonTransparentPixels);
     player1->schedule([=](float dt) {
         player1->player1_move();
         }, 0.05f, "player1_move");
@@ -340,43 +350,8 @@ bool supermarket::init()
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, button);
 
-    // 设置键盘监听器
-    auto listenerWithPlayer = EventListenerKeyboard::create();
-    listenerWithPlayer->onKeyPressed = [this](EventKeyboard::KeyCode keyCode, Event* event)
-        {
-            // 记录 Enter 键被按下
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = true;
-                CCLOG("Enter key pressed.");
-            }
-            // 处理其他按键  
-            if (keyCode == EventKeyboard::KeyCode::KEY_P) {
-                static StoreUI* currentStoreUI = nullptr;  // 保存当前显示的 StoreUI  
-                // 如果当前没有打开 StoreUI，则打开它  
-                if (currentStoreUI == nullptr) {
-                    CCLOG ( "Opening inventory." );
-                    currentStoreUI = StoreUI::create ( inventory , StoreItem );
-                    this->addChild ( currentStoreUI , 20 );
-                } 
-                else {
-                    CCLOG ( "Closing inventory." );
-                    this->removeChild ( currentStoreUI , true );
-                    currentStoreUI = nullptr;  // 重置指针  
-                }
-            }
-        };
-
-    listenerWithPlayer->onKeyReleased = [this](EventKeyboard::KeyCode keyCode, Event* event)
-        {
-            // 释放 Enter 键时，设置为 false
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = false;
-                CCLOG("Enter key released.");
-            }
-        };
-
-    // 将监听器添加到事件分发器中
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listenerWithPlayer, this);
+    // Setup Command Pattern input handling
+    setupInputCommands();
 
 
     return true;
@@ -558,67 +533,114 @@ void supermarket::checkPlayerPosition()
         opendoor->setVisible(false);
     }
 
-    for (const auto& point : nonTransparentPixels)
-    {
-        // 计算玩家与轮廓点之间的距离
-        float distance = 0;
+    // 碰撞检测逻辑已移到Player类的updateMovementPermissions方法中
+    // 通过setCollisionContext设置碰撞点即可
+    // 碰撞权限会在Player的player1_move()中自动更新
 
-        Vec2 temp;
-        temp = playerPos;
-        temp.x -= player1->speed;
-        distance = temp.distance(point);
-        if (distance <= 55) {
-            player1->moveLeft = false;
-           
-        }
-        else {
-            if (player1->leftpressed == false) {
-                player1->moveLeft = true;
+
+
+}
+
+void supermarket::setupInputCommands()
+{
+    // P key to open/close store UI
+    class ToggleStoreUICommand : public KeyCommand {
+    private:
+        supermarket* scene;
+        StoreUI* currentStoreUI;
+    public:
+        ToggleStoreUICommand(supermarket* s) : scene(s), currentStoreUI(nullptr) {}
+        
+        void execute() override {
+            if (currentStoreUI == nullptr) {
+                CCLOG("Opening inventory.");
+                currentStoreUI = StoreUI::create(inventory, scene->StoreItem);
+                scene->addChild(currentStoreUI, 20);
+            } else {
+                CCLOG("Closing inventory.");
+                scene->removeChild(currentStoreUI, true);
+                currentStoreUI = nullptr;
             }
         }
-
-
-
-        temp = playerPos;
-        temp.y -= player1->speed;
-        distance = temp.distance(point);
-        if (distance <= 25) {
-            player1->moveDown = false;
+        
+        void undo() override {
+            // Empty implementation - UI commands don't need undo
         }
-        else {
-            if (player1->downpressed == false) {
-                player1->moveDown = true;
-            }
-        }
+    };
 
-        temp = playerPos;
-        temp.y += player1->speed;
-        distance = temp.distance(point);
-        if (distance <= 45) {
-            player1->moveUp = false;
+    // ENTER key for scene transitions
+    auto sceneTransitionCommand = new ConditionalSceneTransitionCommand(
+        player1,
+        []() -> Scene* { return Town::create(); },
+        [this]() -> bool {
+            Vec2 playerPos = player1->getPosition();
+            return Region_Out.containsPoint(playerPos) && isEnterKeyPressed;
+        },
+        [this]() {
+            player1->removeFromParent();
         }
-        else {
-            if (player1->uppressed == false) {
-                player1->moveUp = true;
-            }
-        }
+    );
 
-        temp = playerPos;
-        temp.x += player1->speed;
-        distance = temp.distance(point);
-        if (distance <= 55) {
-            player1->moveRight = false;
-        }
-        else {
-            if (player1->rightpressed == false) {
-                player1->moveRight = true;
-            }
-        }
+    // Bind commands to input manager
+    auto inputManager = InputManager::getInstance();
+    
+    auto storeCommand = std::make_shared<ToggleStoreUICommand>(this);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_P, storeCommand);
+    boundCommands.push_back(storeCommand);
+    
+    auto sceneTransitionPtr = std::shared_ptr<ConditionalSceneTransitionCommand>(sceneTransitionCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, sceneTransitionPtr);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, sceneTransitionPtr);
+    boundCommands.push_back(sceneTransitionPtr);
 
+    // Additional ENTER key tracking for conditional logic
+    class EnterKeyTracker : public KeyCommand {
+    private:
+        bool* keyPressed;
+    public:
+        EnterKeyTracker(bool* pressed) : keyPressed(pressed) {}
+        void execute() override { *keyPressed = true; }
+        void undo() override {
+            // Empty implementation - tracking commands don't need undo
+        }
+    };
+
+    class EnterKeyReleaser : public KeyCommand {
+    private:
+        bool* keyPressed;
+    public:
+        EnterKeyReleaser(bool* pressed) : keyPressed(pressed) {}
+        void execute() override { *keyPressed = false; }
+        void undo() override {
+            // Empty implementation - tracking commands don't need undo
+        }
+    };
+
+    auto enterTracker = std::make_shared<EnterKeyTracker>(&isEnterKeyPressed);
+    auto enterReleaser = std::make_shared<EnterKeyReleaser>(&isEnterKeyPressed);
+    
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, enterTracker);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, enterTracker);
+    inputManager->bindReleaseCommand(EventKeyboard::KeyCode::KEY_ENTER, enterReleaser);
+    inputManager->bindReleaseCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, enterReleaser);
+    
+    boundCommands.push_back(enterTracker);
+    boundCommands.push_back(enterReleaser);
+}
+
+void supermarket::cleanupInputCommands()
+{
+    auto inputManager = InputManager::getInstance();
+    
+    // 逐一解绑命令
+    for (auto& command : boundCommands) {
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_P, command);
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ENTER, command);
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, command);
     }
-
-
-
+    
+    // 清理命令引用
+    boundCommands.clear();
 }
 
 

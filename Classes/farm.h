@@ -8,6 +8,9 @@
 #include "AppDelegate.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
+#include "KeyCommand.h"
+#include <memory>
+#include <vector>
 
 USING_NS_CC;
 
@@ -37,7 +40,13 @@ public:
 
 
     // 返回作物序号
-    int getRegionNumber ( Vec2 pos );
+    int getRegionNumber(Vec2 pos);
+    
+    // 设置输入命令绑定
+    void setupInputCommands();
+    
+    // 清理输入命令绑定
+    void cleanupInputCommands();
 
     // 创建一个列表，用于保存所有非透明像素的坐标
     std::vector<cocos2d::Vec2> nonTransparentPixels;
@@ -76,13 +85,8 @@ private:
 
     cocos2d::Menu* menu;
 
-    bool isEnterKeyPressed = false;
-    // 判断种植P键是否按下
-    bool isPKeyPressed = false;
-    // 判断浇水W键是否按下
-    bool isWKeyPressed = false;
-    // 判断收割G键是否按下
-    bool isGKeyPressed = false;
+    // Command Pattern相关的成员变量
+    std::vector<std::shared_ptr<KeyCommand>> boundCommands;
 
     Sprite* Box;
 

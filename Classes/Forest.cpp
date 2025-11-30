@@ -5,12 +5,17 @@
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
 #include "vector"
+#include "InputManager.h"
+#include "SceneInteractionCommand.h"
+#include "UICommand.h"
 
 USING_NS_CC;
 
 Forest::Forest() {}
 
-Forest::~Forest() {}
+Forest::~Forest() {
+    cleanupInputCommands();
+}
 
 bool Forest::init()
 {
@@ -93,6 +98,10 @@ bool Forest::init()
     // 初始化角色并将其添加到场景
     if (player1->getParent() == NULL) {
         this->addChild(player1, 6);
+        // 在添加到场景后设置输入绑定
+        player1->setupInputBindings();
+        // 设置碰撞上下文
+        player1->setCollisionContext(nonTransparentPixels);
         for (auto& pair : W_lastplace) {
             if (pair.second == true) { 
                 player1->setPosition(pair.first.second);
@@ -148,50 +157,10 @@ bool Forest::init()
         };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, button);
 
-    // 设置键盘监听器
-    auto listenerWithPlayer = EventListenerKeyboard::create();
-    listenerWithPlayer->onKeyPressed = [this](EventKeyboard::KeyCode keyCode, Event* event)
-        {
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = true;
-                CCLOG("Enter key pressed. ");
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_L) {
-                isLKeyPressed = true;
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE) {
-                static int isOpen = 0;
-                static InventoryUI* currentInventoryUI = nullptr;  // 保存当前显示的 InventoryUI  
-                // 如果当前没有打开 InventoryUI，则打开它  
-                if (currentInventoryUI == nullptr || isOpen == 0) {
-                    isOpen = 1;
-                    CCLOG ( "Opening inventory." );
-                    currentInventoryUI = InventoryUI::create ( inventory , "Forest" );
-                    this->addChild ( currentInventoryUI , 20 );  // 将 InventoryUI 添加到 Town 的上层  
-                }
-                // 如果已经打开 InventoryUI，则关闭它  
-                else {
-                    isOpen = 0;
-                    CCLOG ( "Closing inventory." );
-                    this->removeChild ( currentInventoryUI , true );  // 从当前场景中移除 InventoryUI  
-                    currentInventoryUI = nullptr;  // 重置指针  
-                }
-            }
-        };
+    // 旧的键盘监听器已替换为Command Pattern
 
-    listenerWithPlayer->onKeyReleased = [this](EventKeyboard::KeyCode keyCode, Event* event)
-        {
-            // 释放 Enter 键时，设置为 false
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = false;
-            }
-            if (keyCode == EventKeyboard::KeyCode::KEY_L) {
-                isLKeyPressed = false;
-            }
-        };
-
-    // 将监听器添加到事件分发器中
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listenerWithPlayer, this);
+    // 设置Command Pattern输入绑定
+    setupInputCommands();
 
     //界面下的背包显示
     miniBag = mini_bag::create ( inventory );
@@ -412,211 +381,13 @@ void  Forest::checkPlayerPosition()
     if (Weather == "Rainy") {
         emitter->setPositionY ( currenty + 350 );
     }
-    if (isLKeyPressed) {
+    // 伐木逻辑已移到LoggingCommand中处理
 
-        isLKeyPressed = false;
+    // 场景切换逻辑已移到Command Pattern中处理
 
-        for (auto it = Tree_information.begin(); it != Tree_information.end(); ) {
-
-            auto tree = *it;  
-
-            float distance = tree->position.distance(playerPos);
-            if ((distance <= 250 && tree->available) && strength >= 10) {
-
-                strength -= 10;
-                TimeUI->UpdateEnergy();
-
-                if (skill_tree->GetSkillLevels()[foraging_skill] >= 5) {
-                    tree->removetimes -= 2;
-                }
-                else {
-                    tree->removetimes -= 1;
-                }
-
-                if (tree->removetimes <= 0) {
-                   
-                    inventory->AddItem(Wood);
-
-                    // 升级
-                    skill_tree->AddExperience(foraging_skill, 10);
-
-
-                    cocos2d::log("Cut Down");
-
-                    tree->available = false;
-
-                    tree->mining_day = season[Season] * 7 + day;
-
-
-                    if (player1->pic_path == "character1/player_right3.png") {
-                        player1->setTexture("character1/player_plant3.png");
-                        player1->setScale(3.5f);
-
-                        // 延迟0.3秒后切换到第二个图片
-                        player1->scheduleOnce([=](float dt) {
-                            player1->setTexture("character1/player_plant4.png");  // 更换为player_plant2
-                            player1->setScale(3.7f);
-                            }, 0.15f, "change_image1_key");
-
-                        // 延迟0.6秒后切换到第三个图片
-                        player1->scheduleOnce([=](float dt) {
-                            player1->setTexture("character1/player_right3.png"); // 更换为player_left3
-                            player1->setScale(2.3f);
-                            auto temp = Sprite::create(tree->G_Cut_pic);
-                            this->addChild(temp, 5);
-                            temp->setPosition(tree->position);
-                            temp->setScale(3.1f);
-                            }, 0.35f, "change_image2_key");
-                    }
-                    else {
-                        player1->setTexture("character1/player_plant1.png");
-                        player1->setScale(3.5f);
-
-                        // 延迟0.3秒后切换到第二个图片
-                        player1->scheduleOnce([=](float dt) {
-                            player1->setTexture("character1/player_plant2.png");  // 更换为player_plant2
-                            player1->setScale(3.7f);
-                            }, 0.15f, "change_image1_key");
-
-                        // 延迟0.6秒后切换到第三个图片
-                        player1->scheduleOnce([=](float dt) {
-                            player1->setTexture("character1/player_left3.png"); // 更换为player_left3
-                            player1->setScale(2.3f);
-                            auto temp = Sprite::create(tree->G_Cut_pic);
-                            this->addChild(temp, 5);
-                            temp->setPosition(tree->position);
-                            temp->setScale(3.1f);
-                            }, 0.35f, "change_image2_key");
-                    }
-
-                }
-                else {
-                    if (player1->pic_path == "character1/player_right3.png") {
-                        player1->setTexture("character1/player_plant3.png");
-                        player1->setScale(3.5f);
-
-                        // 延迟0.3秒后切换到第二个图片
-                        player1->scheduleOnce([=](float dt) {
-                            player1->setTexture("character1/player_plant4.png");  // 更换为player_plant2
-                            player1->setScale(3.7f);
-                            }, 0.15f, "change_image1_key");
-
-                        // 延迟0.6秒后切换到第三个图片
-                        player1->scheduleOnce([=](float dt) {
-                            player1->setTexture("character1/player_right3.png"); // 更换为player_left3
-                            player1->setScale(2.3f);
-                            }, 0.35f, "change_image2_key");
-                    }
-                    else {
-                        player1->setTexture("character1/player_plant1.png");
-                        player1->setScale(3.5f);
-
-                        // 延迟0.3秒后切换到第二个图片
-                        player1->scheduleOnce([=](float dt) {
-                            player1->setTexture("character1/player_plant2.png");  // 更换为player_plant2
-                            player1->setScale(3.7f);
-                            }, 0.15f, "change_image1_key");
-
-                        // 延迟0.6秒后切换到第三个图片
-                        player1->scheduleOnce([=](float dt) {
-                            player1->setTexture("character1/player_left3.png"); // 更换为player_left3
-                            player1->setScale(2.3f);
-                            }, 0.35f, "change_image2_key");
-                    }
-                }
-            }
-
-
-            it++;
-
-        }
-    }
-
-    // 是否前往农场
-    if (farm_area.containsPoint(playerPos)) {
-        if (isEnterKeyPressed) {
-            for (auto& pair : W_lastplace) {
-                if (pair.first.first == "farm") {  // 检查 bool 值是否为 true
-                    pair.second = true;
-                }
-            }
-            player1->removeFromParent();
-            auto NextSence = farm::create();
-            Director::getInstance()->replaceScene(NextSence);
-        }
-    }
-
-    // 是否前往小镇
-    if (town_area.containsPoint(playerPos)) {
-        if (isEnterKeyPressed) {
-            for (auto& pair : W_lastplace) {
-                if (pair.first.first == "town") {  // 检查 bool 值是否为 true
-                    pair.second = true;
-                }
-            }
-            player1->removeFromParent();
-            auto NextSence = Town::create();
-            Director::getInstance()->replaceScene(NextSence);
-        }
-    }
-
-    for (const auto& point : nonTransparentPixels)
-    {
-        // 计算玩家与轮廓点之间的距离
-        float distance = 0;
-
-        Vec2 temp;
-        temp = playerPos;
-        temp.x -= player1->speed;
-        distance = temp.distance(point);
-        if (distance <= 17) {
-            player1->moveLeft = false;
-        }
-        else {
-            if (player1->leftpressed == false) {
-                player1->moveLeft = true;
-            }
-        }
-        
-        temp = playerPos;
-        temp.y -= 10;
-        distance = temp.distance(point);
-        if (distance <= 15) {
-            player1->moveDown = false;
-        }
-        else {
-            if (player1->downpressed == false) {
-                player1->moveDown = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.y += 10;
-        distance = temp.distance(point);
-        if (distance <= 15) {
-            player1->moveUp = false;
-        }
-        else {
-            if (player1->uppressed == false) {
-                player1->moveUp = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.x += 10;
-        distance = temp.distance(point);
-        if (distance <= 15) {
-            player1->moveRight = false;
-        }
-        else{
-            if (player1->rightpressed == false) {
-                player1->moveRight = true;
-            }
-        }
-       
-    }
-    
-
+    // 碰撞检测逻辑已移到Player类的updateMovementPermissions方法中
+    // 通过setCollisionContext设置碰撞点即可
+    // 碰撞权限会在Player的player1_move()中自动更新
 }
 
 int Forest::getRegionNumber(Vec2 pos) {
@@ -653,4 +424,83 @@ void Forest::updaterain(float deltaTime) {
 
         emitter->setEmissionRate(emitter->getTotalParticles() / emitter->getLife() * 1.3);
     }
+}
+
+void Forest::setupInputCommands()
+{
+    auto inputManager = InputManager::getInstance();
+    // inventory是全局变量，在AppDelegate.h中声明
+    
+    // 创建条件场景切换命令 - 前往农场
+    auto farmCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        []() { return farm::create(); },
+        [this]() { 
+            Vec2 playerPos = player1->getPosition();
+            return farm_area.containsPoint(playerPos); 
+        },
+        nullptr,
+        "farm"
+    );
+    
+    // 创建条件场景切换命令 - 前往小镇
+    auto townCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        []() { return Town::create(); },
+        [this]() { 
+            Vec2 playerPos = player1->getPosition();
+            return town_area.containsPoint(playerPos); 
+        },
+        nullptr,
+        "town"
+    );
+    
+    // 创建伐木动作命令
+    auto loggingCommand = std::make_shared<LoggingCommand>(
+        this
+    );
+    
+    // 创建UI切换命令 - 背包
+    auto inventoryCommand = std::make_shared<ToggleInventoryCommand>(
+        this,
+        inventory,
+        "Forest"
+    );
+    
+    // 绑定命令到按键
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, farmCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, townCommand);
+    
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, farmCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, townCommand);
+    
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_L, loggingCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ESCAPE, inventoryCommand);
+    
+    // 保存绑定的命令，方便清理
+    boundCommands.push_back(farmCommand);
+    boundCommands.push_back(townCommand);
+    boundCommands.push_back(loggingCommand);
+    boundCommands.push_back(inventoryCommand);
+}
+
+void Forest::cleanupInputCommands()
+{
+    auto inputManager = InputManager::getInstance();
+    
+    // 清理绑定的命令 - 解绑各个按键的命令
+    for (auto& command : boundCommands) {
+        if (auto toggleCmd = std::dynamic_pointer_cast<ToggleInventoryCommand>(command)) {
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ESCAPE, command);
+        } else if (auto loggingCmd = std::dynamic_pointer_cast<LoggingCommand>(command)) {
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_L, command);
+        } else {
+            // 场景切换命令绑定在ENTER键上
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ENTER, command);
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, command);
+        }
+    }
+    
+    // 清空命令列表
+    boundCommands.clear();
 }

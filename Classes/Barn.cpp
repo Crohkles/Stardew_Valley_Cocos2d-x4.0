@@ -2,12 +2,17 @@
 #include "Barn.h"
 #include "farm.h"
 #include "Player.h"
+#include "InputManager.h"
+#include "SceneInteractionCommand.h"
+#include "UICommand.h"
 
 
 
 Barn::Barn() {}
 
-Barn::~Barn() {}
+Barn::~Barn() {
+    cleanupInputCommands();
+}
 
 bool Barn::init ()
 {
@@ -88,6 +93,8 @@ bool Barn::init ()
     // 初始化角色并将其添加到场景
     if (player1->getParent() == NULL) {
         this->addChild(player1, 11);
+        // 在添加到场景后设置输入绑定
+        player1->setupInputBindings();
         player1->setScale(2.7f);
         player1->setPosition(700, 450);
         player1->speed = 7.0f;
@@ -138,44 +145,8 @@ bool Barn::init ()
 
     //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, button);
 
-    // 设置键盘监听器
-    auto listenerWithPlayer = EventListenerKeyboard::create();
-    listenerWithPlayer->onKeyPressed = [this](EventKeyboard::KeyCode keyCode, Event* event)
-        {
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = true;
-                CCLOG("Enter key pressed. ");
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE) {
-                static int isOpen = 0;
-                static InventoryUI* currentInventoryUI = nullptr;  // 保存当前显示的 InventoryUI  
-                // 如果当前没有打开 InventoryUI，则打开它  
-                if (currentInventoryUI == nullptr || isOpen == 0) {
-                    isOpen = 1;
-                    CCLOG ( "Opening inventory." );
-                    currentInventoryUI = InventoryUI::create ( inventory , "Barn" );
-                    this->addChild ( currentInventoryUI , 20 );  // 将 InventoryUI 添加到上层  
-                }
-                // 如果已经打开 InventoryUI，则关闭它  
-                else {
-                    isOpen = 0;
-                    CCLOG ( "Closing inventory." );
-                    this->removeChild ( currentInventoryUI , true );  // 从当前场景中移除 InventoryUI  
-                    currentInventoryUI = nullptr;  // 重置指针  
-                }
-            }
-        };
-
-    listenerWithPlayer->onKeyReleased = [this](EventKeyboard::KeyCode keyCode, Event* event)
-        {
-            // 释放 Enter 键时，设置为 false
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = false;
-            }
-        };
-
-    // 将监听器添加到事件分发器中
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listenerWithPlayer, this);
+    // 设置Command Pattern输入命令
+    setupInputCommands();
 
     // 设置鼠标监听器
     auto mouse_listener = cocos2d::EventListenerMouse::create ();
@@ -227,6 +198,9 @@ Barn* Barn::create()
 // 检查玩家是否接近背景的轮廓点
 void Barn::checkPlayerPosition()
 {
+    // 设置碰撞上下文
+    player1->setCollisionContext(nonTransparentPixels);
+    
     auto visibleSize = Director::getInstance()->getVisibleSize();
     TimeUI->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 
@@ -332,61 +306,9 @@ void Barn::checkPlayerPosition()
     }
 
 
-    for (const auto& point : nonTransparentPixels)
-    {
-        // 计算玩家与轮廓点之间的距离
-        float distance = 0;
-
-        Vec2 temp;
-        temp = playerPos;
-        temp.x -= player1->speed;
-        distance = temp.distance(point);
-        if (distance <= 17) {
-            player1->moveLeft = false;
-        }
-        else {
-            if (player1->leftpressed == false) {
-                player1->moveLeft = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.y -= 10;
-        distance = temp.distance(point);
-        if (distance <= 15) {
-            player1->moveDown = false;
-        }
-        else {
-            if (player1->downpressed == false) {
-                player1->moveDown = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.y += 10;
-        distance = temp.distance(point);
-        if (distance <= 15) {
-            player1->moveUp = false;
-        }
-        else {
-            if (player1->uppressed == false) {
-                player1->moveUp = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.x += 10;
-        distance = temp.distance(point);
-        if (distance <= 15) {
-            player1->moveRight = false;
-        }
-        else {
-            if (player1->rightpressed == false) {
-                player1->moveRight = true;
-            }
-        }
-
-    }
+    // 碰撞检测逻辑已移到Player类的updateMovementPermissions方法中
+    // 通过setCollisionContext设置碰撞点即可
+    // 碰撞权限会在Player的player1_move()中自动更新
 
 
 }
@@ -416,4 +338,56 @@ void Barn::GetProduction ( cocos2d::EventMouse* event ) {
 
         }
     }
+}
+
+void Barn::setupInputCommands() {
+    auto inputManager = InputManager::getInstance();
+
+    // 创建背包切换命令 (ESC键)
+    auto toggleInventoryCommand = std::make_shared<ToggleInventoryCommand>(
+        this, inventory, "Barn"
+    );
+
+    // 创建场景切换命令 (ENTER键) - 离开畜棚回到农场
+    auto exitBarnCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        []() -> cocos2d::Scene* { return farm::create(); },
+        [this]() -> bool {
+            Vec2 playerPos = player1->getPosition();
+            return Out_Barn.containsPoint(playerPos);
+        },
+        [this]() -> void {
+            // 设置位置状态
+            for (auto& pair : F_lastplace) {
+                if (pair.first.first == "farm") {
+                    pair.second = true;
+                }
+            }
+            player1->removeFromParent();
+        },
+        "barn_to_farm"
+    );
+
+    // 绑定命令到键盘
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ESCAPE, toggleInventoryCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, exitBarnCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, exitBarnCommand);
+
+    // 保存命令引用以便清理
+    boundCommands.push_back(toggleInventoryCommand);
+    boundCommands.push_back(exitBarnCommand);
+}
+
+void Barn::cleanupInputCommands() {
+    auto inputManager = InputManager::getInstance();
+    
+    // 逐一解绑命令
+    for (auto& command : boundCommands) {
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ESCAPE, command);
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ENTER, command);
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, command);
+    }
+    
+    // 清理命令引用
+    boundCommands.clear();
 }
