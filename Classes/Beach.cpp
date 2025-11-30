@@ -3,13 +3,26 @@
 #include "Player.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
+#include "InputManager.h"
+#include "SceneInteractionCommand.h"
+#include "UICommand.h"
+#include "InputManager.h"
+#include "SceneInteractionCommand.h"
+#include "UICommand.h"
+#include "GameActionCommand.h"
+#include "InputManager.h"
+#include "SceneInteractionCommand.h"
+#include "UICommand.h"
+#include "GameActionCommand.h"
 
 
 USING_NS_CC;
 
 Beach::Beach () {}
 
-Beach::~Beach () {}
+Beach::~Beach () {
+    cleanupInputCommands();
+}
 
 bool Beach::init ()
 {
@@ -94,6 +107,9 @@ bool Beach::init ()
     // 初始化角色并将其添加到场景
     if (player1->getParent () == NULL) {
         this->addChild ( player1 , 11 );
+        player1->setupInputBindings();  // 确保Player有parent后再设置输入绑定
+        // 设置碰撞上下文
+        player1->setCollisionContext(non_transparent_pixels);
         player1->setScale ( 1.6f );
         player1->setPosition ( 320 , 1400 );
         player1->setAnchorPoint ( Vec2 ( 0.5f , 0.2f ) );
@@ -144,58 +160,10 @@ bool Beach::init ()
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , button );
 
-    // 设置键盘监听器
-    auto listenerWithPlayer = EventListenerKeyboard::create ();
+    // 旧的键盘监听器已替换为Command Pattern
 
-    listenerWithPlayer->onKeyPressed = [this]( EventKeyboard::KeyCode key_code , Event* event ) {
-        if (key_code == EventKeyboard::KeyCode::KEY_ENTER || key_code == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-            isEnterKeyPressed = true;
-            CCLOG ( "Enter key pressed. " );
-        }
-        else if (key_code == EventKeyboard::KeyCode::KEY_H) {
-            if (!this->getChildByName ( "FishingGameLayer" ) && strength >= 10) {
-                strength -= 10;
-                EnergySystem::getInstance()->setEnergy(strength);
-                //将钓鱼游戏界面加入场景中
-                auto fishing_game = FishingGame::create ( player1->getPosition () );
-                this->addChild ( fishing_game , 10 , "FishingGameLayer" );
-                ////暂停场景中其他节点的活动
-                //player1->pause ();
-                //this->pause ();
-            }
-        }
-        else if (key_code == EventKeyboard::KeyCode::KEY_ESCAPE) {
-            static int isOpen = 0;
-            static InventoryUI* currentInventoryUI = nullptr;  // 保存当前显示的 InventoryUI  
-            // 如果当前没有打开 InventoryUI，则打开它  
-            if (currentInventoryUI == nullptr || isOpen == 0) {
-                isOpen = 1;
-                CCLOG ( "Opening inventory." );
-                currentInventoryUI = InventoryUI::create ( inventory , "Beach" );
-                this->addChild ( currentInventoryUI , 30 );  // 将 InventoryUI 添加到上层  
-            }
-            // 如果已经打开 InventoryUI，则关闭它  
-            else {
-                isOpen = 0;
-                CCLOG ( "Closing inventory." );
-                this->removeChild ( currentInventoryUI , true );  // 从当前场景中移除 InventoryUI  
-                currentInventoryUI = nullptr;  // 重置指针  
-            }
-        }
-        };
-
-    listenerWithPlayer->onKeyReleased = [this]( EventKeyboard::KeyCode keyCode , Event* event )
-        {
-            // 释放 Enter 键时，设置为 false
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = false;
-            }
-        };
-
- 
-
-    // 将监听器添加到事件分发器中
-    _eventDispatcher->addEventListenerWithSceneGraphPriority ( listenerWithPlayer , this );
+    // 设置Command Pattern输入绑定
+    setupInputCommands();
 
 
     //界面下的背包显示
@@ -611,74 +579,17 @@ void Beach::CheckPlayerPosition ()
     miniBag->setPosition ( currentx , currenty );
     TimeUI->setPosition ( currentx , currenty );
 
-    // 是否进入小镇
-    if (Out_Beach.containsPoint ( playerPos )) {
-        if (isEnterKeyPressed) {
-            player1->removeFromParent ();
-            auto NextSence = Town::create ();
-            Director::getInstance ()->replaceScene ( NextSence );
-        }
-    }
+    // 场景切换逻辑已移到Command Pattern中处理
 
 
-    for (const auto& point : non_transparent_pixels)
-    {
-        // 计算玩家与轮廓点之间的距离
-        float distance = 0;
-
-        Vec2 temp;
-        temp = playerPos;
-        temp.x -= player1->speed;
-        distance = temp.distance ( point );
-        if (distance <= 15) {
-            player1->moveLeft = false;
-        }
-        else {
-            if (player1->leftpressed == false) {
-                player1->moveLeft = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.y -= 10;
-        distance = temp.distance ( point );
-        if (distance <= 15) {
-            player1->moveDown = false;
-        }
-        else {
-            if (player1->downpressed == false) {
-                player1->moveDown = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.y += 10;
-        distance = temp.distance ( point );
-        if (distance <= 15) {
-            player1->moveUp = false;
-        }
-        else {
-            if (player1->uppressed == false) {
-                player1->moveUp = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.x += 10;
-        distance = temp.distance ( point );
-        if (distance <= 15) {
-            player1->moveRight = false;
-        }
-        else {
-            if (player1->rightpressed == false) {
-                player1->moveRight = true;
-            }
-        }
-
-    }
-
+    // 碰撞检测逻辑已移到Player类的updateMovementPermissions方法中
+    // 通过setCollisionContext设置碰撞点即可
+    // 碰撞权限会在Player的player1_move()中自动更新
 
 }
+
+
+
 
 void Beach::createRainEffect () {
 
@@ -707,4 +618,68 @@ void Beach::updaterain ( float deltaTime ) {
 
         emitter->setEmissionRate ( emitter->getTotalParticles () / emitter->getLife () * 1.3 );
     }
+}
+
+void Beach::setupInputCommands()
+{
+    auto inputManager = InputManager::getInstance();
+    // inventory是全局变量，在AppDelegate.h中声明
+    
+    // 创建条件场景切换命令 - 离开海滩到小镇
+    auto farmCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        []() { return Town::create(); },
+        [this]() { 
+            Vec2 playerPos = player1->getPosition();
+            return Out_Beach.containsPoint(playerPos); 
+        },
+        nullptr,
+        "town"
+    );
+    
+    // 创建钓鱼动作命令
+    auto fishingCommand = std::make_shared<FishingCommand>(
+        this,
+        player1
+    );
+    
+    // 创建UI切换命令 - 背包
+    auto inventoryCommand = std::make_shared<ToggleInventoryCommand>(
+        this,
+        inventory,
+        "Beach"
+    );
+    
+    // 绑定命令到按键
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, farmCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, farmCommand);
+    
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_H, fishingCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ESCAPE, inventoryCommand);
+    
+    // 保存绑定的命令，方便清理
+    boundCommands.push_back(farmCommand);
+    boundCommands.push_back(fishingCommand);
+    boundCommands.push_back(inventoryCommand);
+}
+
+void Beach::cleanupInputCommands()
+{
+    auto inputManager = InputManager::getInstance();
+    
+    // 清理绑定的命令 - 解绑各个按键的命令
+    for (auto& command : boundCommands) {
+        if (auto toggleCmd = std::dynamic_pointer_cast<ToggleInventoryCommand>(command)) {
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ESCAPE, command);
+        } else if (auto fishingCmd = std::dynamic_pointer_cast<FishingCommand>(command)) {
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_H, command);
+        } else {
+            // 场景切换命令绑定在ENTER键上
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ENTER, command);
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, command);
+        }
+    }
+    
+    // 清空命令列表
+    boundCommands.clear();
 }

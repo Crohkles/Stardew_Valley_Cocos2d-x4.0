@@ -24,7 +24,13 @@ public:
     // 判断角色的位置
     void checkPlayerPosition();
 
-    // 返回作物序号
+    // 设置输入命令绑定
+    void setupInputCommands();
+
+    // 清理输入命令绑定
+    void cleanupInputCommands();
+
+    // 返回区域序号
     int getRegionNumber(Vec2 pos);
 
     // 创建一个列表，用于保存所有非透明像素的坐标
@@ -46,10 +52,8 @@ private:
 
     cocos2d::Menu* menu;
 
-    bool isEnterKeyPressed = false;
-    // 判断挖矿M键是否按下
-    bool isMKeyPressed = false;
-
+    // Command Pattern相关的成员变量
+    std::vector<std::shared_ptr<KeyCommand>> boundCommands;
 
 };
 

@@ -4,10 +4,14 @@
 #include "cocos2d.h"  
 #include "AppDelegate.h"
 #include "SkillTree.h"
+#include "InputManager.h"
+#include "UICommand.h"
+#include <memory>
 
 class SkillTreeUI : public cocos2d::Layer {
 public:
     virtual bool init ( std::string sceneName );
+    virtual ~SkillTreeUI();
 
     static SkillTreeUI* create ( std::string sceneName );
 
@@ -16,6 +20,9 @@ public:
 private:
 
     NpcRelationship* NPC_RELATIONSHIP;
+    
+    // Command Patternœ‡πÿ
+    std::shared_ptr<CloseUICommand> escCloseCommand;
 
     void close ();
 

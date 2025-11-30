@@ -7,6 +7,9 @@
 #include "mini_bag.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
+#include "InputManager.h"
+#include "SceneInteractionCommand.h"
+#include "UICommand.h"
 
 USING_NS_CC;
 
@@ -23,6 +26,12 @@ public:
 
     // 判断角色的位置
     void checkPlayerPosition();
+
+    // 设置输入命令绑定
+    void setupInputCommands();
+
+    // 清理输入命令绑定
+    void cleanupInputCommands();
 
     // 下雨效果
     void createRainEffect();
@@ -55,9 +64,10 @@ private:
 
     cocos2d::Sprite* In_gettask;
 
-    bool isEnterKeyPressed = false;
-
     Sprite* Box;
+
+    // Command Pattern相关的成员变量
+    std::vector<std::shared_ptr<KeyCommand>> boundCommands;
 
 };
 

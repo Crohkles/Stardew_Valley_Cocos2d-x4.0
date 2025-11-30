@@ -16,6 +16,8 @@
 //#include "supermarket.h"
 #include "CreateCharacterUI.h"
 #include "EnergySystem.h"
+#include "InputManager.h"
+#include "InputTestScene.h"
 
 // #define USE_AUDIO_ENGINE 1   // 如果需要使用音频引擎，可以取消注释这一行
 
@@ -83,6 +85,11 @@ AppDelegate::AppDelegate() {
 
 AppDelegate::~AppDelegate() {
     // 析构函数：程序结束时会调用
+    
+    // 清理 InputManager
+    InputManager::destroyInstance();
+    CCLOG("InputManager destroyed");
+    
 #if USE_AUDIO_ENGINE
     AudioEngine::end();  // 如果使用了音频引擎，停止音频引擎
 #endif
@@ -128,6 +135,12 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     register_all_packages();  // 注册所有的包
 
+    // 初始化 InputManager（新增的键盘输入管理器）
+    auto inputManager = InputManager::getInstance();
+    inputManager->initialize();
+    inputManager->enableKeyLogging(true);  // 开启调试日志
+    CCLOG("InputManager initialized successfully");
+
     runScene(director);
 
     // set the background music and continuously play it.
@@ -151,43 +164,48 @@ void AppDelegate::runScene(cocos2d::Director* director) {
     T_lastplace.insert(std::make_pair(key, false));
 
     // 运行农场
-    //auto farm = farm::create ();
-    //director->runWithScene ( farm );
+	player1 = Player::create ();
+    auto farm = farm::create ();
+    director->runWithScene ( farm );
 
     //运行海滩场景
-    // auto beach = Beach::create ();
-    // director->runWithScene ( beach );
+     //auto beach = Beach::create ();
+     //director->runWithScene ( beach );
 
     // 运行家的场景
-   /*  auto test = Myhouse::create();
-     director->runWithScene(test); */
+     //auto test = Myhouse::create();
+     //director->runWithScene(test); 
 
     // 运行小镇的场景
      //auto test = Town::create ();
      //director->runWithScene(test);
 
-    // 运行商店的场景
-    //auto test = supermarket::create();
-    //director->runWithScene(test);
+    // 暂时运行输入测试场景来验证新的Command系统
+    //auto testScene = InputTestScene::createScene();
+    //director->runWithScene(testScene);
+    
+    // 运行商店的场景（原有代码，暂时注释）
+     //auto test = supermarket::create();
+     //director->runWithScene(test);
 
     // 运行Cave
      //auto test = Cave::create();
      //director->runWithScene(test);
 
     // 运行Beach
-    // auto test = Beach::create();
-    // director->runWithScene(test);
+     //auto test = Beach::create();
+     //director->runWithScene(test);
     
     // 运行森林
-    /* auto test = Forest::create();
-     director->runWithScene(test);*/
+     //auto test = Forest::create();
+     //director->runWithScene(test);
 
      // 运行畜棚
      // auto test = Barn::create();
      // director->runWithScene(test);
 
     //开局UI运行
-    director->runWithScene ( BeginScene::create () );
+    //director->runWithScene ( BeginScene::create () );
     //创建人物界面运行
     // director->runWithScene ( CreateCharacter::create () );
 }

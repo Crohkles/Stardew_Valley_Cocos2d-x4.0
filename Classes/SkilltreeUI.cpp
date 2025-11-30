@@ -233,16 +233,24 @@ void SkillTreeUI::Buttons_switching () {
     _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , this );
 }
 
+SkillTreeUI::~SkillTreeUI() {
+    // 清理命令绑定
+    if (escCloseCommand) {
+        auto inputManager = InputManager::getInstance();
+        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ESCAPE, escCloseCommand);
+    }
+}
+
 void SkillTreeUI::close () {
-    // 设置键盘监听器  
-    auto listenerClose = EventListenerKeyboard::create ();
-    listenerClose->onKeyPressed = [this]( EventKeyboard::KeyCode keyCode , Event* event ) {
-        if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE) {
-            this->removeFromParent ();
-        }
-        };
-    // 将监听器添加到事件分发器中  
-    _eventDispatcher->addEventListenerWithSceneGraphPriority ( listenerClose , this );
+    // 使用Command Pattern绑定ESC键关闭功能
+    auto inputManager = InputManager::getInstance();
+    auto currentScene = Director::getInstance()->getRunningScene();
+    
+    auto closeCommand = std::make_shared<CloseUICommand>(this, currentScene);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ESCAPE, closeCommand);
+    
+    // 保存命令引用以便清理
+    escCloseCommand = closeCommand;
 }
 
 bool SkillTreeUI::init ( std::string sceneName ) {

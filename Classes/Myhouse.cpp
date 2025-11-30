@@ -11,7 +11,9 @@ USING_NS_CC;
 
 Myhouse::Myhouse() {}
 
-Myhouse::~Myhouse() {}
+Myhouse::~Myhouse() {
+    cleanupInputCommands();
+}
 
 bool Myhouse::init()
 {
@@ -97,6 +99,7 @@ bool Myhouse::init()
     // 初始化角色并将其添加到场景
     if (player1->getParent() == NULL) {
         this->addChild(player1, 11);
+        player1->setupInputBindings();  // 确保Player有parent后再设置输入绑定
         player1->setScale(2.7f);
         player1->speed = 7.0f;
         player1->setAnchorPoint(Vec2(0.5f, 0.2f));
@@ -150,48 +153,106 @@ bool Myhouse::init()
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, button);
 
-    // 设置键盘监听器
-    auto listenerWithPlayer = EventListenerKeyboard::create();
-    listenerWithPlayer->onKeyPressed = [this](EventKeyboard::KeyCode keyCode, Event* event)
-        {
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = true;
-                CCLOG("Enter key pressed. ");
-            }
-            else if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE) {
-                static int isOpen = 0;
-                static InventoryUI* currentInventoryUI = nullptr;  // 保存当前显示的 InventoryUI  
-                // 如果当前没有打开 InventoryUI，则打开它  
-                if (currentInventoryUI == nullptr || isOpen == 0) {
-                    isOpen = 1;
-                    CCLOG ( "Opening inventory." );
-                    currentInventoryUI = InventoryUI::create ( inventory , "Myhouse" );
-                    this->addChild ( currentInventoryUI , 20 );  // 将 InventoryUI 添加到 Town 的上层  
-                }
-                // 如果已经打开 InventoryUI，则关闭它  
-                else {
-                    isOpen = 0;
-                    CCLOG ( "Closing inventory." );
-                    this->removeChild ( currentInventoryUI , true );  // 从当前场景中移除 InventoryUI  
-                    currentInventoryUI = nullptr;  // 重置指针  
-                }
-            }
-        };
+    // 旧的键盘监听器已由Command Pattern替代
 
-    listenerWithPlayer->onKeyReleased = [this](EventKeyboard::KeyCode keyCode, Event* event)
-        {
-            // 释放 Enter 键时，设置为 false
-            if (keyCode == EventKeyboard::KeyCode::KEY_ENTER || keyCode == EventKeyboard::KeyCode::KEY_KP_ENTER) {
-                isEnterKeyPressed = false;
-            }
-        };
-
-    // 将监听器添加到事件分发器中
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listenerWithPlayer, this);
+    // 设置输入命令绑定
+    setupInputCommands();
 
     return true;
 }
 
+void Myhouse::setupInputCommands()
+{
+    auto inputManager = InputManager::getInstance();
+    // inventory是全局变量，在AppDelegate.h中声明
+    
+    // 创建条件场景切换命令 - 出门到农场
+    auto farmCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        []() { return farm::create(); },
+        [this]() { 
+            Vec2 playerPos = player1->getPosition();
+            return OutDoor.containsPoint(playerPos); 
+        },
+        nullptr,
+        "farm"
+    );
+    
+    // 创建条件睡觉命令
+    auto sleepCommand = std::make_shared<ConditionalSceneTransitionCommand>(
+        player1,
+        []() { 
+            // 执行睡觉逻辑
+            extern bool IsNextDay;
+            extern int day;
+            extern std::string Season;
+            
+            IsNextDay = true;
+            day++;
+            
+            if (day == 8) {
+                if (Season == "Spring") {
+                    Season = "Summer";
+                }
+                else if (Season == "Summer") {
+                    Season = "Autumn";
+                }
+                else {
+                    Season = "Winter";
+                }
+                day = 1;
+            }
+            
+            return Myhouse::create(); 
+        },
+        [this]() { 
+            Vec2 playerPos = player1->getPosition();
+            return GoBed.containsPoint(playerPos); 
+        },
+        nullptr,
+        "sleep"
+    );
+    
+    // 创建UI切换命令 - 背包
+    auto inventoryCommand = std::make_shared<ToggleInventoryCommand>(
+        this,
+        inventory,
+        "Myhouse"
+    );
+    
+    // 绑定命令到按键
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, farmCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, sleepCommand);
+    
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, farmCommand);
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, sleepCommand);
+    
+    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ESCAPE, inventoryCommand);
+    
+    // 保存绑定的命令，方便清理
+    boundCommands.push_back(farmCommand);
+    boundCommands.push_back(sleepCommand);
+    boundCommands.push_back(inventoryCommand);
+}
+
+void Myhouse::cleanupInputCommands()
+{
+    auto inputManager = InputManager::getInstance();
+    
+    // 清理绑定的命令 - 解绑ENTER键和ESCAPE键的命令
+    for (auto& command : boundCommands) {
+        if (auto toggleCmd = std::dynamic_pointer_cast<ToggleInventoryCommand>(command)) {
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ESCAPE, command);
+        } else {
+            // 场景切换命令绑定在ENTER键上
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ENTER, command);
+            inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, command);
+        }
+    }
+    
+    // 清空命令列表
+    boundCommands.clear();
+}
 
 Myhouse* Myhouse::create()
 {
@@ -209,6 +270,8 @@ Myhouse* Myhouse::create()
 // 检查玩家是否接近背景的轮廓点
 void Myhouse::checkPlayerPosition()
 {
+    // 设置碰撞上下文
+    player1->setCollisionContext(nonTransparentPixels);
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
     TimeUI->setPosition(visibleSize.width / 2, visibleSize.height / 2);
@@ -305,167 +368,18 @@ void Myhouse::checkPlayerPosition()
 
     }
 
-    // 是否进入农场
-    if (OutDoor.containsPoint(playerPos)) {
-        if (isEnterKeyPressed) {
-            player1->removeFromParent();
-            auto NextSence = farm::create();
-            Director::getInstance()->replaceScene(NextSence);
-        }
-    }
+    // 出门到农场的逻辑现在由ConditionalSceneTransitionCommand处理
+    // 这里可以添加UI提示逻辑
 
-    // 是否睡觉
-    if (GoBed.containsPoint(playerPos)) {
-        if (isEnterKeyPressed) {
+    // 睡觉逻辑现在由ConditionalSceneTransitionCommand处理
+    // 这里可以添加UI提示逻辑
 
-            IsNextDay = true;
-
-            isEnterKeyPressed = false;
-
-            day++;
-
-            if (day == 8) {
-                if (Season == "Spring") {
-                    Season = "Summer";
-                }
-                else if (Season == "Summer") {
-                    Season = "Autumn";
-                }
-                else {
-                    Season = "Winter";
-                }
-                day = 1;
-            }
-
-            if (day % 3 == 1) {
-                Weather = "Rainy";
-            }
-            else {
-                Weather = "Sunny";
-            }
-
-            if ((Season == "Spring") && (day == 1)) {
-                Festival = "Fishing Day";
-            }
-            else {
-                Festival = "Noraml Day";
-            }
+    // 睡觉逻辑的具体实现已移到ConditionalSceneTransitionCommand中
 
 
-            for (auto it = Crop_information.begin(); it != Crop_information.end();) {
-
-                auto crop = *it;  // 解引用迭代器以访问 Crop 对象
-
-                if (day == 1) {
-                    crop->watered = true;
-                }
-                if ((day - 1) % 3 == 1) {
-                    crop->watered = true;
-                }
-
-                // 判断前一天是否浇水
-                if ((crop->watered == false) && (crop->GetPhase() != Phase::MATURE)) {
-                    // 判断是否已经进入枯萎状态
-                    if (crop->GetPhase() != Phase::SAPLESS) {
-                        crop->ChangePhase(Phase::SAPLESS);
-                        crop->ChangMatureNeeded(2); // 延迟两天收获
-                        it++;
-                    }
-                    else {
-                        // 删除元素并更新迭代器
-                        it = Crop_information.erase(it);
-                    }
-
-                }
-                else {
-                    // 更新状态
-                    crop->UpdateGrowth();
-                    it++;
-                }
-
-            }
-
-            for (auto& pair : F_lastplace) {
-                if (pair.first.first == "myhouse") {  // 检查 bool 值是否为 true
-                    pair.second = true;
-                }
-            }
-
-            //恢复为能够生产产品
-            for (auto livestock : livestocks) {
-                livestock->SetCanProduce ( true );
-            }
-
-            IsSleep = true;
-            frombed = true;
-            remainingTime = 10800;
-            player1->removeFromParent();
-            auto TempSleep = Sprite::create("character1/player_sleep.png");
-            TempSleep->setPosition(1195, 545);
-            TempSleep->setScale(1.0f);
-            this->addChild(TempSleep, 7);
-            auto nextday = Myhouse::create();
-            Director::getInstance()->replaceScene(TransitionFade::create(3.0f, nextday)); ;
-
-        }
-    }
-
-
-    for (const auto& point : nonTransparentPixels)
-    {
-        // 计算玩家与轮廓点之间的距离
-        float distance = 0;
-
-        Vec2 temp;
-        temp = playerPos;
-        temp.x -= player1->speed;
-        distance = temp.distance(point);
-        if (distance <= 17) {
-            player1->moveLeft = false;
-        }
-        else {
-            if (player1->leftpressed == false) {
-                player1->moveLeft = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.y -= 10;
-        distance = temp.distance(point);
-        if (distance <= 15) {
-            player1->moveDown = false;
-        }
-        else {
-            if (player1->downpressed == false) {
-                player1->moveDown = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.y += 10;
-        distance = temp.distance(point);
-        if (distance <= 15) {
-            player1->moveUp = false;
-        }
-        else {
-            if (player1->uppressed == false) {
-                player1->moveUp = true;
-            }
-        }
-
-        temp = playerPos;
-        temp.x += 10;
-        distance = temp.distance(point);
-        if (distance <= 15) {
-            player1->moveRight = false;
-        }
-        else {
-            if (player1->rightpressed == false) {
-                player1->moveRight = true;
-            }
-        }
-
-    }
+    // 碰撞检测逻辑已移到Player类的updateMovementPermissions方法中
+    // 通过setCollisionContext设置碰撞点即可
+    // 碰撞权限会在Player的player1_move()中自动更新
 
 
 }

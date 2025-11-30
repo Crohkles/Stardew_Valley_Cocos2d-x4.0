@@ -7,6 +7,9 @@
 #include "AppDelegate.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
+#include "KeyCommand.h"
+#include <memory>
+#include <vector>
 
 USING_NS_CC;
 
@@ -23,6 +26,12 @@ public:
 
     // 判断角色的位置
     void checkPlayerPosition();
+
+    // 设置输入命令绑定
+    void setupInputCommands();
+
+    // 清理输入命令绑定
+    void cleanupInputCommands();
 
     // 返回作物序号
     int getRegionNumber(Vec2 pos);
@@ -58,10 +67,8 @@ private:
 
     cocos2d::Menu* menu;
 
-    bool isEnterKeyPressed = false;
-    // 判断砍树L键是否按下
-    bool isLKeyPressed = false;
-
+    // Command Pattern相关的成员变量
+    std::vector<std::shared_ptr<KeyCommand>> boundCommands;
 
 };
 

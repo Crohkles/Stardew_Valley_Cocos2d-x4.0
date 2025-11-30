@@ -8,6 +8,10 @@
 #include "ui/CocosGUI.h"
 #include "Inventory.h"
 #include "Generaltem.h"
+#include "KeyCommand.h"
+#include "InputManager.h"
+#include "SceneInteractionCommand.h"
+#include "UICommand.h"
 
 class supermarket : public cocos2d::Scene
 {
@@ -17,6 +21,10 @@ public:
     ~supermarket();
 
     virtual bool init();
+
+    // Command Pattern methods
+    void setupInputCommands();
+    void cleanupInputCommands();
 
     static supermarket* create();
 
@@ -45,6 +53,9 @@ private:
     bool  isEnterKeyPressed = false;
 
     Inventory* StoreItem;
+
+    // Command Pattern members
+    std::vector<std::shared_ptr<KeyCommand>> boundCommands;
 
 };
 

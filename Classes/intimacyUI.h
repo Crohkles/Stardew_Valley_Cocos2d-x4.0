@@ -7,10 +7,14 @@
 #include "InventoryUI.h"
 #include <NPC.h>
 #include "SkillTreeUI.h"
+#include "InputManager.h"
+#include "UICommand.h"
+#include <memory>
 
 class intimacyUI : public cocos2d::Layer {
 public:
     virtual bool init ( std::string sceneName );
+    virtual ~intimacyUI();
 
     static intimacyUI* create ( std::string sceneName );
 
@@ -28,6 +32,9 @@ public:
 
 private:  
     std::string SceneName;
+    
+    // Command Patternœ‡πÿ
+    std::shared_ptr<CloseUICommand> escCloseCommand;
 
     NpcRelationship* NPC_RELATIONSHIP;
 };

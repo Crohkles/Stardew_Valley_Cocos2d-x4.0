@@ -22,11 +22,23 @@ public:
     // 初始化角色
     bool init();
 
-    // 按键按下时触发的回调函数
+    // 按键按下时触发的回调函数（已废弃，保留用于兼容性）
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 
-    // 按键释放时触发的回调函数
+    // 按键释放时触发的回调函数（已废弃，保留用于兼容性）
     void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+    
+    // 设置输入绑定的方法（新Command系统）
+    void setupInputBindings();
+    
+    // 新增：Command系统用的移动状态控制方法
+    void startMove(int direction);  // direction: 0=down, 1=left, 2=right, 3=up
+    void stopMove(int direction);
+    bool canMove(int direction) const;
+    
+    // 碰撞上下文管理方法
+    void setCollisionContext(const std::vector<cocos2d::Vec2>& collisionPoints);
+    void updateMovementPermissions();
 
     void player1_move();
 
@@ -46,6 +58,11 @@ public:
 
     //int energy_limit = kDefaultEnergy;
     //int current_energy = kDefaultEnergy;
+
+private:
+    // 碰撞检测相关
+    std::vector<cocos2d::Vec2> collisionPoints;
+    float collisionRadius = 15.0f;  // 碰撞检测半径
 
 };
 

@@ -9,6 +9,9 @@
 #include "AppDelegate.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
+#include "KeyCommand.h"
+#include <memory>
+#include <vector>
 
 
 USING_NS_CC;
@@ -35,6 +38,11 @@ public:
     // 判断角色的位置
     void CheckPlayerPosition ();
 
+    // 设置输入命令绑定
+    void setupInputCommands();
+
+    // 清理输入命令绑定
+    void cleanupInputCommands();
 
     // 创建一个列表，用于保存所有非透明像素的坐标
     std::vector<cocos2d::Vec2> non_transparent_pixels;
@@ -54,9 +62,8 @@ private:
 
     cocos2d::Menu* menu;
 
-    bool isEnterKeyPressed = false;
-
-
+    // Command Pattern相关的成员变量
+    std::vector<std::shared_ptr<KeyCommand>> boundCommands;
 
 };
 
