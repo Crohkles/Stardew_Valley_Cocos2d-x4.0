@@ -166,8 +166,8 @@ void AppDelegate::runScene(cocos2d::Director* director) {
 
     // 运行农场
 	player1 = Player::create ();
-    auto farm = farm::create ();
-    director->runWithScene ( farm );
+    // auto farm = farm::create ();
+    // director->runWithScene ( farm );
 
     //运行海滩场景
      //auto beach = Beach::create ();
@@ -186,8 +186,8 @@ void AppDelegate::runScene(cocos2d::Director* director) {
     //director->runWithScene(testScene);
     
     // 运行商店的场景（原有代码，暂时注释）
-     //auto test = supermarket::create();
-     //director->runWithScene(test);
+    auto test = supermarket::create();
+    director->runWithScene(test);
 
     // 运行Cave
      //auto test = Cave::create();
