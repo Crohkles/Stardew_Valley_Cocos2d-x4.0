@@ -9,6 +9,7 @@
 #include "../Core/InputManager.h"
 #include "../Commands/SceneInteractionCommand.h"
 #include "../Commands/UICommand.h"
+#include "../Items/Generaltem.h"  // 引入新的flyweight物品系统
 
 USING_NS_CC;
 
@@ -35,39 +36,42 @@ bool supermarket::init()
 
     StoreItem = new Inventory ();
 
+    // 初始化flyweight物品系统
+    ItemManager::InitializeItems();
+    
     // 动物  
-    StoreItem->AddItem ( AnimalChicken );
+    StoreItem->AddItem ( *GetAnimalChicken() );
 
-    StoreItem->AddItem ( AnimalSheep );
+    StoreItem->AddItem ( *GetAnimalSheep() );
 
-    StoreItem->AddItem ( AnimalCow );
+    StoreItem->AddItem ( *GetAnimalCow() );
 
-    StoreItem->AddItem ( Blueberry_Seeds );
+    StoreItem->AddItem ( *GetBlueberrySeeds() );
 
-    StoreItem->AddItem ( Corn_Seeds );
+    StoreItem->AddItem ( *GetCornSeeds() );
 
-    StoreItem->AddItem ( Potato_Seeds );
+    StoreItem->AddItem ( *GetPotatoSeeds() );
 
-    StoreItem->AddItem ( Pumpkin_Seeds );
+    StoreItem->AddItem ( *GetPumpkinSeeds() );
 
-    StoreItem->AddItem ( Wheat_Seeds );
+    StoreItem->AddItem ( *GetWheatSeeds() );
 
-    StoreItem->AddItem ( Apple_Sapling );
+    StoreItem->AddItem ( *GetAppleSapling() );
 
-    StoreItem->AddItem ( Apricot_Sapling );
+    StoreItem->AddItem ( *GetApricotSapling() );
 
 
-    StoreItem->AddItem ( Banana_Sapling );
+    StoreItem->AddItem ( *GetBananaSapling() );
 
-    StoreItem->AddItem ( Cherry_Sapling );
+    StoreItem->AddItem ( *GetCherrySapling() );
 
-    StoreItem->AddItem ( Mango_Sapling );
+    StoreItem->AddItem ( *GetMangoSapling() );
 
-    StoreItem->AddItem ( Orange_Sapling );
+    StoreItem->AddItem ( *GetOrangeSapling() );
 
-    StoreItem->AddItem ( Peach_Sapling );
+    StoreItem->AddItem ( *GetPeachSapling() );
 
-    StoreItem->AddItem ( Pomegranate_Sapling );
+    StoreItem->AddItem ( *GetPomegranateSapling() );
 
     /*
     // 春季种子物品列表  
@@ -153,80 +157,80 @@ bool supermarket::init()
     */
 
     // 工具列表  
-    StoreItem->AddItem ( Backpack_36 );
+    StoreItem->AddItem ( *GetBackpack36() );
 
-    StoreItem->AddItem ( Backpack );
+    StoreItem->AddItem ( *GetBackpack() );
 
-    StoreItem->AddItem ( Advanced_Iridium_Rod );
+    StoreItem->AddItem ( *GetAdvancedIridiumRod() );
 
-    StoreItem->AddItem ( Axe );
+    StoreItem->AddItem ( *GetAxe() );
 
-    StoreItem->AddItem ( Bamboo_Pole );
+    StoreItem->AddItem ( *GetBambooPole() );
 
-    StoreItem->AddItem ( Copper_Axe );
+    StoreItem->AddItem ( *GetCopperAxe() );
 
-    StoreItem->AddItem ( Copper_Hoe );
+    StoreItem->AddItem ( *GetCopperHoe() );
 
-    StoreItem->AddItem ( Copper_Pan );
+    StoreItem->AddItem ( *GetCopperPan() );
 
-    StoreItem->AddItem ( Copper_Pickaxe );
+    StoreItem->AddItem ( *GetCopperPickaxe() );
 
-    StoreItem->AddItem ( Copper_Watering );
+    StoreItem->AddItem ( *GetCopperWatering() );
 
-    StoreItem->AddItem ( Fiberglass_Rod );
+    StoreItem->AddItem ( *GetFiberglassRod() );
 
-    StoreItem->AddItem ( Gold_Axe );
+    StoreItem->AddItem ( *GetGoldAxe() );
 
-    StoreItem->AddItem ( Gold_Hoe );
+    StoreItem->AddItem ( *GetGoldHoe() );
 
-    StoreItem->AddItem ( Gold_Pan );
+    StoreItem->AddItem ( *GetGoldPan() );
 
-    StoreItem->AddItem ( Gold_Pickaxe );
+    StoreItem->AddItem ( *GetGoldPickaxe() );
 
-    StoreItem->AddItem ( Gold_Watering_Can );
+    StoreItem->AddItem ( *GetGoldWateringCan() );
 
-    StoreItem->AddItem ( Golden_Scythe );
+    StoreItem->AddItem ( *GetGoldenScythe() );
 
-    StoreItem->AddItem ( Hoe );
+    StoreItem->AddItem ( *GetHoe() );
 
-    StoreItem->AddItem ( Pickaxe );
+    StoreItem->AddItem ( *GetPickaxe() );
 
-    StoreItem->AddItem ( Milk_Pail );
+    StoreItem->AddItem ( *GetMilkPail() );
 
-    StoreItem->AddItem ( Scythe );
+    StoreItem->AddItem ( *GetScythe() );
 
-    StoreItem->AddItem ( Steel_Axe );
+    StoreItem->AddItem ( *GetSteelAxe() );
 
-    StoreItem->AddItem ( Steel_Hoe );
+    StoreItem->AddItem ( *GetSteelHoe() );
 
-    StoreItem->AddItem ( Steel_Pan );
+    StoreItem->AddItem ( *GetSteelPan() );
 
-    StoreItem->AddItem ( Steel_Pickaxe );
+    StoreItem->AddItem ( *GetSteelPickaxe() );
 
-    StoreItem->AddItem ( Steel_Watering );
+    StoreItem->AddItem ( *GetSteelWatering() );
 
-    StoreItem->AddItem ( Trash_Can_Copper );
+    StoreItem->AddItem ( *GetTrashCanCopper() );
 
-    StoreItem->AddItem ( Watering_Can );
+    StoreItem->AddItem ( *GetWateringCan() );
 
-    StoreItem->AddItem ( Trash_Can_Steel );
+    StoreItem->AddItem ( *GetTrashCanSteel() );
 
-    // 树苗列表  
-    StoreItem->AddItem ( Apple_Sapling );
+    // 树苗列表 (重复添加，但保持原有逻辑)  
+    StoreItem->AddItem ( *GetAppleSapling() );
 
-    StoreItem->AddItem ( Apricot_Sapling );
+    StoreItem->AddItem ( *GetApricotSapling() );
 
-    StoreItem->AddItem ( Banana_Sapling );
+    StoreItem->AddItem ( *GetBananaSapling() );
 
-    StoreItem->AddItem ( Cherry_Sapling );
+    StoreItem->AddItem ( *GetCherrySapling() );
 
-    StoreItem->AddItem ( Mango_Sapling );
+    StoreItem->AddItem ( *GetMangoSapling() );
 
-    StoreItem->AddItem ( Orange_Sapling );
+    StoreItem->AddItem ( *GetOrangeSapling() );
 
-    StoreItem->AddItem ( Peach_Sapling );
+    StoreItem->AddItem ( *GetPeachSapling() );
 
-    StoreItem->AddItem ( Pomegranate_Sapling );
+    StoreItem->AddItem ( *GetPomegranateSapling() );
 
     // 设置计时器标签
     TimeUI = Timesystem::create ( "supermarket" );
