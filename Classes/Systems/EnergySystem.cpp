@@ -1,4 +1,4 @@
 #include "EnergySystem.h"
 
-// 静态成员初始化
+// 闈欐�佹垚鍛樺垵濮嬪寲
 EnergySystem* EnergySystem::instance = nullptr;

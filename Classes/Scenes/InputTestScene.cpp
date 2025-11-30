@@ -1,9 +1,9 @@
 #include "InputTestScene.h"
-#include "InputManager.h"
-#include "PlayerMovementCommand.h"
-#include "UICommand.h"
-#include "Player.h"
-#include "AppDelegate.h"
+#include "../Core/InputManager.h"
+#include "../Commands/PlayerMovementCommand.h"
+#include "../Commands/UICommand.h"
+#include "../Entities/Player.h"
+#include "../Core/AppDelegate.h"
 
 USING_NS_CC;
 

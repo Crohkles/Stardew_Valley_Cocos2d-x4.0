@@ -4,37 +4,37 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "Item.h"
+#include "../Items/Item.h"
 
-// ¹Û²ìÕß½Ó¿Ú
+// è§‚å¯Ÿè€…æ¥å£
 class GameStateObserver {
 public:
     virtual ~GameStateObserver() = default;
     
-    // ¾­¼Ã×´Ì¬±ä»¯Í¨Öª
+    // ç»æµçŠ¶æ€å˜åŒ–é€šçŸ¥
     virtual void onEconomicStateChanged(int newGoldAmount, int delta) {}
     
-    // ±³°ü×´Ì¬±ä»¯Í¨Öª
+    // èƒŒåŒ…çŠ¶æ€å˜åŒ–é€šçŸ¥
     virtual void onInventoryStateChanged() {}
     
-    // ÌåÁ¦×´Ì¬±ä»¯Í¨Öª
+    // ä½“åŠ›çŠ¶æ€å˜åŒ–é€šçŸ¥
     virtual void onEnergyStateChanged(int newEnergy, int maxEnergy) {}
     
-    // NPC¹ØÏµ×´Ì¬±ä»¯Í¨Öª
+    // NPCå…³ç³»çŠ¶æ€å˜åŒ–é€šçŸ¥
     virtual void onRelationshipStateChanged(const std::string& npc, double newLevel) {}
     
-    // ÈÎÎñ×´Ì¬±ä»¯Í¨Öª
+    // ä»»åŠ¡çŠ¶æ€å˜åŒ–é€šçŸ¥
     virtual void onTaskStateChanged(const std::string& taskName, int state) {}
 };
 
-// ±»¹Û²ìÕß»ùÀà
+// è¢«è§‚å¯Ÿè€…åŸºç±»
 class GameStateSubject {
 private:
     std::vector<GameStateObserver*> observers;
     
 public:
     virtual ~GameStateSubject() {
-        // Çå¿Õ¹Û²ìÕßÁĞ±í£¬·ÀÖ¹Ğü¿ÕÖ¸Õë
+        // æ¸…ç©ºè§‚å¯Ÿè€…åˆ—è¡¨ï¼Œé˜²æ­¢æ‚¬ç©ºæŒ‡é’ˆ
         observers.clear();
     }
     
@@ -55,7 +55,7 @@ public:
     
 protected:
     void notifyEconomicStateChanged(int newGoldAmount, int delta) {
-        // ´´½¨¹Û²ìÕßÁĞ±íµÄ¸±±¾ÒÔ·ÀÖ¹µü´ú¹ı³ÌÖĞÁĞ±í±»ĞŞ¸Ä
+        // åˆ›å»ºè§‚å¯Ÿè€…åˆ—è¡¨çš„å‰¯æœ¬ä»¥é˜²æ­¢è¿­ä»£è¿‡ç¨‹ä¸­åˆ—è¡¨è¢«ä¿®æ”¹
         auto observersCopy = observers;
         for (auto* observer : observersCopy) {
             if (observer != nullptr) {
@@ -65,7 +65,7 @@ protected:
     }
     
     void notifyInventoryStateChanged() {
-        // ´´½¨¹Û²ìÕßÁĞ±íµÄ¸±±¾ÒÔ·ÀÖ¹µü´ú¹ı³ÌÖĞÁĞ±í±»ĞŞ¸Ä
+        // åˆ›å»ºè§‚å¯Ÿè€…åˆ—è¡¨çš„å‰¯æœ¬ä»¥é˜²æ­¢è¿­ä»£è¿‡ç¨‹ä¸­åˆ—è¡¨è¢«ä¿®æ”¹
         auto observersCopy = observers;
         for (auto* observer : observersCopy) {
             if (observer != nullptr) {
@@ -75,7 +75,7 @@ protected:
     }
     
     void notifyEnergyStateChanged(int newEnergy, int maxEnergy) {
-        // ´´½¨¹Û²ìÕßÁĞ±íµÄ¸±±¾ÒÔ·ÀÖ¹µü´ú¹ı³ÌÖĞÁĞ±í±»ĞŞ¸Ä
+        // åˆ›å»ºè§‚å¯Ÿè€…åˆ—è¡¨çš„å‰¯æœ¬ä»¥é˜²æ­¢è¿­ä»£è¿‡ç¨‹ä¸­åˆ—è¡¨è¢«ä¿®æ”¹
         auto observersCopy = observers;
         for (auto* observer : observersCopy) {
             if (observer != nullptr) {
@@ -85,7 +85,7 @@ protected:
     }
     
     void notifyRelationshipStateChanged(const std::string& npc, double newLevel) {
-        // ´´½¨¹Û²ìÕßÁĞ±íµÄ¸±±¾ÒÔ·ÀÖ¹µü´ú¹ı³ÌÖĞÁĞ±í±»ĞŞ¸Ä
+        // åˆ›å»ºè§‚å¯Ÿè€…åˆ—è¡¨çš„å‰¯æœ¬ä»¥é˜²æ­¢è¿­ä»£è¿‡ç¨‹ä¸­åˆ—è¡¨è¢«ä¿®æ”¹
         auto observersCopy = observers;
         for (auto* observer : observersCopy) {
             if (observer != nullptr) {
@@ -95,7 +95,7 @@ protected:
     }
     
     void notifyTaskStateChanged(const std::string& taskName, int state) {
-        // ´´½¨¹Û²ìÕßÁĞ±íµÄ¸±±¾ÒÔ·ÀÖ¹µü´ú¹ı³ÌÖĞÁĞ±í±»ĞŞ¸Ä
+        // åˆ›å»ºè§‚å¯Ÿè€…åˆ—è¡¨çš„å‰¯æœ¬ä»¥é˜²æ­¢è¿­ä»£è¿‡ç¨‹ä¸­åˆ—è¡¨è¢«ä¿®æ”¹
         auto observersCopy = observers;
         for (auto* observer : observersCopy) {
             if (observer != nullptr) {

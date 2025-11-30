@@ -1,14 +1,14 @@
-#include "AppDelegate.h"
+#include "../Core/AppDelegate.h"
 #include "supermarket.h"
 #include "Town.h"
-#include "Player.h"
+#include "../Entities/Player.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
-#include "StoreUI.h"
-#include "KeyCommand.h"
-#include "InputManager.h"
-#include "SceneInteractionCommand.h"
-#include "UICommand.h"
+#include "../UI/StoreUI.h"
+#include "../Commands/KeyCommand.h"
+#include "../Core/InputManager.h"
+#include "../Commands/SceneInteractionCommand.h"
+#include "../Commands/UICommand.h"
 
 USING_NS_CC;
 
@@ -35,7 +35,7 @@ bool supermarket::init()
 
     StoreItem = new Inventory ();
 
-    // ¶¯Îï  
+    // åŠ¨ç‰©  
     StoreItem->AddItem ( AnimalChicken );
 
     StoreItem->AddItem ( AnimalSheep );
@@ -70,7 +70,7 @@ bool supermarket::init()
     StoreItem->AddItem ( Pomegranate_Sapling );
 
     /*
-    // ´º¼¾ÖÖ×ÓÎïÆ·ÁĞ±í  
+    // æ˜¥å­£ç§å­ç‰©å“åˆ—è¡¨  
     StoreItem->AddItem ( Bean_Starter );
 
     StoreItem->AddItem ( Carrot_Seeds );
@@ -97,7 +97,7 @@ bool supermarket::init()
 
     StoreItem->AddItem ( Tulip_Bulb );
 
-    // ÏÄ¼¾ÖÖ×ÓÎïÆ·ÁĞ±í  
+    // å¤å­£ç§å­ç‰©å“åˆ—è¡¨  
     StoreItem->AddItem ( Amaranth_Seeds );
 
     StoreItem->AddItem ( Artichoke_Seeds );
@@ -148,11 +148,11 @@ bool supermarket::init()
 
     StoreItem->AddItem ( Yam_Seeds );
 
-    // ¶¬¼¾ÖÖ×ÓÎïÆ·ÁĞ±í  
+    // å†¬å­£ç§å­ç‰©å“åˆ—è¡¨  
     StoreItem->AddItem ( Powdermelon_Seeds );
     */
 
-    // ¹¤¾ßÁĞ±í  
+    // å·¥å…·åˆ—è¡¨  
     StoreItem->AddItem ( Backpack_36 );
 
     StoreItem->AddItem ( Backpack );
@@ -211,7 +211,7 @@ bool supermarket::init()
 
     StoreItem->AddItem ( Trash_Can_Steel );
 
-    // Ê÷ÃçÁĞ±í  
+    // æ ‘è‹—åˆ—è¡¨  
     StoreItem->AddItem ( Apple_Sapling );
 
     StoreItem->AddItem ( Apricot_Sapling );
@@ -228,16 +228,16 @@ bool supermarket::init()
 
     StoreItem->AddItem ( Pomegranate_Sapling );
 
-    // ÉèÖÃ¼ÆÊ±Æ÷±êÇ©
+    // è®¾ç½®è®¡æ—¶å™¨æ ‡ç­¾
     TimeUI = Timesystem::create ( "supermarket" );
     this->addChild ( TimeUI , 13 );
 
-    // ³õÊ¼»¯¿ªÃÅ¼ü
+    // åˆå§‹åŒ–å¼€é—¨é”®
     opendoor = Sprite::create("opendoor.png");
     this->addChild(opendoor, 11);
     opendoor->setVisible(false);
 
-    // ÉèÖÃ±³¾°Í¼Æ¬
+    // è®¾ç½®èƒŒæ™¯å›¾ç‰‡
     auto background_real = Sprite::create("supermarket/supermarket.png");
     background_real->setPosition(Vec2(visibleSize.width / 2 + 1700, visibleSize.height / 2 + 370));
     this->addChild(background_real, 1);
@@ -254,14 +254,14 @@ bool supermarket::init()
     background->setScale(6.7f);
 
 
-    Vec2 spritePosition = background->getPosition();   // »ñÈ¡¾«ÁéµÄÎ»ÖÃ£¨ÖĞĞÄµã£©
-    Size spriteSize = background->getContentSize();    // »ñÈ¡¾«ÁéµÄ³ß´ç£¨¿í¶ÈºÍ¸ß¶È£©
+    Vec2 spritePosition = background->getPosition();   // è·å–ç²¾çµçš„ä½ç½®ï¼ˆä¸­å¿ƒç‚¹ï¼‰
+    Size spriteSize = background->getContentSize();    // è·å–ç²¾çµçš„å°ºå¯¸ï¼ˆå®½åº¦å’Œé«˜åº¦ï¼‰
   
 
-    // ¼ÆËã×óÏÂ½ÇµÄ×ø±ê
+    // è®¡ç®—å·¦ä¸‹è§’çš„åæ ‡
     Vec2 leftBottomPosition = Vec2(
-        spritePosition.x - background->getScaleX() * spriteSize.width / 2,   // ÖĞĞÄµã x ×ø±ê¼õÈ¥¿í¶ÈµÄÒ»°ë
-        spritePosition.y - background->getScaleY() * spriteSize.height / 2   // ÖĞĞÄµã y ×ø±ê¼õÈ¥¸ß¶ÈµÄÒ»°ë
+        spritePosition.x - background->getScaleX() * spriteSize.width / 2,   // ä¸­å¿ƒç‚¹ x åæ ‡å‡å»å®½åº¦çš„ä¸€åŠ
+        spritePosition.y - background->getScaleY() * spriteSize.height / 2   // ä¸­å¿ƒç‚¹ y åæ ‡å‡å»é«˜åº¦çš„ä¸€åŠ
     );
    
 
@@ -271,35 +271,35 @@ bool supermarket::init()
         int width = img.getWidth();
         int height = img.getHeight();
 
-        // »ñÈ¡ÏñËØÊı¾İ
+        // è·å–åƒç´ æ•°æ®
         unsigned char* data = img.getData();
 
-        // ±éÀúËùÓĞÏñËØ£¬¼ì²éÊÇ·ñÓĞÄÚÈİ£¨Í¸Ã÷¶È´óÓÚ0£©
+        // éå†æ‰€æœ‰åƒç´ ï¼Œæ£€æŸ¥æ˜¯å¦æœ‰å†…å®¹ï¼ˆé€æ˜åº¦å¤§äº0ï¼‰
         for (int y = 0; y < height; y = y + 4)
         {
             for (int x = 0; x < width; x = x + 4)
             {
-                // »ñÈ¡µ±Ç°ÏñËØµÄ RGBA Öµ
-                int index = (y * width + x) * 4;  // Ã¿¸öÏñËØÕ¼ÓÃ 4 ¸ö×Ö½Ú (RGBA)
-                unsigned char a = data[index + 3];  // Í¸Ã÷¶È
+                // è·å–å½“å‰åƒç´ çš„ RGBA å€¼
+                int index = (y * width + x) * 4;  // æ¯ä¸ªåƒç´ å ç”¨ 4 ä¸ªå­—èŠ‚ (RGBA)
+                unsigned char a = data[index + 3];  // é€æ˜åº¦
 
-                // Èç¹ûÍ¸Ã÷¶È (alpha) ´óÓÚ 0£¬±íÊ¾´ËÏñËØÓĞÄÚÈİ
+                // å¦‚æœé€æ˜åº¦ (alpha) å¤§äº 0ï¼Œè¡¨ç¤ºæ­¤åƒç´ æœ‰å†…å®¹
                 if (a > 0)
                 {
                     float screenX = leftBottomPosition.x + x * background->getScaleX();
-                    float screenY = leftBottomPosition.y + (height - y - 1) * background->getScaleY();  // ×¢Òâ Y Öá·´Ïò
-                    nonTransparentPixels.push_back(Vec2(screenX, screenY));  // ¼ÇÂ¼ÆÁÄ»×ø±ê
+                    float screenY = leftBottomPosition.y + (height - y - 1) * background->getScaleY();  // æ³¨æ„ Y è½´åå‘
+                    nonTransparentPixels.push_back(Vec2(screenX, screenY));  // è®°å½•å±å¹•åæ ‡
                 }
             }
         }
     }
 
 
-    // ³õÊ¼»¯½ÇÉ«²¢½«ÆäÌí¼Óµ½³¡¾°
+    // åˆå§‹åŒ–è§’è‰²å¹¶å°†å…¶æ·»åŠ åˆ°åœºæ™¯
     this->addChild(player1, 5);
-    // ÔÚÌí¼Óµ½³¡¾°ºóÉèÖÃÊäÈë°ó¶¨
+    // åœ¨æ·»åŠ åˆ°åœºæ™¯åè®¾ç½®è¾“å…¥ç»‘å®š
     player1->setupInputBindings();
-    // ÉèÖÃÅö×²ÉÏÏÂÎÄ
+    // è®¾ç½®ç¢°æ’ä¸Šä¸‹æ–‡
     player1->setCollisionContext(nonTransparentPixels);
     player1->schedule([=](float dt) {
         player1->player1_move();
@@ -308,40 +308,40 @@ bool supermarket::init()
     player1->schedule([=](float dt) {
         player1->player_change();
         }, 0.3f, "player_change");
-    player1->setPosition(Vec2(visibleSize.width / 2 + 43, visibleSize.height / 2 - 101));  // ÉèÖÃÍæ¼Ò³õÊ¼Î»ÖÃ
+    player1->setPosition(Vec2(visibleSize.width / 2 + 43, visibleSize.height / 2 - 101));  // è®¾ç½®ç©å®¶åˆå§‹ä½ç½®
     player1->setScale(3.1f);
     player1->setAnchorPoint(Vec2(0.5f, 0.2f));
     player1->speed = 5.3f;
 
-    // ¼ÆËã±³¾°¾«ÁéµÄËõ·Åºó·¶Î§
+    // è®¡ç®—èƒŒæ™¯ç²¾çµçš„ç¼©æ”¾åèŒƒå›´
     float scaledWidth = background->getContentSize().width * background->getScaleX();
     float scaledHeight = background->getContentSize().height * background->getScaleY();
 
-    // ¹¹Ôì Follow µÄ±ß½ç Rect
+    // æ„é€  Follow çš„è¾¹ç•Œ Rect
     auto followRect = cocos2d::Rect(leftBottomPosition.x, leftBottomPosition.y, scaledWidth, scaledHeight);
 
-    // ´´½¨ Follow ¶¯×÷²¢ÏŞÖÆÍæ¼ÒÔÚ±³¾°·¶Î§ÄÚÒÆ¶¯
+    // åˆ›å»º Follow åŠ¨ä½œå¹¶é™åˆ¶ç©å®¶åœ¨èƒŒæ™¯èŒƒå›´å†…ç§»åŠ¨
     auto followAction = Follow::create(player1, followRect);
     this->runAction(followAction);
 
 
-    // ¶¨ÆÚ¸üĞÂÍæ¼Ò×´Ì¬
+    // å®šæœŸæ›´æ–°ç©å®¶çŠ¶æ€
     this->schedule([this](float dt) {
-        this->checkPlayerPosition();  // ¼ì²éÍæ¼ÒÊÇ·ñ½Ó½üÂÖÀªµã
+        this->checkPlayerPosition();  // æ£€æŸ¥ç©å®¶æ˜¯å¦æ¥è¿‘è½®å»“ç‚¹
         }, 0.01f, "check_position_key");
 
     auto listener = EventListenerMouse::create();
 
     listener->onMouseDown = [this](Event* event) {
        
-        // »ñÈ¡Êó±êµã»÷µÄÎ»ÖÃ
+        // è·å–é¼ æ ‡ç‚¹å‡»çš„ä½ç½®
         auto mouseEvent = static_cast<EventMouse*>(event);
         Vec2 clickPos(mouseEvent->getCursorX(), mouseEvent->getCursorY());
         clickPos = this->convertToNodeSpace(clickPos);
-        // µ÷ÊÔÊä³öÊó±êÎ»ÖÃ
+        // è°ƒè¯•è¾“å‡ºé¼ æ ‡ä½ç½®
         CCLOG("Mouse Position: (%f, %f)", clickPos.x, clickPos.y);
 
-        // ÅĞ¶Ïµã»÷Î»ÖÃÊÇ·ñÔÚ¾«Áé·¶Î§ÄÚ
+        // åˆ¤æ–­ç‚¹å‡»ä½ç½®æ˜¯å¦åœ¨ç²¾çµèŒƒå›´å†…
         if (button != nullptr && button->getBoundingBox().containsPoint(clickPos)) {
             CCLOG("Button clicked!");
             Director::getInstance()->end();
@@ -370,13 +370,13 @@ supermarket* supermarket::create()
     return nullptr;
 }
 
-// ¼ì²éÍæ¼ÒÊÇ·ñ½Ó½ü±³¾°µÄÂÖÀªµã
+// æ£€æŸ¥ç©å®¶æ˜¯å¦æ¥è¿‘èƒŒæ™¯çš„è½®å»“ç‚¹
 void supermarket::checkPlayerPosition()
 {
-    // »ñÈ¡Íæ¼ÒµÄÎ»ÖÃ
+    // è·å–ç©å®¶çš„ä½ç½®
     Vec2 playerPos = player1->getPosition();
 
-    // ¸üĞÂ¼ÆÊ±Æ÷ÏÔÊ¾
+    // æ›´æ–°è®¡æ—¶å™¨æ˜¾ç¤º
     remainingTime++;
     if (remainingTime == 43200) {
 
@@ -414,7 +414,7 @@ void supermarket::checkPlayerPosition()
 
         for (auto it = Crop_information.begin(); it != Crop_information.end();) {
 
-            auto crop = *it;  // ½âÒıÓÃµü´úÆ÷ÒÔ·ÃÎÊ Crop ¶ÔÏó
+            auto crop = *it;  // è§£å¼•ç”¨è¿­ä»£å™¨ä»¥è®¿é—® Crop å¯¹è±¡
 
             if (day == 1) {
                 crop->watered = true;
@@ -423,22 +423,22 @@ void supermarket::checkPlayerPosition()
                 crop->watered = true;
             }
 
-            // ÅĞ¶ÏÇ°Ò»ÌìÊÇ·ñ½½Ë®
+            // åˆ¤æ–­å‰ä¸€å¤©æ˜¯å¦æµ‡æ°´
             if ((crop->watered == false) && (crop->GetPhase() != Phase::MATURE)) {
-                // ÅĞ¶ÏÊÇ·ñÒÑ¾­½øÈë¿İÎ®×´Ì¬
+                // åˆ¤æ–­æ˜¯å¦å·²ç»è¿›å…¥æ¯èçŠ¶æ€
                 if (crop->GetPhase() != Phase::SAPLESS) {
                     crop->ChangePhase(Phase::SAPLESS);
-                    crop->ChangMatureNeeded(2); // ÑÓ³ÙÁ½ÌìÊÕ»ñ
+                    crop->ChangMatureNeeded(2); // å»¶è¿Ÿä¸¤å¤©æ”¶è·
                     it++;
                 }
                 else {
-                    // É¾³ıÔªËØ²¢¸üĞÂµü´úÆ÷
+                    // åˆ é™¤å…ƒç´ å¹¶æ›´æ–°è¿­ä»£å™¨
                     it = Crop_information.erase(it);
                 }
 
             }
             else {
-                // ¸üĞÂ×´Ì¬
+                // æ›´æ–°çŠ¶æ€
                 crop->UpdateGrowth();
                 it++;
             }
@@ -449,7 +449,7 @@ void supermarket::checkPlayerPosition()
             if (pair.second) {
                 pair.second = false;
             }
-            if (pair.first.first == "myhouse") {  // ¼ì²é bool ÖµÊÇ·ñÎª true
+            if (pair.first.first == "myhouse") {  // æ£€æŸ¥ bool å€¼æ˜¯å¦ä¸º true
                 pair.second = true;
             }
         }
@@ -473,7 +473,7 @@ void supermarket::checkPlayerPosition()
         }
 
 
-        //»Ö¸´ÎªÄÜ¹»Éú²ú²úÆ·
+        //æ¢å¤ä¸ºèƒ½å¤Ÿç”Ÿäº§äº§å“
         for (auto livestock : livestocks) {
             livestock->SetCanProduce ( true );
         }
@@ -488,7 +488,7 @@ void supermarket::checkPlayerPosition()
     }
 
 
-    // ¸üĞÂ±êÇ©Î»ÖÃ
+    // æ›´æ–°æ ‡ç­¾ä½ç½®
     float currentx = 0, currenty = 0;
     if (playerPos.x <= 743) {
         currentx = 743;
@@ -511,17 +511,17 @@ void supermarket::checkPlayerPosition()
     TimeUI->setPosition(currentx, currenty);
     button->setPosition(currentx + 690, currenty - 590);
    
-    // ¼ì²éÍæ¼ÒÊÇ·ñ½øÈëÄ¿±êÇøÓò£¬²¢ÇÒ°´ÏÂ Enter ¼ü
+    // æ£€æŸ¥ç©å®¶æ˜¯å¦è¿›å…¥ç›®æ ‡åŒºåŸŸï¼Œå¹¶ä¸”æŒ‰ä¸‹ Enter é”®
     if (Region_Out.containsPoint(playerPos)) {
-        // Íæ¼Ò½øÈëÄ¿±êÇøÓò
+        // ç©å®¶è¿›å…¥ç›®æ ‡åŒºåŸŸ
         opendoor->setVisible(true);
         opendoor->setPosition(playerPos.x + 110, playerPos.y + 30);
 
 
         if (isEnterKeyPressed) {
-            // ´òÓ¡µ÷ÊÔĞÅÏ¢£¬¼ì²é Enter ¼üµÄ×´Ì¬
+            // æ‰“å°è°ƒè¯•ä¿¡æ¯ï¼Œæ£€æŸ¥ Enter é”®çš„çŠ¶æ€
             CCLOG("Player in target area, isEnterKeyPressed: %d", isEnterKeyPressed);
-            // µ÷ÓÃ³¡¾°ÇĞ»»Âß¼­
+            // è°ƒç”¨åœºæ™¯åˆ‡æ¢é€»è¾‘
             player1->removeFromParent();
             auto nextscene = Town::create();
             Director::getInstance()->replaceScene(nextscene);
@@ -533,9 +533,9 @@ void supermarket::checkPlayerPosition()
         opendoor->setVisible(false);
     }
 
-    // Åö×²¼ì²âÂß¼­ÒÑÒÆµ½PlayerÀàµÄupdateMovementPermissions·½·¨ÖĞ
-    // Í¨¹ısetCollisionContextÉèÖÃÅö×²µã¼´¿É
-    // Åö×²È¨ÏŞ»áÔÚPlayerµÄplayer1_move()ÖĞ×Ô¶¯¸üĞÂ
+    // ç¢°æ’æ£€æµ‹é€»è¾‘å·²ç§»åˆ°Playerç±»çš„updateMovementPermissionsæ–¹æ³•ä¸­
+    // é€šè¿‡setCollisionContextè®¾ç½®ç¢°æ’ç‚¹å³å¯
+    // ç¢°æ’æƒé™ä¼šåœ¨Playerçš„player1_move()ä¸­è‡ªåŠ¨æ›´æ–°
 
 
 
@@ -632,14 +632,14 @@ void supermarket::cleanupInputCommands()
 {
     auto inputManager = InputManager::getInstance();
     
-    // ÖğÒ»½â°óÃüÁî
+    // é€ä¸€è§£ç»‘å‘½ä»¤
     for (auto& command : boundCommands) {
         inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_P, command);
         inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ENTER, command);
         inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, command);
     }
     
-    // ÇåÀíÃüÁîÒıÓÃ
+    // æ¸…ç†å‘½ä»¤å¼•ç”¨
     boundCommands.clear();
 }
 

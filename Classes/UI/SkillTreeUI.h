@@ -1,11 +1,11 @@
 #pragma once
 //SkillTreeUI.h
-//人物技能树界面
+//浜虹墿鎶�鑳芥爲鐣岄潰
 #include "cocos2d.h"  
-#include "AppDelegate.h"
-#include "SkillTree.h"
-#include "InputManager.h"
-#include "UICommand.h"
+#include "../Core/AppDelegate.h"
+#include "../Systems/SkillTree.h"
+#include "../Core/InputManager.h"
+#include "../Commands/UICommand.h"
 #include <memory>
 
 class SkillTreeUI : public cocos2d::Layer {
@@ -21,7 +21,7 @@ private:
 
     NpcRelationship* NPC_RELATIONSHIP;
     
-    // Command Pattern相关
+    // Command Pattern鐩稿叧
     std::shared_ptr<CloseUICommand> escCloseCommand;
 
     void close ();

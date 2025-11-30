@@ -2,12 +2,12 @@
 #define __Forest_H__
 
 #include "cocos2d.h"
-#include "Player.h"
-#include "tree.h"
-#include "AppDelegate.h"
+#include "../Entities/Player.h"
+#include "../Entities/tree.h"
+#include "../Core/AppDelegate.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
-#include "KeyCommand.h"
+#include "../Commands/KeyCommand.h"
 #include <memory>
 #include <vector>
 
@@ -24,34 +24,34 @@ public:
 
     static  Forest* create();
 
-    // ÅĞ¶Ï½ÇÉ«µÄÎ»ÖÃ
+    // åˆ¤æ–­è§’è‰²çš„ä½ç½®
     void checkPlayerPosition();
 
-    // ÉèÖÃÊäÈëÃüÁî°ó¶¨
+    // è®¾ç½®è¾“å…¥å‘½ä»¤ç»‘å®š
     void setupInputCommands();
 
-    // ÇåÀíÊäÈëÃüÁî°ó¶¨
+    // æ¸…ç†è¾“å…¥å‘½ä»¤ç»‘å®š
     void cleanupInputCommands();
 
-    // ·µ»Ø×÷ÎïĞòºÅ
+    // è¿”å›ä½œç‰©åºå·
     int getRegionNumber(Vec2 pos);
 
-    // ÏÂÓêĞ§¹û
+    // ä¸‹é›¨æ•ˆæœ
     void createRainEffect();
 
-    // ¸ü¸ÄÓêµÎÉúÃüÖÜÆÚ
+    // æ›´æ”¹é›¨æ»´ç”Ÿå‘½å‘¨æœŸ
     void updaterain(float deltaTime);
 
-    // ´´½¨Ò»¸öÁĞ±í£¬ÓÃÓÚ±£´æËùÓĞ·ÇÍ¸Ã÷ÏñËØµÄ×ø±ê
+    // åˆ›å»ºä¸€ä¸ªåˆ—è¡¨ï¼Œç”¨äºä¿å­˜æ‰€æœ‰éé€æ˜åƒç´ çš„åæ ‡
     std::vector<cocos2d::Vec2> nonTransparentPixels;
   
-    // »Ö¸´ÖÖÖ²
+    // æ¢å¤ç§æ¤
     void AllInitialize_ore(); 
 
-    // Ç°ÍùÅ©³¡
+    // å‰å¾€å†œåœº
     Rect farm_area = Rect(1100, 2500, 150, 300);
 
-    // Ç°ÍùĞ¡Õò
+    // å‰å¾€å°é•‡
     Rect town_area = Rect(2500, 1850, 400, 150);
 
     cocos2d::ParticleRain* emitter;
@@ -59,15 +59,15 @@ public:
    
 private:
 
-    /* ÍË³ö°´Å¥ */
+    /* é€€å‡ºæŒ‰é’® */
     Sprite* button;
 
-    // ÍË³ö°´Å¥
+    // é€€å‡ºæŒ‰é’®
     cocos2d::MenuItemImage* closeItem;
 
     cocos2d::Menu* menu;
 
-    // Command PatternÏà¹ØµÄ³ÉÔ±±äÁ¿
+    // Command Patternç›¸å…³çš„æˆå‘˜å˜é‡
     std::vector<std::shared_ptr<KeyCommand>> boundCommands;
 
 };

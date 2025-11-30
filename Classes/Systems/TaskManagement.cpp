@@ -2,44 +2,44 @@
 
 TaskManagement::TaskManagement () {}
 
-// ´´½¨ÈÎÎñ
+// åˆ›å»ºä»»åŠ¡
 void TaskManagement::createTask ( const Task& task ) {
 	tasks.push_back ( task );
 }
 
-// Ìí¼ÓÒÑ¾­½ÓÊÜµÄÈÎÎñ
+// æ·»åŠ å·²ç»æ¥å—çš„ä»»åŠ¡
 void TaskManagement::AddAcceptTask ( const Task& task ) {
     acceptTasks.push_back ( task );
 }
 
-// Íê³ÉÈÎÎñ²¢»ñµÃ½±Àø
+// å®Œæˆä»»åŠ¡å¹¶è·å¾—å¥–åŠ±
 void TaskManagement::completeTask ( const std::string& task_name ) {
-    // ²éÕÒÒÑ½ÓÊÜµÄÈÎÎñ
+    // æŸ¥æ‰¾å·²æ¥å—çš„ä»»åŠ¡
     auto it = std::find_if ( acceptTasks.begin () , acceptTasks.end () ,
                             [&task_name]( const Task& task ) {
                                 return task.name == task_name;
                             } );
 
-    // Èç¹ûÕÒµ½ÁËÈÎÎñ
+    // å¦‚æœæ‰¾åˆ°äº†ä»»åŠ¡
     if (it != acceptTasks.end ()) {
         const Task& task = *it;
 
-        // ¸ù¾İÈÎÎñÀàĞÍÔö¼Ó½ğ±ÒºÍ/»òÎïÆ·
+        // æ ¹æ®ä»»åŠ¡ç±»å‹å¢åŠ é‡‘å¸å’Œ/æˆ–ç‰©å“
         if (task.type == NPC_TASK || task.type == SYSTEM_TASK) {
-            GoldAmount += 400; // ¼ÙÉèGoldAmountÊÇÀàµÄ³ÉÔ±±äÁ¿
+            GoldAmount += 400; // å‡è®¾GoldAmountæ˜¯ç±»çš„æˆå‘˜å˜é‡
             for (const auto& requiredItem : task.requiredItems) {
-                inventory->RemoveItem ( requiredItem , 1 ); // ÒÆ³ıÎïÆ·
+                inventory->RemoveItem ( requiredItem , 1 ); // ç§»é™¤ç‰©å“
             }
         }
 
-        // Èç¹ûÊÇNPCÈÎÎñ£¬Ôö¼Ó¶ÔÓ¦NPCµÄºÃ¸Ğ¶È
+        // å¦‚æœæ˜¯NPCä»»åŠ¡ï¼Œå¢åŠ å¯¹åº”NPCçš„å¥½æ„Ÿåº¦
         if (task.type == NPC_TASK) {
             npc_relationship->increaseRelationship ( "player" , task.npcName , task.relationshipPoints );
         }
-        // Èç¹ûÊÇ½ÚÈÕÈÎÎñ£¬Ôö¼ÓËùÓĞNPCµÄºÃ¸Ğ¶È£¬²¢´¦ÀíÌØÊâ½±Àø
+        // å¦‚æœæ˜¯èŠ‚æ—¥ä»»åŠ¡ï¼Œå¢åŠ æ‰€æœ‰NPCçš„å¥½æ„Ÿåº¦ï¼Œå¹¶å¤„ç†ç‰¹æ®Šå¥–åŠ±
         else if (task.type == FESTIVAL_TASK) {
             for (const Item& item : task.specialRewards) {
-                inventory->AddItem ( item ); // ¼ÙÉèinventoryÊÇÀàµÄ³ÉÔ±±äÁ¿£¬ĞèÒªÌí¼ÓÎïÆ·
+                inventory->AddItem ( item ); // å‡è®¾inventoryæ˜¯ç±»çš„æˆå‘˜å˜é‡ï¼Œéœ€è¦æ·»åŠ ç‰©å“
             }
             npc_relationship->increaseRelationship ( "player" , "Alex" , task.relationshipPoints );
             npc_relationship->increaseRelationship ( "player" , "Abigail" , task.relationshipPoints );
@@ -48,38 +48,38 @@ void TaskManagement::completeTask ( const std::string& task_name ) {
             npc_relationship->increaseRelationship ( "player" , "Emily" , task.relationshipPoints );
         }
 
-        // ´ÓÒÑ½ÓÊÜµÄÈÎÎñÁĞ±íÖĞÒÆ³ıÈÎÎñ
+        // ä»å·²æ¥å—çš„ä»»åŠ¡åˆ—è¡¨ä¸­ç§»é™¤ä»»åŠ¡
         acceptTasks.erase ( it );
     }
     else {
-        // Èç¹ûÃ»ÓĞÕÒµ½ÈÎÎñ£¬Å×³öÒì³£
+        // å¦‚æœæ²¡æœ‰æ‰¾åˆ°ä»»åŠ¡ï¼ŒæŠ›å‡ºå¼‚å¸¸
         // throw std::runtime_error ( "Task not found in accepted tasks." );
     }
 }
 
 
-//ÈÎÎñ½ÓÊÜºó´Ó·¢²¼ÈÎÎñÖĞÉ¾³ı
+//ä»»åŠ¡æ¥å—åä»å‘å¸ƒä»»åŠ¡ä¸­åˆ é™¤
 void TaskManagement::DeleteAcceptTask ( const Task& task ) {
-    // ´Ó Tasks ÖĞÉ¾³ıÈÎÎñ
+    // ä» Tasks ä¸­åˆ é™¤ä»»åŠ¡
     tasks.erase ( std::remove_if ( tasks.begin () , tasks.end () ,
         [&task]( const Task& t ) {
-            return t.name == task.name && t.npcName == task.npcName && t.type == task.type;  // ¸ù¾İ¶à¸öÌõ¼ş½øĞĞÆ¥Åä
+            return t.name == task.name && t.npcName == task.npcName && t.type == task.type;  // æ ¹æ®å¤šä¸ªæ¡ä»¶è¿›è¡ŒåŒ¹é…
         } ) ,
         tasks.end () );
 }
 
-// ·µ»ØÎïÆ·¶ÔÓ¦µÄÈÎÎñ
+// è¿”å›ç‰©å“å¯¹åº”çš„ä»»åŠ¡
 std::string TaskManagement::findTaskByRequiredItems ( const std::string& itemName ) {
-    // ±éÀúacceptTasksÑ°ÕÒ°üº¬Ö¸¶¨ÎïÆ·µÄÈÎÎñ
+    // éå†acceptTaskså¯»æ‰¾åŒ…å«æŒ‡å®šç‰©å“çš„ä»»åŠ¡
     for (const auto& task : acceptTasks) {
         for (const auto& item : task.requiredItems) {
             if (item.GetName() == itemName) {
-                return task.name; // ÕÒµ½Æ¥ÅäµÄÈÎÎñ£¬·µ»ØÈÎÎñÃû³Æ
+                return task.name; // æ‰¾åˆ°åŒ¹é…çš„ä»»åŠ¡ï¼Œè¿”å›ä»»åŠ¡åç§°
             }
         }
     }
 
-    // Èç¹ûÃ»ÓĞÕÒµ½£¬Å×³öÒì³£
+    // å¦‚æœæ²¡æœ‰æ‰¾åˆ°ï¼ŒæŠ›å‡ºå¼‚å¸¸
     // throw std::runtime_error ( "No task found with the required item." );
     return "";
 }

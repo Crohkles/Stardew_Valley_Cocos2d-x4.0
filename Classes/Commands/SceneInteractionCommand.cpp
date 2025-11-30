@@ -1,10 +1,10 @@
 #include "SceneInteractionCommand.h"
-#include "Player.h"
-#include "farm.h"
-#include "Myhouse.h"
-#include "FishingGame.h"
-#include "AppDelegate.h"
-#include "EnergySystem.h"
+#include "../Entities/Player.h"
+#include "../Scenes/farm.h"
+#include "../Scenes/Myhouse.h"
+#include "../Systems/FishingGame.h"
+#include "../Core/AppDelegate.h"
+#include "../Systems/EnergySystem.h"
 
 // ==================== SceneTransitionCommand 实现 ====================
 

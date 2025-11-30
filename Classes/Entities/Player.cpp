@@ -1,167 +1,167 @@
 #include "Player.h"
-#include "InputManager.h"
-#include "PlayerMovementCommand.h"
+#include "../Core/InputManager.h"
+#include "../Commands/PlayerMovementCommand.h"
 
-USING_NS_CC;  // Ê¹ÓÃ Cocos2d-x ÃüÃû¿Õ¼ä
+USING_NS_CC;  // ä½¿ç”¨ Cocos2d-x å‘½åç©ºé—´
 
-// Player ÀàµÄ¹¹Ôìº¯Êı
+// Player ç±»çš„æ„é€ å‡½æ•°
 Player::Player() : speed(10.0f),pic_path("character1 / player_down3.png") {}
 
-// Player ÀàµÄÎö¹¹º¯Êı
+// Player ç±»çš„ææ„å‡½æ•°
 Player::~Player() {}
 
-// Player ÀàµÄ³õÊ¼»¯º¯Êı
+// Player ç±»çš„åˆå§‹åŒ–å‡½æ•°
 bool Player::init()
 {
-    if (!Sprite::init())  // ³õÊ¼»¯¸¸Àà Sprite£¬¼ì²éÊÇ·ñ³É¹¦
+    if (!Sprite::init())  // åˆå§‹åŒ–çˆ¶ç±» Spriteï¼Œæ£€æŸ¥æ˜¯å¦æˆåŠŸ
     {
-        return false;  // Èç¹û³õÊ¼»¯Ê§°Ü£¬·µ»Ø false
+        return false;  // å¦‚æœåˆå§‹åŒ–å¤±è´¥ï¼Œè¿”å› false
     }
 
-    // ¼ÓÔØ½ÇÉ«µÄÍ¼Æ¬£¨Íæ¼Ò³¯ÏÂµÄÕ¾Á¢Í¼Æ¬£©
+    // åŠ è½½è§’è‰²çš„å›¾ç‰‡ï¼ˆç©å®¶æœä¸‹çš„ç«™ç«‹å›¾ç‰‡ï¼‰
     this->initWithFile("character1/player_down3.png");
 
-    // ×¢Òâ£ºsetupInputBindings() ĞèÒªÔÚPlayer±»addChildµ½³¡¾°ºóµ÷ÓÃ
-    // ÒòÎªCommandµÄcanExecute()ĞèÒª¼ì²éplayer->getParent() != nullptr
+    // æ³¨æ„ï¼šsetupInputBindings() éœ€è¦åœ¨Playerè¢«addChildåˆ°åœºæ™¯åè°ƒç”¨
+    // å› ä¸ºCommandçš„canExecute()éœ€è¦æ£€æŸ¥player->getParent() != nullptr
 
-    // Ã¿ 0.05 Ãëµ÷ÓÃÒ»´Î player1_move() º¯Êı£¬¿ØÖÆÍæ¼ÒÒÆ¶¯
+    // æ¯ 0.05 ç§’è°ƒç”¨ä¸€æ¬¡ player1_move() å‡½æ•°ï¼Œæ§åˆ¶ç©å®¶ç§»åŠ¨
     this->schedule([this](float dt) {
         this->player1_move();
         }, 0.05f, "player1_move");
 
-    // Ã¿ 0.3 Ãëµ÷ÓÃÒ»´Î player_change() º¯Êı£¬¿ØÖÆÍæ¼Ò¶¯»­ÇĞ»»
+    // æ¯ 0.3 ç§’è°ƒç”¨ä¸€æ¬¡ player_change() å‡½æ•°ï¼Œæ§åˆ¶ç©å®¶åŠ¨ç”»åˆ‡æ¢
     this->schedule([this](float dt) {
         this->player_change();
         }, 0.3f, "player_change");
 
-    return true;  // ³õÊ¼»¯³É¹¦£¬·µ»Ø true
+    return true;  // åˆå§‹åŒ–æˆåŠŸï¼Œè¿”å› true
 }
 
-// Player ÀàµÄ¾²Ì¬´´½¨·½·¨
+// Player ç±»çš„é™æ€åˆ›å»ºæ–¹æ³•
 Player* Player::create()
 {
-    Player* player = new Player();  // ´´½¨ Player ¶ÔÏó
-    if (player && player->init())  // Èç¹û´´½¨²¢³õÊ¼»¯³É¹¦
+    Player* player = new Player();  // åˆ›å»º Player å¯¹è±¡
+    if (player && player->init())  // å¦‚æœåˆ›å»ºå¹¶åˆå§‹åŒ–æˆåŠŸ
     {
-        player->autorelease();  // ×Ô¶¯ÊÍ·ÅÄÚ´æ
-        return player;  // ·µ»ØĞÂ´´½¨µÄ Player ¶ÔÏó
+        player->autorelease();  // è‡ªåŠ¨é‡Šæ”¾å†…å­˜
+        return player;  // è¿”å›æ–°åˆ›å»ºçš„ Player å¯¹è±¡
     }
-    CC_SAFE_DELETE(player);  // Èç¹û´´½¨Ê§°Ü£¬É¾³ı player ¶ÔÏó
-    return nullptr;  // ·µ»Ø¿ÕÖ¸Õë
+    CC_SAFE_DELETE(player);  // å¦‚æœåˆ›å»ºå¤±è´¥ï¼Œåˆ é™¤ player å¯¹è±¡
+    return nullptr;  // è¿”å›ç©ºæŒ‡é’ˆ
 }
 
-// °´¼ü°´ÏÂÊ±µÄ»Øµ÷º¯Êı (ÒÑ·ÏÆú£¬ÏÖÔÚÊ¹ÓÃCommandÏµÍ³)
-// ´Ë·½·¨±£ÁôÓÃÓÚ¼æÈİĞÔ£¬µ«²»ÔÙÊ¹ÓÃ
+// æŒ‰é”®æŒ‰ä¸‹æ—¶çš„å›è°ƒå‡½æ•° (å·²åºŸå¼ƒï¼Œç°åœ¨ä½¿ç”¨Commandç³»ç»Ÿ)
+// æ­¤æ–¹æ³•ä¿ç•™ç”¨äºå…¼å®¹æ€§ï¼Œä½†ä¸å†ä½¿ç”¨
 void Player::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 {
-    // ²»ÔÙ´¦Àí¼üÅÌÊäÈë£¬ËùÓĞÊäÈëÓÉInputManagerºÍCommandÏµÍ³´¦Àí
-    // ´Ë·½·¨ÒÑ·ÏÆú£¬µ«±£Áô½Ó¿ÚÒÔÈ·±£¼æÈİĞÔ
+    // ä¸å†å¤„ç†é”®ç›˜è¾“å…¥ï¼Œæ‰€æœ‰è¾“å…¥ç”±InputManagerå’ŒCommandç³»ç»Ÿå¤„ç†
+    // æ­¤æ–¹æ³•å·²åºŸå¼ƒï¼Œä½†ä¿ç•™æ¥å£ä»¥ç¡®ä¿å…¼å®¹æ€§
 }
 
-// °´¼üÊÍ·ÅÊ±µÄ»Øµ÷º¯Êı (ÒÑ·ÏÆú£¬ÏÖÔÚÊ¹ÓÃCommandÏµÍ³)
-// ´Ë·½·¨±£ÁôÓÃÓÚ¼æÈİĞÔ£¬µ«²»ÔÙÊ¹ÓÃ
+// æŒ‰é”®é‡Šæ”¾æ—¶çš„å›è°ƒå‡½æ•° (å·²åºŸå¼ƒï¼Œç°åœ¨ä½¿ç”¨Commandç³»ç»Ÿ)
+// æ­¤æ–¹æ³•ä¿ç•™ç”¨äºå…¼å®¹æ€§ï¼Œä½†ä¸å†ä½¿ç”¨
 void Player::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
 {
-    // ²»ÔÙ´¦Àí¼üÅÌÊäÈë£¬ËùÓĞÊäÈëÓÉInputManagerºÍCommandÏµÍ³´¦Àí
-    // °´¼üÊÍ·ÅµÄÂß¼­ÏÖÔÚÔÚ¸÷¸öStopMoveCommandÖĞ´¦Àí
-    // ´Ë·½·¨ÒÑ·ÏÆú£¬µ«±£Áô½Ó¿ÚÒÔÈ·±£¼æÈİĞÔ
+    // ä¸å†å¤„ç†é”®ç›˜è¾“å…¥ï¼Œæ‰€æœ‰è¾“å…¥ç”±InputManagerå’ŒCommandç³»ç»Ÿå¤„ç†
+    // æŒ‰é”®é‡Šæ”¾çš„é€»è¾‘ç°åœ¨åœ¨å„ä¸ªStopMoveCommandä¸­å¤„ç†
+    // æ­¤æ–¹æ³•å·²åºŸå¼ƒï¼Œä½†ä¿ç•™æ¥å£ä»¥ç¡®ä¿å…¼å®¹æ€§
 }
 
-// Íæ¼ÒÒÆ¶¯µÄÂß¼­
+// ç©å®¶ç§»åŠ¨çš„é€»è¾‘
 void Player::player1_move() {
-    // ÔÚÒÆ¶¯Ç°¸üĞÂÅö×²È¨ÏŞ
+    // åœ¨ç§»åŠ¨å‰æ›´æ–°ç¢°æ’æƒé™
     if (!collisionPoints.empty()) {
         updateMovementPermissions();
     }
 
-    // Èç¹û°´ÏÂ×ó¼ıÍ·²¢ÇÒÔÊĞíÏò×óÒÆ¶¯
+    // å¦‚æœæŒ‰ä¸‹å·¦ç®­å¤´å¹¶ä¸”å…è®¸å‘å·¦ç§»åŠ¨
     if (this->leftpressed && this->moveLeft) {
         if (this->look_state == 0) {
-            this->look_state++;  // Èç¹ûÍæ¼Ò¾²Ö¹×´Ì¬£¬¸üĞÂ×´Ì¬
+            this->look_state++;  // å¦‚æœç©å®¶é™æ­¢çŠ¶æ€ï¼Œæ›´æ–°çŠ¶æ€
             return;
         }
-        this->setPositionX(this->getPositionX() - speed);  // Ïò×óÒÆ¶¯
+        this->setPositionX(this->getPositionX() - speed);  // å‘å·¦ç§»åŠ¨
     }
-    // Èç¹û°´ÏÂÏÂ¼ıÍ·²¢ÇÒÔÊĞíÏòÏÂÒÆ¶¯
+    // å¦‚æœæŒ‰ä¸‹ä¸‹ç®­å¤´å¹¶ä¸”å…è®¸å‘ä¸‹ç§»åŠ¨
     else if (this->downpressed && this->moveDown) {
         if (this->look_state == 0) {
-            this->look_state++;  // Èç¹ûÍæ¼Ò¾²Ö¹×´Ì¬£¬¸üĞÂ×´Ì¬
+            this->look_state++;  // å¦‚æœç©å®¶é™æ­¢çŠ¶æ€ï¼Œæ›´æ–°çŠ¶æ€
             return;
         }
-        this->setPositionY(this->getPositionY() - speed);  // ÏòÏÂÒÆ¶¯
+        this->setPositionY(this->getPositionY() - speed);  // å‘ä¸‹ç§»åŠ¨
     }
-    // Èç¹û°´ÏÂÉÏ¼ıÍ·²¢ÇÒÔÊĞíÏòÉÏÒÆ¶¯
+    // å¦‚æœæŒ‰ä¸‹ä¸Šç®­å¤´å¹¶ä¸”å…è®¸å‘ä¸Šç§»åŠ¨
     else if (this->uppressed && this->moveUp) {
         if (this->look_state == 0) {
-            this->look_state++;  // Èç¹ûÍæ¼Ò¾²Ö¹×´Ì¬£¬¸üĞÂ×´Ì¬
+            this->look_state++;  // å¦‚æœç©å®¶é™æ­¢çŠ¶æ€ï¼Œæ›´æ–°çŠ¶æ€
             return;
         }
-        this->setPositionY(this->getPositionY() + speed);  // ÏòÉÏÒÆ¶¯
+        this->setPositionY(this->getPositionY() + speed);  // å‘ä¸Šç§»åŠ¨
     }
-    // Èç¹û°´ÏÂÓÒ¼ıÍ·²¢ÇÒÔÊĞíÏòÓÒÒÆ¶¯
+    // å¦‚æœæŒ‰ä¸‹å³ç®­å¤´å¹¶ä¸”å…è®¸å‘å³ç§»åŠ¨
     else if (this->rightpressed && this->moveRight) {
         if (this->look_state == 0) {
-            this->look_state++;  // Èç¹ûÍæ¼Ò¾²Ö¹×´Ì¬£¬¸üĞÂ×´Ì¬
+            this->look_state++;  // å¦‚æœç©å®¶é™æ­¢çŠ¶æ€ï¼Œæ›´æ–°çŠ¶æ€
             return;
         }
-        this->setPositionX(this->getPositionX() + speed);  // ÏòÓÒÒÆ¶¯
+        this->setPositionX(this->getPositionX() + speed);  // å‘å³ç§»åŠ¨
     }
 }
 
-// Íæ¼Ò×´Ì¬±ä»¯µÄÂß¼­£¨ÇĞ»»¶¯»­£©
+// ç©å®¶çŠ¶æ€å˜åŒ–çš„é€»è¾‘ï¼ˆåˆ‡æ¢åŠ¨ç”»ï¼‰
 void Player::player_change() {
 
-    // Èç¹û°´ÏÂ×ó¼ıÍ·²¢ÇÒÔÊĞíÏò×óÒÆ¶¯
+    // å¦‚æœæŒ‰ä¸‹å·¦ç®­å¤´å¹¶ä¸”å…è®¸å‘å·¦ç§»åŠ¨
     if (this->leftpressed && this->moveLeft) {
-        if (this->look_state % 2 == 1) {  // Èç¹ûÊÇÆæÊıÖ¡£¬ÇĞ»»ÎªµÚÒ»¸ö¶¯»­
+        if (this->look_state % 2 == 1) {  // å¦‚æœæ˜¯å¥‡æ•°å¸§ï¼Œåˆ‡æ¢ä¸ºç¬¬ä¸€ä¸ªåŠ¨ç”»
             this->look_state++;
             this->setTexture("character1/player_left1.png");
         }
-        else {  // Èç¹ûÊÇÅ¼ÊıÖ¡£¬ÇĞ»»ÎªµÚ¶ş¸ö¶¯»­
+        else {  // å¦‚æœæ˜¯å¶æ•°å¸§ï¼Œåˆ‡æ¢ä¸ºç¬¬äºŒä¸ªåŠ¨ç”»
             this->look_state++;
             this->setTexture("character1/player_left2.png");
         }
     }
-    // Èç¹û°´ÏÂÏÂ¼ıÍ·²¢ÇÒÔÊĞíÏòÏÂÒÆ¶¯
+    // å¦‚æœæŒ‰ä¸‹ä¸‹ç®­å¤´å¹¶ä¸”å…è®¸å‘ä¸‹ç§»åŠ¨
     else if (this->downpressed && this->moveDown) {
-        if (this->look_state % 2 == 1) {  // Èç¹ûÊÇÆæÊıÖ¡£¬ÇĞ»»ÎªµÚÒ»¸ö¶¯»­
+        if (this->look_state % 2 == 1) {  // å¦‚æœæ˜¯å¥‡æ•°å¸§ï¼Œåˆ‡æ¢ä¸ºç¬¬ä¸€ä¸ªåŠ¨ç”»
             this->look_state++;
             this->setTexture("character1/player_down1.png");
         }
-        else {  // Èç¹ûÊÇÅ¼ÊıÖ¡£¬ÇĞ»»ÎªµÚ¶ş¸ö¶¯»­
+        else {  // å¦‚æœæ˜¯å¶æ•°å¸§ï¼Œåˆ‡æ¢ä¸ºç¬¬äºŒä¸ªåŠ¨ç”»
             this->look_state++;
             this->setTexture("character1/player_down2.png");
         }
     }
-    // Èç¹û°´ÏÂÉÏ¼ıÍ·²¢ÇÒÔÊĞíÏòÉÏÒÆ¶¯
+    // å¦‚æœæŒ‰ä¸‹ä¸Šç®­å¤´å¹¶ä¸”å…è®¸å‘ä¸Šç§»åŠ¨
     else if (this->uppressed && this->moveUp) {
-        if (this->look_state % 2 == 1) {  // Èç¹ûÊÇÆæÊıÖ¡£¬ÇĞ»»ÎªµÚÒ»¸ö¶¯»­
+        if (this->look_state % 2 == 1) {  // å¦‚æœæ˜¯å¥‡æ•°å¸§ï¼Œåˆ‡æ¢ä¸ºç¬¬ä¸€ä¸ªåŠ¨ç”»
             this->look_state++;
             this->setTexture("character1/player_up1.png");
         }
-        else {  // Èç¹ûÊÇÅ¼ÊıÖ¡£¬ÇĞ»»ÎªµÚ¶ş¸ö¶¯»­
+        else {  // å¦‚æœæ˜¯å¶æ•°å¸§ï¼Œåˆ‡æ¢ä¸ºç¬¬äºŒä¸ªåŠ¨ç”»
             this->look_state++;
             this->setTexture("character1/player_up2.png");
         }
     }
-    // Èç¹û°´ÏÂÓÒ¼ıÍ·²¢ÇÒÔÊĞíÏòÓÒÒÆ¶¯
+    // å¦‚æœæŒ‰ä¸‹å³ç®­å¤´å¹¶ä¸”å…è®¸å‘å³ç§»åŠ¨
     else if (this->rightpressed && this->moveRight) {
-        if (this->look_state % 2 == 1) {  // Èç¹ûÊÇÆæÊıÖ¡£¬ÇĞ»»ÎªµÚÒ»¸ö¶¯»­
+        if (this->look_state % 2 == 1) {  // å¦‚æœæ˜¯å¥‡æ•°å¸§ï¼Œåˆ‡æ¢ä¸ºç¬¬ä¸€ä¸ªåŠ¨ç”»
             this->look_state++;
             this->setTexture("character1/player_right1.png");
         }
-        else {  // Èç¹ûÊÇÅ¼ÊıÖ¡£¬ÇĞ»»ÎªµÚ¶ş¸ö¶¯»­
+        else {  // å¦‚æœæ˜¯å¶æ•°å¸§ï¼Œåˆ‡æ¢ä¸ºç¬¬äºŒä¸ªåŠ¨ç”»
             this->look_state++;
             this->setTexture("character1/player_right2.png");
         }
     }
 }
 
-// ĞÂÔö·½·¨£ºÉèÖÃPlayerµÄÊäÈë°ó¶¨
+// æ–°å¢æ–¹æ³•ï¼šè®¾ç½®Playerçš„è¾“å…¥ç»‘å®š
 void Player::setupInputBindings() {
     auto inputManager = InputManager::getInstance();
     
-    // ´´½¨ÒÆ¶¯ÃüÁî
+    // åˆ›å»ºç§»åŠ¨å‘½ä»¤
     auto moveUpCommand = std::make_shared<MoveUpCommand>(this);
     auto moveDownCommand = std::make_shared<MoveDownCommand>(this);
     auto moveLeftCommand = std::make_shared<MoveLeftCommand>(this);
@@ -172,13 +172,13 @@ void Player::setupInputBindings() {
     auto stopMoveLeftCommand = std::make_shared<StopMoveLeftCommand>(this);
     auto stopMoveRightCommand = std::make_shared<StopMoveRightCommand>(this);
     
-    // °ó¶¨°´¼ü°´ÏÂÊÂ¼ş
+    // ç»‘å®šæŒ‰é”®æŒ‰ä¸‹äº‹ä»¶
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_UP_ARROW, moveUpCommand);
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_DOWN_ARROW, moveDownCommand);
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_LEFT_ARROW, moveLeftCommand);
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_RIGHT_ARROW, moveRightCommand);
     
-    // °ó¶¨°´¼üÊÍ·ÅÊÂ¼ş
+    // ç»‘å®šæŒ‰é”®é‡Šæ”¾äº‹ä»¶
     inputManager->bindReleaseCommand(EventKeyboard::KeyCode::KEY_UP_ARROW, stopMoveUpCommand);
     inputManager->bindReleaseCommand(EventKeyboard::KeyCode::KEY_DOWN_ARROW, stopMoveDownCommand);
     inputManager->bindReleaseCommand(EventKeyboard::KeyCode::KEY_LEFT_ARROW, stopMoveLeftCommand);
@@ -187,7 +187,7 @@ void Player::setupInputBindings() {
     CCLOG("Player input bindings set up successfully");
 }
 
-// ĞÂÔö£ºCommandÏµÍ³ÓÃµÄÒÆ¶¯×´Ì¬¿ØÖÆ·½·¨
+// æ–°å¢ï¼šCommandç³»ç»Ÿç”¨çš„ç§»åŠ¨çŠ¶æ€æ§åˆ¶æ–¹æ³•
 void Player::startMove(int direction) {
     switch(direction) {
         case 0: // down
@@ -268,7 +268,7 @@ bool Player::canMove(int direction) const {
     }
 }
 
-// Åö×²ÉÏÏÂÎÄ¹ÜÀí·½·¨ÊµÏÖ
+// ç¢°æ’ä¸Šä¸‹æ–‡ç®¡ç†æ–¹æ³•å®ç°
 void Player::setCollisionContext(const std::vector<Vec2>& collisionPoints) {
     this->collisionPoints = collisionPoints;
     updateMovementPermissions();
@@ -277,22 +277,22 @@ void Player::setCollisionContext(const std::vector<Vec2>& collisionPoints) {
 
 void Player::updateMovementPermissions() {
     if (collisionPoints.empty()) {
-        // Èç¹ûÃ»ÓĞÅö×²µã£¬ÔÊĞíËùÓĞ·½ÏòÒÆ¶¯
+        // å¦‚æœæ²¡æœ‰ç¢°æ’ç‚¹ï¼Œå…è®¸æ‰€æœ‰æ–¹å‘ç§»åŠ¨
         moveLeft = moveRight = moveUp = moveDown = true;
         return;
     }
 
     Vec2 playerPos = this->getPosition();
     
-    // ÖØÖÃÒÆ¶¯È¨ÏŞ
+    // é‡ç½®ç§»åŠ¨æƒé™
     moveLeft = moveRight = moveUp = moveDown = true;
     
-    // ¼ì²éÃ¿¸ö·½ÏòµÄÅö×²
+    // æ£€æŸ¥æ¯ä¸ªæ–¹å‘çš„ç¢°æ’
     for (const auto& point : collisionPoints) {
         float distance;
         Vec2 tempPos;
         
-        // ¼ì²é×óÒÆ
+        // æ£€æŸ¥å·¦ç§»
         tempPos = playerPos;
         tempPos.x -= speed;
         distance = tempPos.distance(point);
@@ -300,7 +300,7 @@ void Player::updateMovementPermissions() {
             moveLeft = false;
         }
         
-        // ¼ì²éÓÒÒÆ
+        // æ£€æŸ¥å³ç§»
         tempPos = playerPos;
         tempPos.x += speed;
         distance = tempPos.distance(point);
@@ -308,7 +308,7 @@ void Player::updateMovementPermissions() {
             moveRight = false;
         }
         
-        // ¼ì²éÉÏÒÆ
+        // æ£€æŸ¥ä¸Šç§»
         tempPos = playerPos;
         tempPos.y += speed;
         distance = tempPos.distance(point);
@@ -316,7 +316,7 @@ void Player::updateMovementPermissions() {
             moveUp = false;
         }
         
-        // ¼ì²éÏÂÒÆ
+        // æ£€æŸ¥ä¸‹ç§»
         tempPos = playerPos;
         tempPos.y -= speed;
         distance = tempPos.distance(point);

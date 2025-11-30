@@ -128,15 +128,15 @@ int Inventory::SetSelectedItem (const int new_position) {
 		return 0;
 	}
 	auto it_previous = package.find ( selected_position );
-	//若原来`selected_position`位置处有物品，将其改为unusable
+	//鑻ュ師鏉selected_position`浣嶇疆澶勬湁鐗╁搧锛屽皢鍏舵敼涓簎nusable
 	if (it_previous != package.end ()) {
 		it_previous->second.first->SetUnusable ();
 	}
-	//只能设置物品栏最顶层中的Item为当前选中物品
+	//鍙兘璁剧疆鐗╁搧鏍忔渶椤跺眰涓殑Item涓哄綋鍓嶉�変腑鐗╁搧
 	if (new_position >= 1 && new_position <= kRowSize) {
 		selected_position = new_position;
 		auto it_new = package.find ( new_position );
-		//若新位置有Item,设置其为usable
+		//鑻ユ柊浣嶇疆鏈塈tem,璁剧疆鍏朵负usable
 		if (it_new != package.end () && it_new->second.first != nullptr) {
 			it_new->second.first->SetUsable ();
 			return 0;

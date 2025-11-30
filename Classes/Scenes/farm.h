@@ -3,12 +3,12 @@
 
 #include "cocos2d.h"
 #include "Barn.h"
-#include "Player.h"
-#include "Crop.h"
-#include "AppDelegate.h"
+#include "../Entities/Player.h"
+#include "../Entities/Crop.h"
+#include "../Core/AppDelegate.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
-#include "KeyCommand.h"
+#include "../Commands/KeyCommand.h"
 #include <memory>
 #include <vector>
 
@@ -28,64 +28,64 @@ public:
 
     static farm* create ();
 
-    // ÅĞ¶Ï½ÇÉ«µÄÎ»ÖÃ
+    // åˆ¤æ–­è§’è‰²çš„ä½ç½®
     void checkPlayerPosition ();
 
-    // ÏÂÓêĞ§¹û
+    // ä¸‹é›¨æ•ˆæœ
     void createRainEffect();
 
-    // ¸ü¸ÄÓêµÎÉúÃüÖÜÆÚ
+    // æ›´æ”¹é›¨æ»´ç”Ÿå‘½å‘¨æœŸ
     void updaterain(float deltaTime);
 
 
 
-    // ·µ»Ø×÷ÎïĞòºÅ
+    // è¿”å›ä½œç‰©åºå·
     int getRegionNumber(Vec2 pos);
     
-    // ÉèÖÃÊäÈëÃüÁî°ó¶¨
+    // è®¾ç½®è¾“å…¥å‘½ä»¤ç»‘å®š
     void setupInputCommands();
     
-    // ÇåÀíÊäÈëÃüÁî°ó¶¨
+    // æ¸…ç†è¾“å…¥å‘½ä»¤ç»‘å®š
     void cleanupInputCommands();
 
-    // ´´½¨Ò»¸öÁĞ±í£¬ÓÃÓÚ±£´æËùÓĞ·ÇÍ¸Ã÷ÏñËØµÄ×ø±ê
+    // åˆ›å»ºä¸€ä¸ªåˆ—è¡¨ï¼Œç”¨äºä¿å­˜æ‰€æœ‰éé€æ˜åƒç´ çš„åæ ‡
     std::vector<cocos2d::Vec2> nonTransparentPixels;
 
-    // Àë¿ªÅ©³¡µÄÇøÓò
+    // ç¦»å¼€å†œåœºçš„åŒºåŸŸ
     Rect Out_Farm = Rect ( 792 , 1187 , 36 , 153 );
 
-    // ¿ÉÖÖÖ²ÇøÓò(µ¥¿éÃæ»ıÎª 48 * 48 )
+    // å¯ç§æ¤åŒºåŸŸ(å•å—é¢ç§¯ä¸º 48 * 48 )
     Rect plant_area = Rect ( 474 , 467 , 864 , 510 );
 
-    // ¿ÉÒÔ½øÈë¼ÒµÄÇøÓò
+    // å¯ä»¥è¿›å…¥å®¶çš„åŒºåŸŸ
     Rect myhouse_area = Rect ( 70 , 920 , 75 , 30 );
 
-    // ¿ÉÒÔ½øÈëĞóÅïµÄÇøÓò
+    // å¯ä»¥è¿›å…¥ç•œæ£šçš„åŒºåŸŸ
     Rect barn_area = Rect ( 20 , 170 , 70 , 70 );
 
-    // ¿ÉÒÔ½øÈëÉ½¶´µÄÇøÓò
+    // å¯ä»¥è¿›å…¥å±±æ´çš„åŒºåŸŸ
     Rect cave_area = Rect ( 635 , 1185 , 90 , 40 );
 
-    // ¿ÉÒÔ½øÈëÉ­ÁÖµÄÇøÓò
+    // å¯ä»¥è¿›å…¥æ£®æ—çš„åŒºåŸŸ
     Rect forest_area = Rect ( 750 , -70 , 100 , 50 );
 
     cocos2d::ParticleRain* emitter;
 
-    // »Ö¸´ÖÖÖ²
+    // æ¢å¤ç§æ¤
     void AllInitialize_crop ();
 
 private:
 
-    /* ÍË³ö°´Å¥ */
+    /* é€€å‡ºæŒ‰é’® */
     Sprite* button;
 
 
-    // ÍË³ö°´Å¥
+    // é€€å‡ºæŒ‰é’®
     cocos2d::MenuItemImage* closeItem;
 
     cocos2d::Menu* menu;
 
-    // Command PatternÏà¹ØµÄ³ÉÔ±±äÁ¿
+    // Command Patternç›¸å…³çš„æˆå‘˜å˜é‡
     std::vector<std::shared_ptr<KeyCommand>> boundCommands;
 
     Sprite* Box;

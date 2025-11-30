@@ -2,9 +2,9 @@
 #define __Cave_H__
 
 #include "cocos2d.h"
-#include "Player.h"
-#include "Ore.h"
-#include "AppDelegate.h"
+#include "../Entities/Player.h"
+#include "../Items/Ore.h"
+#include "../Core/AppDelegate.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
 
@@ -21,38 +21,38 @@ public:
 
     static Cave* create();
 
-    // ÅĞ¶Ï½ÇÉ«µÄÎ»ÖÃ
+    // åˆ¤æ–­è§’è‰²çš„ä½ç½®
     void checkPlayerPosition();
 
-    // ÉèÖÃÊäÈëÃüÁî°ó¶¨
+    // è®¾ç½®è¾“å…¥å‘½ä»¤ç»‘å®š
     void setupInputCommands();
 
-    // ÇåÀíÊäÈëÃüÁî°ó¶¨
+    // æ¸…ç†è¾“å…¥å‘½ä»¤ç»‘å®š
     void cleanupInputCommands();
 
-    // ·µ»ØÇøÓòĞòºÅ
+    // è¿”å›åŒºåŸŸåºå·
     int getRegionNumber(Vec2 pos);
 
-    // ´´½¨Ò»¸öÁĞ±í£¬ÓÃÓÚ±£´æËùÓĞ·ÇÍ¸Ã÷ÏñËØµÄ×ø±ê
+    // åˆ›å»ºä¸€ä¸ªåˆ—è¡¨ï¼Œç”¨äºä¿å­˜æ‰€æœ‰éé€æ˜åƒç´ çš„åæ ‡
     std::vector<cocos2d::Vec2> nonTransparentPixels;
   
-    // »Ö¸´ÖÖÖ²
+    // æ¢å¤ç§æ¤
     void AllInitialize_ore(); 
 
-    // Àë¿ªÉ½¶´
+    // ç¦»å¼€å±±æ´
     Rect Out_cave = Rect(720, 1100, 150, 150);
 
 private:
 
-    /* ÍË³ö°´Å¥ */
+    /* é€€å‡ºæŒ‰é’® */
     Sprite* button;
 
-    // ÍË³ö°´Å¥
+    // é€€å‡ºæŒ‰é’®
     cocos2d::MenuItemImage* closeItem;
 
     cocos2d::Menu* menu;
 
-    // Command PatternÏà¹ØµÄ³ÉÔ±±äÁ¿
+    // Command Patternç›¸å…³çš„æˆå‘˜å˜é‡
     std::vector<std::shared_ptr<KeyCommand>> boundCommands;
 
 };

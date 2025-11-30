@@ -1,7 +1,7 @@
 #include "CreateCharacterUI.h"
-#include "Town.h"
-#include "AppDelegate.h"
-#include "Myhouse.h"
+#include "../Scenes/Town.h"
+#include "../Core/AppDelegate.h"
+#include "../Scenes/Myhouse.h"
 
 USING_NS_CC;
 
@@ -37,7 +37,7 @@ void CreateCharacter::cloudAni ( float dt )
         problemLoading ( "'Clouds.png'" );
     }
 
-    // ¼ÆËã¾«ÁéÒÆ¶¯µÄÄ¿±êÎ»ÖÃ£¨ÆÁÄ»µÄ×ó²à£©
+    // è®¡ç®—ç²¾çµç§»åŠ¨çš„ç›®æ ‡ä½ç½®ï¼ˆå±å¹•çš„å·¦ä¾§ï¼‰
     auto moveTo_s = cocos2d::MoveTo::create ( 50.0f , cocos2d::Vec2 ( -visibleSize.width * 0.6 , clouds->getPosition ().y ) );
     clouds->runAction ( cocos2d::RepeatForever::create ( moveTo_s ) );
 }
@@ -54,11 +54,11 @@ void CreateCharacter::BackgroundAdd () {
     }
     else
     {
-        // ¼ÆËãËùÐèµÄËõ·Å±ÈÀý  
+        // è®¡ç®—æ‰€éœ€çš„ç¼©æ”¾æ¯”ä¾‹  
         float scaleX = visibleSize.width / background->getContentSize ().width;
         float scaleY = visibleSize.height / background->getContentSize ().height;
 
-        // Ñ¡Ôñ½Ï´óµÄËõ·ÅÒò×Ó½øÐÐ·Å´ó£¨ÒÔÈ·±£Ìî³äÕû¸ö´°¿Ú£©  
+        // é€‰æ‹©è¾ƒå¤§çš„ç¼©æ”¾å› å­è¿›è¡Œæ”¾å¤§ï¼ˆä»¥ç¡®ä¿å¡«å……æ•´ä¸ªçª—å£ï¼‰  
         float scaleFactor = std::max ( scaleX , scaleY );
         background->setScale ( scaleFactor );
 
@@ -86,12 +86,12 @@ void CreateCharacter::optionFace () {
         float newHeight = visibleSize.height * 0.9f;
         optionface->setContentSize ( Size ( newWidth , newHeight ) );
 
-        // »ñÈ¡¾«ÁéµÄ¸ß¶È
+        // èŽ·å–ç²¾çµçš„é«˜åº¦
         float spriteHeight = optionface->getContentSize ().height;
 
-        // ÉèÖÃ¾«ÁéµÄ×ø±ê£¬Ê¹Æäµ×²¿½ôÌùÆÁÄ»ÏÂ½ç
-        // visibleSize.height ÊÇÆÁÄ»µÄ¸ß¶È£¬spriteHeight ÊÇ¾«ÁéµÄ¸ß¶È
-        optionface->setPosition ( visibleSize.width / 2 , spriteHeight / 2 );  // ¾ÓÖÐ¶ÔÆë¿í¶È
+        // è®¾ç½®ç²¾çµçš„åæ ‡ï¼Œä½¿å…¶åº•éƒ¨ç´§è´´å±å¹•ä¸‹ç•Œ
+        // visibleSize.height æ˜¯å±å¹•çš„é«˜åº¦ï¼ŒspriteHeight æ˜¯ç²¾çµçš„é«˜åº¦
+        optionface->setPosition ( visibleSize.width / 2 , spriteHeight / 2 );  // å±…ä¸­å¯¹é½å®½åº¦
 
         // add the sprite as a child to this layer
         this->addChild ( optionface , 1 );
@@ -104,20 +104,20 @@ void CreateCharacter::optionFace () {
     }
     else
     {
-        // »ñÈ¡Ô­Ê¼Í¼Æ¬µÄ¿í¸ß
+        // èŽ·å–åŽŸå§‹å›¾ç‰‡çš„å®½é«˜
         float originalWidth = displaycharacter->getContentSize ().width;
         float originalHeight = displaycharacter->getContentSize ().height;
 
-        // ¸ù¾ÝÆÁÄ»¿í¶ÈºÍÍ¼Æ¬Ô­Ê¼¿í¸ß¼ÆËã±ÈÀý
+        // æ ¹æ®å±å¹•å®½åº¦å’Œå›¾ç‰‡åŽŸå§‹å®½é«˜è®¡ç®—æ¯”ä¾‹
         float scaleX = visibleSize.width / originalWidth;
         float scaleY = visibleSize.height / originalHeight;
 
-        // Ñ¡Ôñ×îÐ¡µÄËõ·Å±ÈÀý£¬ÒÔ±£Ö¤Í¼Æ¬ÍêÈ«ÏÔÊ¾ÔÚÆÁÄ»ÉÏÇÒ²»±äÐÎ
+        // é€‰æ‹©æœ€å°çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œä»¥ä¿è¯å›¾ç‰‡å®Œå…¨æ˜¾ç¤ºåœ¨å±å¹•ä¸Šä¸”ä¸å˜å½¢
         float scale = std::min ( scaleX , scaleY );
         displaycharacter->setScale ( scale / 5 );
         Vec2 leftTopPos = Vec2 ( visibleSize.width / 2 - optionface->getContentSize ().width * 0.2 , visibleSize.height / 2 + optionface->getContentSize ().height * 0.2 );
 
-        // ÉèÖÃÐ¡Í¼Î»ÖÃ
+        // è®¾ç½®å°å›¾ä½ç½®
         displaycharacter->setPosition ( leftTopPos );
 
         // add the sprite as a child to this layer
@@ -131,15 +131,15 @@ void CreateCharacter::optionFace () {
     }
     else
     {
-        // »ñÈ¡Ô­Ê¼Í¼Æ¬µÄ¿í¸ß
+        // èŽ·å–åŽŸå§‹å›¾ç‰‡çš„å®½é«˜
         float originalWidth = male->getContentSize ().width;
         float originalHeight = male->getContentSize ().height;
 
-        // ¸ù¾ÝÆÁÄ»¿í¶ÈºÍÍ¼Æ¬Ô­Ê¼¿í¸ß¼ÆËã±ÈÀý
+        // æ ¹æ®å±å¹•å®½åº¦å’Œå›¾ç‰‡åŽŸå§‹å®½é«˜è®¡ç®—æ¯”ä¾‹
         float scaleX = visibleSize.width / originalWidth;
         float scaleY = visibleSize.height / originalHeight;
 
-        // Ñ¡Ôñ×îÐ¡µÄËõ·Å±ÈÀý£¬ÒÔ±£Ö¤Í¼Æ¬ÍêÈ«ÏÔÊ¾ÔÚÆÁÄ»ÉÏÇÒ²»±äÐÎ
+        // é€‰æ‹©æœ€å°çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œä»¥ä¿è¯å›¾ç‰‡å®Œå…¨æ˜¾ç¤ºåœ¨å±å¹•ä¸Šä¸”ä¸å˜å½¢
         float scale = std::min ( scaleX , scaleY );
         male->setScale ( scale / 16.5 );
         Vec2 displaycharacterPos = displaycharacter->getPosition ();
@@ -157,15 +157,15 @@ void CreateCharacter::optionFace () {
     }
     else
     {
-        // »ñÈ¡Ô­Ê¼Í¼Æ¬µÄ¿í¸ß
+        // èŽ·å–åŽŸå§‹å›¾ç‰‡çš„å®½é«˜
         float originalWidth = female->getContentSize ().width;
         float originalHeight = female->getContentSize ().height;
 
-        // ¸ù¾ÝÆÁÄ»¿í¶ÈºÍÍ¼Æ¬Ô­Ê¼¿í¸ß¼ÆËã±ÈÀý
+        // æ ¹æ®å±å¹•å®½åº¦å’Œå›¾ç‰‡åŽŸå§‹å®½é«˜è®¡ç®—æ¯”ä¾‹
         float scaleX = visibleSize.width / originalWidth;
         float scaleY = visibleSize.height / originalHeight;
 
-        // Ñ¡Ôñ×îÐ¡µÄËõ·Å±ÈÀý£¬ÒÔ±£Ö¤Í¼Æ¬ÍêÈ«ÏÔÊ¾ÔÚÆÁÄ»ÉÏÇÒ²»±äÐÎ
+        // é€‰æ‹©æœ€å°çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œä»¥ä¿è¯å›¾ç‰‡å®Œå…¨æ˜¾ç¤ºåœ¨å±å¹•ä¸Šä¸”ä¸å˜å½¢
         float scale = std::min ( scaleX , scaleY );
         female->setScale ( scale / 16.5 );
         Vec2 Pos = Vec2 ( displaycharacterPos.x + displaycharacter->getContentSize ().width / 2 , displaycharacterPos.y - displaycharacter->getContentSize ().height );
@@ -183,15 +183,15 @@ void CreateCharacter::optionFace () {
     }
     else
     {
-        // »ñÈ¡Ô­Ê¼Í¼Æ¬µÄ¿í¸ß
+        // èŽ·å–åŽŸå§‹å›¾ç‰‡çš„å®½é«˜
         float originalWidth = xuanzhong->getContentSize ().width;
         float originalHeight = xuanzhong->getContentSize ().height;
 
-        // ¸ù¾ÝÆÁÄ»¿í¶ÈºÍÍ¼Æ¬Ô­Ê¼¿í¸ß¼ÆËã±ÈÀý
+        // æ ¹æ®å±å¹•å®½åº¦å’Œå›¾ç‰‡åŽŸå§‹å®½é«˜è®¡ç®—æ¯”ä¾‹
         float scaleX = visibleSize.width / originalWidth;
         float scaleY = visibleSize.height / originalHeight;
 
-        // Ñ¡Ôñ×îÐ¡µÄËõ·Å±ÈÀý£¬ÒÔ±£Ö¤Í¼Æ¬ÍêÈ«ÏÔÊ¾ÔÚÆÁÄ»ÉÏÇÒ²»±äÐÎ
+        // é€‰æ‹©æœ€å°çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œä»¥ä¿è¯å›¾ç‰‡å®Œå…¨æ˜¾ç¤ºåœ¨å±å¹•ä¸Šä¸”ä¸å˜å½¢
         float scale = std::min ( scaleX , scaleY );
         xuanzhong->setScale ( scale / 13 );
         Vec2 Pos = Vec2 ( displaycharacterPos.x - displaycharacter->getContentSize ().width / 2 , displaycharacterPos.y - displaycharacter->getContentSize ().height );
@@ -240,7 +240,7 @@ void CreateCharacter::optionFace () {
             OK->setScale ( scale / 8 );
         };
     _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , OK );
-    OK->setEnabled ( false );  // ½ûÓÃµã»÷ÊÂ¼þ
+    OK->setEnabled ( false );  // ç¦ç”¨ç‚¹å‡»äº‹ä»¶
     OK->addClickEventListener ( [this]( Ref* sender ) {
         AudioEngine::pauseAll ( );
         // auto backgroundAudioID = AudioEngine::play2d ( "mymusic.mp3" , true );
@@ -266,15 +266,15 @@ cocos2d::Sprite* CreateCharacter::directions ( const std::string& normalImage , 
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
     if (item) {
         Size itemSize = item->getContentSize ();
-        // »ñÈ¡Ô­Ê¼Í¼Æ¬µÄ¿í¸ß
+        // èŽ·å–åŽŸå§‹å›¾ç‰‡çš„å®½é«˜
         float originalWidth = item->getContentSize ().width;
         float originalHeight = item->getContentSize ().height;
 
-        // ¸ù¾ÝÆÁÄ»¿í¶ÈºÍÍ¼Æ¬Ô­Ê¼¿í¸ß¼ÆËã±ÈÀý
+        // æ ¹æ®å±å¹•å®½åº¦å’Œå›¾ç‰‡åŽŸå§‹å®½é«˜è®¡ç®—æ¯”ä¾‹
         float scaleX = visibleSize.width / originalWidth;
         float scaleY = visibleSize.height / originalHeight;
 
-        // Ñ¡Ôñ×îÐ¡µÄËõ·Å±ÈÀý£¬ÒÔ±£Ö¤Í¼Æ¬ÍêÈ«ÏÔÊ¾ÔÚÆÁÄ»ÉÏÇÒ²»±äÐÎ
+        // é€‰æ‹©æœ€å°çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œä»¥ä¿è¯å›¾ç‰‡å®Œå…¨æ˜¾ç¤ºåœ¨å±å¹•ä¸Šä¸”ä¸å˜å½¢
         float scale = std::min ( scaleX , scaleY );
         item->setScale ( scale / 18 );
         item->setPosition ( position );
@@ -362,34 +362,34 @@ void CreateCharacter::textIn () {
     auto textBox1 = Sprite::create ( "UIresource/create/textBox.png" );
     auto nameLabel = cocos2d::Label::createWithSystemFont ( "Name" , "fonts/Comic Sans MS.ttf" , 25 );
     nameLabel->setTag ( 10 );
-    nameLabel->setTextColor ( cocos2d::Color4B::RED );  // ³õÊ¼ÑÕÉ«ÊÇºìÉ«
+    nameLabel->setTextColor ( cocos2d::Color4B::RED );  // åˆå§‹é¢œè‰²æ˜¯çº¢è‰²
     this->addChild ( nameLabel , 2 );
     auto textBox2 = Sprite::create ( "UIresource/create/textBox.png" );
     auto Farmname = cocos2d::Label::createWithSystemFont ( "Farm name" , "fonts/Comic Sans MS.ttf" , 25 );
     Farmname->setTag ( 20 );
-    Farmname->setTextColor ( cocos2d::Color4B::RED );  // ³õÊ¼ÑÕÉ«ÊÇºìÉ«
+    Farmname->setTextColor ( cocos2d::Color4B::RED );  // åˆå§‹é¢œè‰²æ˜¯çº¢è‰²
     this->addChild ( Farmname , 2 );
     auto textBox3 = Sprite::create ( "UIresource/create/textBox.png" );
     auto Favoritethings = cocos2d::Label::createWithSystemFont ( "Favorite things" , "fonts/Comic Sans MS.ttf" , 25 );
     Favoritethings->setTag ( 30 );
-    Favoritethings->setTextColor ( cocos2d::Color4B::RED );  // ³õÊ¼ÑÕÉ«ÊÇºìÉ«
+    Favoritethings->setTextColor ( cocos2d::Color4B::RED );  // åˆå§‹é¢œè‰²æ˜¯çº¢è‰²
     this->addChild ( Favoritethings , 2 );
     if (textBox1 == nullptr)
     {
-        // Ê¾ÀýÍ¼Æ¬
+        // ç¤ºä¾‹å›¾ç‰‡
         problemLoading ( "'textBox.png'" );
     }
     else
     {
-        // »ñÈ¡Ô­Ê¼Í¼Æ¬µÄ¿í¸ß
+        // èŽ·å–åŽŸå§‹å›¾ç‰‡çš„å®½é«˜
         float originalWidth = textBox1->getContentSize ().width;
         float originalHeight = textBox1->getContentSize ().height;
 
-        // ¸ù¾ÝÆÁÄ»¿í¶ÈºÍÍ¼Æ¬Ô­Ê¼¿í¸ß¼ÆËã±ÈÀý
+        // æ ¹æ®å±å¹•å®½åº¦å’Œå›¾ç‰‡åŽŸå§‹å®½é«˜è®¡ç®—æ¯”ä¾‹
         float scaleX = visibleSize.width / originalWidth;
         float scaleY = visibleSize.height / originalHeight;
 
-        // Ñ¡Ôñ×îÐ¡µÄËõ·Å±ÈÀý£¬ÒÔ±£Ö¤Í¼Æ¬ÍêÈ«ÏÔÊ¾ÔÚÆÁÄ»ÉÏÇÒ²»±äÐÎ
+        // é€‰æ‹©æœ€å°çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œä»¥ä¿è¯å›¾ç‰‡å®Œå…¨æ˜¾ç¤ºåœ¨å±å¹•ä¸Šä¸”ä¸å˜å½¢
         float scale = std::min ( scaleX , scaleY );
         textBox1->setScale ( scale / 8 );
         textBox2->setScale ( scale / 8 );
@@ -426,14 +426,14 @@ void CreateCharacter::textIn () {
 }
 
 ui::TextField* CreateCharacter::createTextIn ( float sizex , float sizey , const Vec2& Pos ) {
-    // ´´½¨Ò»¸ö TextField
+    // åˆ›å»ºä¸€ä¸ª TextField
     auto textField = ui::TextField::create ( "Please enter" , "Arial" , 24 );
     textField->setPosition ( Pos );
     textField->setContentSize ( Size ( sizex , sizey ) );
     textField->setMaxLength ( 20 );
     textField->setCursorEnabled ( true );
     textField->setTouchSize ( Size ( sizex , sizey ) );
-    // ¼àÌýÎÄ±¾ÊäÈë
+    // ç›‘å¬æ–‡æœ¬è¾“å…¥
     textField->addEventListener ( [=]( cocos2d::Ref* sender , cocos2d::ui::TextField::EventType type ) {
         if (type == cocos2d::ui::TextField::EventType::ATTACH_WITH_IME) {
             CCLOG ( "TextField attach with IME" );
@@ -472,17 +472,17 @@ void CreateCharacter::checkTextFields ( ui::TextField* textfield1 , ui::TextFiel
     if (!text3.empty ()) {
         favanimal->setColor ( cocos2d::Color3B::BLACK );
     }
-    // ¼ì²éÈý¸öÎÄ±¾¿òÊÇ·ñ¶¼ÓÐÄÚÈÝ
+    // æ£€æŸ¥ä¸‰ä¸ªæ–‡æœ¬æ¡†æ˜¯å¦éƒ½æœ‰å†…å®¹
     if (!text1.empty () && !text2.empty () && !text3.empty ())
     {
-        OK->setOpacity ( 255 );    // Ê¹OK²»Í¸Ã÷
-        OK->setEnabled ( true );   // ÆôÓÃOK°´Å¥µÄµã»÷ÊÂ¼þ
+        OK->setOpacity ( 255 );    // ä½¿OKä¸é€æ˜Ž
+        OK->setEnabled ( true );   // å¯ç”¨OKæŒ‰é’®çš„ç‚¹å‡»äº‹ä»¶
     }
     else
     {
         OK->setOpacity ( 128 );
         OK->setEnabled ( false );
-        // Èç¹ûÈÎÒ»ÎÄ±¾¿òÎª¿Õ£¬»Ö¸´
+        // å¦‚æžœä»»ä¸€æ–‡æœ¬æ¡†ä¸ºç©ºï¼Œæ¢å¤
     }
 }
 
@@ -490,19 +490,19 @@ void CreateCharacter::favoranimal () {
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
     Vec2 origin = Director::getInstance ()->getVisibleOrigin ();
 
-    //ÎÄ×ÖÌí¼Ó
+    //æ–‡å­—æ·»åŠ 
     auto favanimal = cocos2d::Label::createWithSystemFont ( "Favorite animal" , "fonts/Comic Sans MS.ttf" , 25 );
-    favanimal->setTextColor ( cocos2d::Color4B::BLACK );  // ³õÊ¼ÑÕÉ«ÊÇºÚÉ«
+    favanimal->setTextColor ( cocos2d::Color4B::BLACK );  // åˆå§‹é¢œè‰²æ˜¯é»‘è‰²
     Vec2 Pos = Vec2 ( visibleSize.width / 2.0 , visibleSize.height / 2.05 );
     favanimal->setPosition ( Pos );
     this->addChild ( favanimal , 2 );
 
-    //¼ýÍ·Ìí¼Ó
+    //ç®­å¤´æ·»åŠ 
     Vec2 leftPos = Vec2 ( visibleSize.width / 1.7 , visibleSize.height / 2.05 );
     auto leftarrow = directions ( "UIresource/create/left.png" , origin , leftPos );
     Vec2 rightPos = Vec2 ( visibleSize.width / 1.4 , visibleSize.height / 2.05 );
     auto rightarrow = directions ( "UIresource/create/right.png" , origin , rightPos );
-    //¶¯ÎïÍ¼Æ¬Ìí¼Ó
+    //åŠ¨ç‰©å›¾ç‰‡æ·»åŠ 
     auto animal = Sprite::create ( "UIresource/create/like1.png" );
     if (animal == nullptr)
     {
@@ -564,45 +564,45 @@ void CreateCharacter::updateItems ( cocos2d::Sprite* item , const std::string& n
 {
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
     EventMouse* e = (EventMouse*)event;
-    Vec2 mousePos = e->getLocationInView ();  // »ñÈ¡Êó±êÎ»ÖÃ
-    Rect targetRect = item->getBoundingBox ();  // »ñÈ¡Ä¿±ê½ÚµãµÄ¾ØÐÎÇøÓò
+    Vec2 mousePos = e->getLocationInView ();  // èŽ·å–é¼ æ ‡ä½ç½®
+    Rect targetRect = item->getBoundingBox ();  // èŽ·å–ç›®æ ‡èŠ‚ç‚¹çš„çŸ©å½¢åŒºåŸŸ
     Size itemSize = item->getContentSize ();
-    // »ñÈ¡Ô­Ê¼Í¼Æ¬µÄ¿í¸ß
+    // èŽ·å–åŽŸå§‹å›¾ç‰‡çš„å®½é«˜
     float originalWidth = item->getContentSize ().width;
     float originalHeight = item->getContentSize ().height;
 
-    // ¸ù¾ÝÆÁÄ»¿í¶ÈºÍÍ¼Æ¬Ô­Ê¼¿í¸ß¼ÆËã±ÈÀý
+    // æ ¹æ®å±å¹•å®½åº¦å’Œå›¾ç‰‡åŽŸå§‹å®½é«˜è®¡ç®—æ¯”ä¾‹
     float scaleX = visibleSize.width / originalWidth;
     float scaleY = visibleSize.height / originalHeight;
 
-    // Ñ¡Ôñ×îÐ¡µÄËõ·Å±ÈÀý£¬ÒÔ±£Ö¤Í¼Æ¬ÍêÈ«ÏÔÊ¾ÔÚÆÁÄ»ÉÏÇÒ²»±äÐÎ
+    // é€‰æ‹©æœ€å°çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œä»¥ä¿è¯å›¾ç‰‡å®Œå…¨æ˜¾ç¤ºåœ¨å±å¹•ä¸Šä¸”ä¸å˜å½¢
     float scale = std::min ( scaleX , scaleY );
 
     if (targetRect.containsPoint ( mousePos )) {
-        // Êó±êÐüÍ£ÔÚÄ¿±ê½ÚµãÉÏ£¬·Å´ó
+        // é¼ æ ‡æ‚¬åœåœ¨ç›®æ ‡èŠ‚ç‚¹ä¸Šï¼Œæ”¾å¤§
         item->setScale ( scale / Magnification * 1.2 );
     }
     else {
-        // Êó±êÀë¿ª£¬»Ö¸´Ô­´óÐ¡
+        // é¼ æ ‡ç¦»å¼€ï¼Œæ¢å¤åŽŸå¤§å°
         item->setScale ( scale / Magnification );
     }
 }
 
 void CreateCharacter::mousedowncallback ( Ref* pSender , Sprite* item ) {
-    // »ñÈ¡µ±Ç°¾«ÁéµÄËõ·Å±ÈÀý
+    // èŽ·å–å½“å‰ç²¾çµçš„ç¼©æ”¾æ¯”ä¾‹
     float currentScale = item->getScale ();
-    // ¼ÆËãÐÂµÄËõ·Å±ÈÀý£¨µ±Ç°±ÈÀý / 1.2£©
+    // è®¡ç®—æ–°çš„ç¼©æ”¾æ¯”ä¾‹ï¼ˆå½“å‰æ¯”ä¾‹ / 1.2ï¼‰
     float newScale = currentScale / 1.2f;
-    // ÉèÖÃÐÂµÄËõ·Å±ÈÀý
+    // è®¾ç½®æ–°çš„ç¼©æ”¾æ¯”ä¾‹
     item->setScale ( newScale );
 }
 
 void CreateCharacter::mouseupcallback ( Ref* pSender , Sprite* item ) {
-    // »ñÈ¡µ±Ç°¾«ÁéµÄËõ·Å±ÈÀý
+    // èŽ·å–å½“å‰ç²¾çµçš„ç¼©æ”¾æ¯”ä¾‹
     float currentScale = item->getScale ();
-    // ¼ÆËãÐÂµÄËõ·Å±ÈÀý£¨µ±Ç°±ÈÀý * 1.2£©
+    // è®¡ç®—æ–°çš„ç¼©æ”¾æ¯”ä¾‹ï¼ˆå½“å‰æ¯”ä¾‹ * 1.2ï¼‰
     float newScale = currentScale * 1.2f;
-    // ÉèÖÃÐÂµÄËõ·Å±ÈÀý
+    // è®¾ç½®æ–°çš„ç¼©æ”¾æ¯”ä¾‹
     item->setScale ( newScale );
 }
 

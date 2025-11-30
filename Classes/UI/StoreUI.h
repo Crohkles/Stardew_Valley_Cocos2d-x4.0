@@ -1,9 +1,9 @@
 #pragma once
 // StoreUI.h    
 #include "cocos2d.h"  
-#include "Inventory.h"  
-#include "AppDelegate.h"
-#include "EconomicSystem.h"
+#include "../Systems/Inventory.h"  
+#include "../Core/AppDelegate.h"
+#include "../Systems/EconomicSystem.h"
 
 USING_NS_CC;
 
@@ -11,14 +11,14 @@ class StoreUI : public cocos2d::Layer {
 public:
     virtual bool init ( Inventory* mybag , Inventory* goods );
     static StoreUI* create ( Inventory* mybag , Inventory* goods );
-    //±³¾°Í¼Õ¹Ê¾
+    //èƒŒæ™¯å›¾å±•ç¤º
     void backgroundcreate ();
-    //ÉÌÆ·Õ¹Ê¾
+    //å•†å“å±•ç¤º
     void ProductDisplay ( Inventory* mybag , Inventory* goods );
 
     void Itemblock ( Inventory* mybag , Inventory* goods );
 
-    void updateDisplay (); // ¸üĞÂÏÔÊ¾ÄÚÈİ  
+    void updateDisplay (); // æ›´æ–°æ˜¾ç¤ºå†…å®¹  
 
     void moneyDisplay ();
 
@@ -28,17 +28,17 @@ public:
 
 private:
 
-    Inventory* _mybag; // Ö¸Ïò×Ô¼º±³°üÊµÀıµÄÖ¸Õë  
+    Inventory* _mybag; // æŒ‡å‘è‡ªå·±èƒŒåŒ…å®ä¾‹çš„æŒ‡é’ˆ  
 
-    Inventory* _goods; // Ö¸ÏòÉÌÆ·ÊµÀıµÄÖ¸Õë  
+    Inventory* _goods; // æŒ‡å‘å•†å“å®ä¾‹çš„æŒ‡é’ˆ  
 
-    cocos2d::Label* _itemLabel;  // ÏÔÊ¾ÎïÆ·ĞÅÏ¢µÄ±êÇ© 
+    cocos2d::Label* _itemLabel;  // æ˜¾ç¤ºç‰©å“ä¿¡æ¯çš„æ ‡ç­¾ 
 
-    cocos2d::Vector<cocos2d::Sprite*> _itemSlots; // ´æ´¢ÎïÆ·²ÛµÄ Sprite  
+    cocos2d::Vector<cocos2d::Sprite*> _itemSlots; // å­˜å‚¨ç‰©å“æ§½çš„ Sprite  
 
-    int _selectedSlot; // µ±Ç°Ñ¡ÖĞµÄ²ÛÎ»  
+    int _selectedSlot; // å½“å‰é€‰ä¸­çš„æ§½ä½  
 
-    void onItemSlotClicked ( cocos2d::Ref* sender ); // ÎïÆ·²ÛµÄµã»÷ÊÂ¼ş´¦Àí 
+    void onItemSlotClicked ( cocos2d::Ref* sender ); // ç‰©å“æ§½çš„ç‚¹å‡»äº‹ä»¶å¤„ç† 
 
     bool isClick = false;
 

@@ -56,12 +56,145 @@ endif()
 
 # add cross-platforms source files and header files 
 list(APPEND GAME_SOURCE
-     Classes/AppDelegate.cpp
-     Classes/HelloWorldScene.cpp
+     # Core
+     Classes/Core/AppDelegate.cpp
+     Classes/Core/InputManager.cpp
+     
+     # Commands
+     Classes/Commands/GameActionCommand.cpp
+     Classes/Commands/PlayerMovementCommand.cpp
+     Classes/Commands/SceneInteractionCommand.cpp
+     Classes/Commands/UICommand.cpp
+     
+     # Entities
+     Classes/Entities/Chicken.cpp
+     Classes/Entities/Cow.cpp
+     Classes/Entities/Crop.cpp
+     Classes/Entities/Fish.cpp
+     Classes/Entities/Livestock.cpp
+     Classes/Entities/Marry.cpp
+     Classes/Entities/NPC.cpp
+     Classes/Entities/NPCreate.cpp
+     Classes/Entities/NpcRelationship.cpp
+     Classes/Entities/Player.cpp
+     Classes/Entities/Sheep.cpp
+     Classes/Entities/tree.cpp
+     
+     # Items
+     Classes/Items/CookingPot.cpp
+     Classes/Items/Food.cpp
+     Classes/Items/Generaltem.cpp
+     Classes/Items/Item.cpp
+     Classes/Items/Ore.cpp
+     Classes/Items/Wool.cpp
+     
+     # Scenes
+     Classes/Scenes/Barn.cpp
+     Classes/Scenes/Beach.cpp
+     Classes/Scenes/Cave.cpp
+     Classes/Scenes/farm.cpp
+     Classes/Scenes/Forest.cpp
+     Classes/Scenes/HelloWorldScene.cpp
+     Classes/Scenes/InputTestScene.cpp
+     Classes/Scenes/Myhouse.cpp
+     Classes/Scenes/supermarket.cpp
+     Classes/Scenes/Town.cpp
+     
+     # Systems
+     Classes/Systems/EconomicSystem.cpp
+     Classes/Systems/EnergySystem.cpp
+     Classes/Systems/FishingGame.cpp
+     Classes/Systems/Inventroy.cpp
+     Classes/Systems/Skill.cpp
+     Classes/Systems/SkillTree.cpp
+     Classes/Systems/TaskManagement.cpp
+     Classes/Systems/Timesystem.cpp
+     
+     # UI
+     Classes/UI/CreateCharacterUI.cpp
+     Classes/UI/DailyRecordUI.cpp
+     Classes/UI/DetailedtaskUI.cpp
+     Classes/UI/GameBeginUI.cpp
+     Classes/UI/intimacyUI.cpp
+     Classes/UI/InventoryUI.cpp
+     Classes/UI/mailBoxUI.cpp
+     Classes/UI/mini_bag.cpp
+     Classes/UI/NPCtalkUI.cpp
+     Classes/UI/quitUI.cpp
+     Classes/UI/SkilltreeUI.cpp
+     Classes/UI/StoreUI.cpp
      )
 list(APPEND GAME_HEADER
-     Classes/AppDelegate.h
-     Classes/HelloWorldScene.h
+     # Core
+     Classes/Core/AppDelegate.h
+     Classes/Core/BasicInformation.h
+     Classes/Core/GameStateObserver.h
+     Classes/Core/InputManager.h
+     
+     # Commands
+     Classes/Commands/GameActionCommand.h
+     Classes/Commands/KeyCommand.h
+     Classes/Commands/PlayerMovementCommand.h
+     Classes/Commands/SceneInteractionCommand.h
+     Classes/Commands/UICommand.h
+     
+     # Entities
+     Classes/Entities/Chicken.h
+     Classes/Entities/Cow.h
+     Classes/Entities/Crop.h
+     Classes/Entities/Fish.h
+     Classes/Entities/Livestock.h
+     Classes/Entities/Marry.h
+     Classes/Entities/NPC.h
+     Classes/Entities/NPCreate.h
+     Classes/Entities/NpcRelationship.h
+     Classes/Entities/Player.h
+     Classes/Entities/Sheep.h
+     Classes/Entities/tree.h
+     
+     # Items
+     Classes/Items/CookingPot.h
+     Classes/Items/Food.h
+     Classes/Items/Generaltem.h
+     Classes/Items/Item.h
+     Classes/Items/Ore.h
+     Classes/Items/Wool.h
+     
+     # Scenes
+     Classes/Scenes/Barn.h
+     Classes/Scenes/Beach.h
+     Classes/Scenes/Cave.h
+     Classes/Scenes/farm.h
+     Classes/Scenes/Forest.h
+     Classes/Scenes/HelloWorldScene.h
+     Classes/Scenes/InputTestScene.h
+     Classes/Scenes/Myhouse.h
+     Classes/Scenes/supermarket.h
+     Classes/Scenes/Town.h
+     
+     # Systems
+     Classes/Systems/EconomicSystem.h
+     Classes/Systems/EnergySystem.h
+     Classes/Systems/FishingGame.h
+     Classes/Systems/Inventory.h
+     Classes/Systems/Skill.h
+     Classes/Systems/SkillTree.h
+     Classes/Systems/TaskManagement.h
+     Classes/Systems/Timesystem.h
+     
+     # UI
+     Classes/UI/CreateCharacterUI.h
+     Classes/UI/DailyRecordUI.h
+     Classes/UI/DetailedtaskUI.h
+     Classes/UI/GameBeginUI.h
+     Classes/UI/intimacyUI.h
+     Classes/UI/InventoryUI.h
+     Classes/UI/mailBoxUI.h
+     Classes/UI/mini_bag.h
+     Classes/UI/NPCtalkUI.h
+     Classes/UI/quitUI.h
+     Classes/UI/SkillTreeUI.h
+     Classes/UI/StoreUI.h
      )
 
 if(ANDROID)
@@ -134,6 +267,14 @@ target_include_directories(${APP_NAME}
         PRIVATE Classes
         PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
 )
+
+# 添加编译器特定设置
+if(MSVC)
+    # 设置UTF-8编码支持
+    target_compile_options(${APP_NAME} PRIVATE /utf-8)
+    # 禁用C4819警告（文件编码问题）
+    target_compile_options(${APP_NAME} PRIVATE /wd4819)
+endif()
 
 # mark app resources
 setup_cocos_app_config(${APP_NAME})

@@ -1,9 +1,9 @@
 #include "UICommand.h"
-#include "InventoryUI.h"
-#include "mini_bag.h"
-#include "Food.h"
-#include "AppDelegate.h"
-#include "EnergySystem.h"
+#include "../UI/InventoryUI.h"
+#include "../UI/mini_bag.h"
+#include "../Items/Food.h"
+#include "../Core/AppDelegate.h"
+#include "../Systems/EnergySystem.h"
 #include "cocos2d.h"
 #include <memory>
 #include <algorithm>

@@ -1,8 +1,8 @@
-#include "AppDelegate.h"
+#include "../Core/AppDelegate.h"
 #include "Myhouse.h"
 #include "farm.h"
-#include "Crop.h" 
-#include "Player.h"
+#include "../Entities/Crop.h" 
+#include "../Entities/Player.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
 
@@ -40,7 +40,7 @@ bool Myhouse::init()
     }
     
 
-    // ÉèÖÃ±³¾°Í¼Æ¬
+    // è®¾ç½®èƒŒæ™¯å›¾ç‰‡
     auto background_real = Sprite::create("Myhouse/myhouse.png");
     background_real->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
     this->addChild(background_real, 1);
@@ -56,14 +56,14 @@ bool Myhouse::init()
     this->addChild(background_up, 7);
     background_up->setScale(5.5f);
 
-    Vec2 spritePosition = background->getPosition();   // »ñÈ¡¾«ÁéµÄÎ»ÖÃ£¨ÖĞĞÄµã£©
-    Size spriteSize = background->getContentSize();    // »ñÈ¡¾«ÁéµÄ³ß´ç£¨¿í¶ÈºÍ¸ß¶È£©
+    Vec2 spritePosition = background->getPosition();   // è·å–ç²¾çµçš„ä½ç½®ï¼ˆä¸­å¿ƒç‚¹ï¼‰
+    Size spriteSize = background->getContentSize();    // è·å–ç²¾çµçš„å°ºå¯¸ï¼ˆå®½åº¦å’Œé«˜åº¦ï¼‰
 
 
-    // ¼ÆËã×óÏÂ½ÇµÄ×ø±ê
+    // è®¡ç®—å·¦ä¸‹è§’çš„åæ ‡
     Vec2 leftBottomPosition = Vec2(
-        spritePosition.x - background->getScaleX() * spriteSize.width / 2,   // ÖĞĞÄµã x ×ø±ê¼õÈ¥¿í¶ÈµÄÒ»°ë
-        spritePosition.y - background->getScaleY() * spriteSize.height / 2   // ÖĞĞÄµã y ×ø±ê¼õÈ¥¸ß¶ÈµÄÒ»°ë
+        spritePosition.x - background->getScaleX() * spriteSize.width / 2,   // ä¸­å¿ƒç‚¹ x åæ ‡å‡å»å®½åº¦çš„ä¸€åŠ
+        spritePosition.y - background->getScaleY() * spriteSize.height / 2   // ä¸­å¿ƒç‚¹ y åæ ‡å‡å»é«˜åº¦çš„ä¸€åŠ
     );
 
 
@@ -73,33 +73,33 @@ bool Myhouse::init()
         int width = img.getWidth();
         int height = img.getHeight();
 
-        // »ñÈ¡ÏñËØÊı¾İ
+        // è·å–åƒç´ æ•°æ®
         unsigned char* data = img.getData();
 
-        // ±éÀúËùÓĞÏñËØ£¬¼ì²éÊÇ·ñÓĞÄÚÈİ£¨Í¸Ã÷¶È´óÓÚ0£©
+        // éå†æ‰€æœ‰åƒç´ ï¼Œæ£€æŸ¥æ˜¯å¦æœ‰å†…å®¹ï¼ˆé€æ˜åº¦å¤§äº0ï¼‰
         for (int y = 0; y < height; y = y + 2)
         {
             for (int x = 0; x < width; x = x + 2)
             {
-                // »ñÈ¡µ±Ç°ÏñËØµÄ RGBA Öµ
-                int index = (y * width + x) * 4;  // Ã¿¸öÏñËØÕ¼ÓÃ 4 ¸ö×Ö½Ú (RGBA)
-                unsigned char a = data[index + 3];  // Í¸Ã÷¶È
+                // è·å–å½“å‰åƒç´ çš„ RGBA å€¼
+                int index = (y * width + x) * 4;  // æ¯ä¸ªåƒç´ å ç”¨ 4 ä¸ªå­—èŠ‚ (RGBA)
+                unsigned char a = data[index + 3];  // é€æ˜åº¦
 
-                // Èç¹ûÍ¸Ã÷¶È (alpha) ´óÓÚ 0£¬±íÊ¾´ËÏñËØÓĞÄÚÈİ
+                // å¦‚æœé€æ˜åº¦ (alpha) å¤§äº 0ï¼Œè¡¨ç¤ºæ­¤åƒç´ æœ‰å†…å®¹
                 if (a > 0)
                 {
                     float screenX = leftBottomPosition.x + x * background->getScaleX();
-                    float screenY = leftBottomPosition.y + (height - y - 1) * background->getScaleY();  // ×¢Òâ Y Öá·´Ïò
-                    nonTransparentPixels.push_back(Vec2(screenX, screenY));  // ¼ÇÂ¼ÆÁÄ»×ø±ê
+                    float screenY = leftBottomPosition.y + (height - y - 1) * background->getScaleY();  // æ³¨æ„ Y è½´åå‘
+                    nonTransparentPixels.push_back(Vec2(screenX, screenY));  // è®°å½•å±å¹•åæ ‡
                 }
             }
         }
     }
 
-    // ³õÊ¼»¯½ÇÉ«²¢½«ÆäÌí¼Óµ½³¡¾°
+    // åˆå§‹åŒ–è§’è‰²å¹¶å°†å…¶æ·»åŠ åˆ°åœºæ™¯
     if (player1->getParent() == NULL) {
         this->addChild(player1, 11);
-        player1->setupInputBindings();  // È·±£PlayerÓĞparentºóÔÙÉèÖÃÊäÈë°ó¶¨
+        player1->setupInputBindings();  // ç¡®ä¿Playeræœ‰parentåå†è®¾ç½®è¾“å…¥ç»‘å®š
         player1->setScale(2.7f);
         player1->speed = 7.0f;
         player1->setAnchorPoint(Vec2(0.5f, 0.2f));
@@ -107,7 +107,7 @@ bool Myhouse::init()
         
     }
 
-    // Æô¶¯ÈËÎïµÄ¶¨Ê±Æ÷
+    // å¯åŠ¨äººç‰©çš„å®šæ—¶å™¨
     player1->schedule([=](float dt) {
         player1->player1_move();
         }, 0.05f, "player1_move");
@@ -117,35 +117,35 @@ bool Myhouse::init()
         }, 0.3f, "player_change");
 
 
-    // ¼ÆËã±³¾°¾«ÁéµÄËõ·Åºó·¶Î§
+    // è®¡ç®—èƒŒæ™¯ç²¾çµçš„ç¼©æ”¾åèŒƒå›´
     float scaledWidth = background->getContentSize().width * background->getScaleX();
     float scaledHeight = background->getContentSize().height * background->getScaleY();
 
-    // ¹¹Ôì Follow µÄ±ß½ç Rect
+    // æ„é€  Follow çš„è¾¹ç•Œ Rect
     auto followRect = cocos2d::Rect(leftBottomPosition.x, leftBottomPosition.y, scaledWidth, scaledHeight);
 
-    // ´´½¨ Follow ¶¯×÷²¢ÏŞÖÆÍæ¼ÒÔÚ±³¾°·¶Î§ÄÚÒÆ¶¯
+    // åˆ›å»º Follow åŠ¨ä½œå¹¶é™åˆ¶ç©å®¶åœ¨èƒŒæ™¯èŒƒå›´å†…ç§»åŠ¨
     auto followAction = Follow::create(player1, followRect);
     this->runAction(followAction);
 
-    // ÉèÖÃ¼ÆÊ±Æ÷±êÇ©
+    // è®¾ç½®è®¡æ—¶å™¨æ ‡ç­¾
     TimeUI = Timesystem::create("Myhouse");
     this->addChild(TimeUI, 17);
 
-    // ¶¨ÆÚ¸üĞÂÍæ¼Ò×´Ì¬
+    // å®šæœŸæ›´æ–°ç©å®¶çŠ¶æ€
     this->schedule([this](float dt) {
-        this->checkPlayerPosition();  // ¼ì²éÍæ¼ÒÊÇ·ñ½Ó½üÂÖÀªµã
+        this->checkPlayerPosition();  // æ£€æŸ¥ç©å®¶æ˜¯å¦æ¥è¿‘è½®å»“ç‚¹
         }, 0.01f, "check_position_key");
 
     auto listener = EventListenerMouse::create();
     listener->onMouseDown = [this](Event* event) {
 
-        // »ñÈ¡Êó±êµã»÷µÄÎ»ÖÃ
+        // è·å–é¼ æ ‡ç‚¹å‡»çš„ä½ç½®
         auto mouseEvent = static_cast<EventMouse*>(event);
         Vec2 clickPos(mouseEvent->getCursorX(), mouseEvent->getCursorY());
         clickPos = this->convertToNodeSpace(clickPos);
 
-        // ÅĞ¶Ïµã»÷Î»ÖÃÊÇ·ñÔÚ¾«Áé·¶Î§ÄÚ
+        // åˆ¤æ–­ç‚¹å‡»ä½ç½®æ˜¯å¦åœ¨ç²¾çµèŒƒå›´å†…
         if (button != nullptr && button->getBoundingBox().containsPoint(clickPos)) {
             Director::getInstance()->end();
         }
@@ -153,9 +153,9 @@ bool Myhouse::init()
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, button);
 
-    // ¾ÉµÄ¼üÅÌ¼àÌıÆ÷ÒÑÓÉCommand PatternÌæ´ú
+    // æ—§çš„é”®ç›˜ç›‘å¬å™¨å·²ç”±Command Patternæ›¿ä»£
 
-    // ÉèÖÃÊäÈëÃüÁî°ó¶¨
+    // è®¾ç½®è¾“å…¥å‘½ä»¤ç»‘å®š
     setupInputCommands();
 
     return true;
@@ -164,9 +164,9 @@ bool Myhouse::init()
 void Myhouse::setupInputCommands()
 {
     auto inputManager = InputManager::getInstance();
-    // inventoryÊÇÈ«¾Ö±äÁ¿£¬ÔÚAppDelegate.hÖĞÉùÃ÷
+    // inventoryæ˜¯å…¨å±€å˜é‡ï¼Œåœ¨AppDelegate.hä¸­å£°æ˜
     
-    // ´´½¨Ìõ¼ş³¡¾°ÇĞ»»ÃüÁî - ³öÃÅµ½Å©³¡
+    // åˆ›å»ºæ¡ä»¶åœºæ™¯åˆ‡æ¢å‘½ä»¤ - å‡ºé—¨åˆ°å†œåœº
     auto farmCommand = std::make_shared<ConditionalSceneTransitionCommand>(
         player1,
         []() { return farm::create(); },
@@ -178,11 +178,11 @@ void Myhouse::setupInputCommands()
         "farm"
     );
     
-    // ´´½¨Ìõ¼şË¯¾õÃüÁî
+    // åˆ›å»ºæ¡ä»¶ç¡è§‰å‘½ä»¤
     auto sleepCommand = std::make_shared<ConditionalSceneTransitionCommand>(
         player1,
         []() { 
-            // Ö´ĞĞË¯¾õÂß¼­
+            // æ‰§è¡Œç¡è§‰é€»è¾‘
             extern bool IsNextDay;
             extern int day;
             extern std::string Season;
@@ -213,14 +213,14 @@ void Myhouse::setupInputCommands()
         "sleep"
     );
     
-    // ´´½¨UIÇĞ»»ÃüÁî - ±³°ü
+    // åˆ›å»ºUIåˆ‡æ¢å‘½ä»¤ - èƒŒåŒ…
     auto inventoryCommand = std::make_shared<ToggleInventoryCommand>(
         this,
         inventory,
         "Myhouse"
     );
     
-    // °ó¶¨ÃüÁîµ½°´¼ü
+    // ç»‘å®šå‘½ä»¤åˆ°æŒ‰é”®
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, farmCommand);
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, sleepCommand);
     
@@ -229,7 +229,7 @@ void Myhouse::setupInputCommands()
     
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ESCAPE, inventoryCommand);
     
-    // ±£´æ°ó¶¨µÄÃüÁî£¬·½±ãÇåÀí
+    // ä¿å­˜ç»‘å®šçš„å‘½ä»¤ï¼Œæ–¹ä¾¿æ¸…ç†
     boundCommands.push_back(farmCommand);
     boundCommands.push_back(sleepCommand);
     boundCommands.push_back(inventoryCommand);
@@ -239,18 +239,18 @@ void Myhouse::cleanupInputCommands()
 {
     auto inputManager = InputManager::getInstance();
     
-    // ÇåÀí°ó¶¨µÄÃüÁî - ½â°óENTER¼üºÍESCAPE¼üµÄÃüÁî
+    // æ¸…ç†ç»‘å®šçš„å‘½ä»¤ - è§£ç»‘ENTERé”®å’ŒESCAPEé”®çš„å‘½ä»¤
     for (auto& command : boundCommands) {
         if (auto toggleCmd = std::dynamic_pointer_cast<ToggleInventoryCommand>(command)) {
             inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ESCAPE, command);
         } else {
-            // ³¡¾°ÇĞ»»ÃüÁî°ó¶¨ÔÚENTER¼üÉÏ
+            // åœºæ™¯åˆ‡æ¢å‘½ä»¤ç»‘å®šåœ¨ENTERé”®ä¸Š
             inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ENTER, command);
             inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, command);
         }
     }
     
-    // Çå¿ÕÃüÁîÁĞ±í
+    // æ¸…ç©ºå‘½ä»¤åˆ—è¡¨
     boundCommands.clear();
 }
 
@@ -267,19 +267,19 @@ Myhouse* Myhouse::create()
 }
 
 
-// ¼ì²éÍæ¼ÒÊÇ·ñ½Ó½ü±³¾°µÄÂÖÀªµã
+// æ£€æŸ¥ç©å®¶æ˜¯å¦æ¥è¿‘èƒŒæ™¯çš„è½®å»“ç‚¹
 void Myhouse::checkPlayerPosition()
 {
-    // ÉèÖÃÅö×²ÉÏÏÂÎÄ
+    // è®¾ç½®ç¢°æ’ä¸Šä¸‹æ–‡
     player1->setCollisionContext(nonTransparentPixels);
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
     TimeUI->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 
-    // »ñÈ¡Íæ¼ÒµÄÎ»ÖÃ
+    // è·å–ç©å®¶çš„ä½ç½®
     Vec2 playerPos = player1->getPosition();
 
-    // ¸üĞÂ¼ÆÊ±Æ÷ÏÔÊ¾
+    // æ›´æ–°è®¡æ—¶å™¨æ˜¾ç¤º
     remainingTime++;
     if (remainingTime == 43200) {
 
@@ -317,7 +317,7 @@ void Myhouse::checkPlayerPosition()
 
         for (auto it = Crop_information.begin(); it != Crop_information.end();) {
 
-            auto crop = *it;  // ½âÒıÓÃµü´úÆ÷ÒÔ·ÃÎÊ Crop ¶ÔÏó
+            auto crop = *it;  // è§£å¼•ç”¨è¿­ä»£å™¨ä»¥è®¿é—® Crop å¯¹è±¡
 
             if (day == 1) {
                 crop->watered = true;
@@ -326,22 +326,22 @@ void Myhouse::checkPlayerPosition()
                 crop->watered = true;
             }
 
-            // ÅĞ¶ÏÇ°Ò»ÌìÊÇ·ñ½½Ë®
+            // åˆ¤æ–­å‰ä¸€å¤©æ˜¯å¦æµ‡æ°´
             if ((crop->watered == false) && (crop->GetPhase() != Phase::MATURE)) {
-                // ÅĞ¶ÏÊÇ·ñÒÑ¾­½øÈë¿İÎ®×´Ì¬
+                // åˆ¤æ–­æ˜¯å¦å·²ç»è¿›å…¥æ¯èçŠ¶æ€
                 if (crop->GetPhase() != Phase::SAPLESS) {
                     crop->ChangePhase(Phase::SAPLESS);
-                    crop->ChangMatureNeeded(2); // ÑÓ³ÙÁ½ÌìÊÕ»ñ
+                    crop->ChangMatureNeeded(2); // å»¶è¿Ÿä¸¤å¤©æ”¶è·
                     it++;
                 }
                 else {
-                    // É¾³ıÔªËØ²¢¸üĞÂµü´úÆ÷
+                    // åˆ é™¤å…ƒç´ å¹¶æ›´æ–°è¿­ä»£å™¨
                     it = Crop_information.erase(it);
                 }
 
             }
             else {
-                // ¸üĞÂ×´Ì¬
+                // æ›´æ–°çŠ¶æ€
                 crop->UpdateGrowth();
                 it++;
             }
@@ -349,12 +349,12 @@ void Myhouse::checkPlayerPosition()
         }
 
         for (auto& pair : F_lastplace) {
-            if (pair.first.first == "myhouse") {  // ¼ì²é bool ÖµÊÇ·ñÎª true
+            if (pair.first.first == "myhouse") {  // æ£€æŸ¥ bool å€¼æ˜¯å¦ä¸º true
                 pair.second = true;
             }
         }
 
-        //»Ö¸´ÎªÄÜ¹»Éú²ú²úÆ·
+        //æ¢å¤ä¸ºèƒ½å¤Ÿç”Ÿäº§äº§å“
         for (auto livestock : livestocks) {
             livestock->SetCanProduce ( true );
         }
@@ -368,18 +368,18 @@ void Myhouse::checkPlayerPosition()
 
     }
 
-    // ³öÃÅµ½Å©³¡µÄÂß¼­ÏÖÔÚÓÉConditionalSceneTransitionCommand´¦Àí
-    // ÕâÀï¿ÉÒÔÌí¼ÓUIÌáÊ¾Âß¼­
+    // å‡ºé—¨åˆ°å†œåœºçš„é€»è¾‘ç°åœ¨ç”±ConditionalSceneTransitionCommandå¤„ç†
+    // è¿™é‡Œå¯ä»¥æ·»åŠ UIæç¤ºé€»è¾‘
 
-    // Ë¯¾õÂß¼­ÏÖÔÚÓÉConditionalSceneTransitionCommand´¦Àí
-    // ÕâÀï¿ÉÒÔÌí¼ÓUIÌáÊ¾Âß¼­
+    // ç¡è§‰é€»è¾‘ç°åœ¨ç”±ConditionalSceneTransitionCommandå¤„ç†
+    // è¿™é‡Œå¯ä»¥æ·»åŠ UIæç¤ºé€»è¾‘
 
-    // Ë¯¾õÂß¼­µÄ¾ßÌåÊµÏÖÒÑÒÆµ½ConditionalSceneTransitionCommandÖĞ
+    // ç¡è§‰é€»è¾‘çš„å…·ä½“å®ç°å·²ç§»åˆ°ConditionalSceneTransitionCommandä¸­
 
 
-    // Åö×²¼ì²âÂß¼­ÒÑÒÆµ½PlayerÀàµÄupdateMovementPermissions·½·¨ÖĞ
-    // Í¨¹ısetCollisionContextÉèÖÃÅö×²µã¼´¿É
-    // Åö×²È¨ÏŞ»áÔÚPlayerµÄplayer1_move()ÖĞ×Ô¶¯¸üĞÂ
+    // ç¢°æ’æ£€æµ‹é€»è¾‘å·²ç§»åˆ°Playerç±»çš„updateMovementPermissionsæ–¹æ³•ä¸­
+    // é€šè¿‡setCollisionContextè®¾ç½®ç¢°æ’ç‚¹å³å¯
+    // ç¢°æ’æƒé™ä¼šåœ¨Playerçš„player1_move()ä¸­è‡ªåŠ¨æ›´æ–°
 
 
 }

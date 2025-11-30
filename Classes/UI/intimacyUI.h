@@ -1,14 +1,14 @@
 //intimacyUI.h
-//ÈËÎïÇ×ÃÜ¶È½çÃæ
+//äººç‰©äº²å¯†åº¦ç•Œé¢
 #pragma once
 #include "cocos2d.h"  
-#include "NpcRelationship.h"  
-#include "AppDelegate.h"
+#include "../Entities/NpcRelationship.h"  
+#include "../Core/AppDelegate.h"
 #include "InventoryUI.h"
-#include <NPC.h>
+#include "../Entities/NPC.h"
 #include "SkillTreeUI.h"
-#include "InputManager.h"
-#include "UICommand.h"
+#include "../Core/InputManager.h"
+#include "../Commands/UICommand.h"
 #include <memory>
 
 class intimacyUI : public cocos2d::Layer {
@@ -33,7 +33,7 @@ public:
 private:  
     std::string SceneName;
     
-    // Command PatternÏà¹Ø
+    // Command Patternç›¸å…³
     std::shared_ptr<CloseUICommand> escCloseCommand;
 
     NpcRelationship* NPC_RELATIONSHIP;

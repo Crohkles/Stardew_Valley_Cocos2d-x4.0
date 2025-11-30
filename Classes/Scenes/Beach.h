@@ -3,13 +3,13 @@
 
 #include "cocos2d.h"
 #include "farm.h"
-#include "FishingGame.h"
+#include "../Systems/FishingGame.h"
 #include "Myhouse.h"
-#include "Player.h"
-#include "AppDelegate.h"
+#include "../Entities/Player.h"
+#include "../Core/AppDelegate.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
-#include "KeyCommand.h"
+#include "../Commands/KeyCommand.h"
 #include <memory>
 #include <vector>
 

@@ -1,8 +1,8 @@
 // InventoryUI.h  
 #pragma once  
 #include "cocos2d.h"  
-#include "Inventory.h"  
-#include "AppDelegate.h"
+#include "../Systems/Inventory.h"  
+#include "../Core/AppDelegate.h"
 #include "intimacyUI.h"
 #include "SkillTreeUI.h"
 
@@ -16,23 +16,23 @@ public:
 
     void Itemblock ( Inventory* inventory );
 
-    void updateDisplay (); // ¸üĞÂÏÔÊ¾ÄÚÈİ  
+    void updateDisplay (); // æ›´æ–°æ˜¾ç¤ºå†…å®¹  
 
     void Buttons_switching ();
 
     void updateCoordinate ( float &x , float &y );
 private:
-    Inventory* _inventory; // Ö¸Ïò Inventory ÊµÀıµÄÖ¸Õë  
+    Inventory* _inventory; // æŒ‡å‘ Inventory å®ä¾‹çš„æŒ‡é’ˆ  
 
-    cocos2d::Label* _itemLabel;  // ÏÔÊ¾ÎïÆ·ĞÅÏ¢µÄ±êÇ© 
+    cocos2d::Label* _itemLabel;  // æ˜¾ç¤ºç‰©å“ä¿¡æ¯çš„æ ‡ç­¾ 
 
-    cocos2d::Vector<cocos2d::Sprite*> _itemSlots; // ´æ´¢ÎïÆ·²ÛµÄ Sprite  
+    cocos2d::Vector<cocos2d::Sprite*> _itemSlots; // å­˜å‚¨ç‰©å“æ§½çš„ Sprite  
 
-    int _selectedSlot; // µ±Ç°Ñ¡ÖĞµÄ²ÛÎ» 
+    int _selectedSlot; // å½“å‰é€‰ä¸­çš„æ§½ä½ 
 
-    bool isClick = false;  // ±êÖ¾£¬±íÊ¾ÊÇ·ñ±»µã»÷
+    bool isClick = false;  // æ ‡å¿—ï¼Œè¡¨ç¤ºæ˜¯å¦è¢«ç‚¹å‡»
 
-    Sprite* currentItemSprite = nullptr; // ±êÊ¶µ±Ç°Ñ¡ÔñµÄÎïÆ·
+    Sprite* currentItemSprite = nullptr; // æ ‡è¯†å½“å‰é€‰æ‹©çš„ç‰©å“
 
     std::string SceneName;
 };

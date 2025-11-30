@@ -1,8 +1,8 @@
 #include "GameActionCommand.h"
-#include "Player.h"
-#include "EnergySystem.h"
-#include "FishingGame.h"
-#include "AppDelegate.h"
+#include "../Entities/Player.h"
+#include "../Systems/EnergySystem.h"
+#include "../Systems/FishingGame.h"
+#include "../Core/AppDelegate.h"
 #include "cocos2d.h"
 
 USING_NS_CC;

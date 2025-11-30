@@ -2,14 +2,14 @@
 #define __Myhouse_H__
 
 #include "cocos2d.h"
-#include "Player.h"
-#include "AppDelegate.h"
+#include "../Entities/Player.h"
+#include "../Core/AppDelegate.h"
 #include "farm.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
 #include "InputManager.h"
-#include "SceneInteractionCommand.h"
-#include "UICommand.h"
+#include "../Commands/SceneInteractionCommand.h"
+#include "../Commands/UICommand.h"
 
 USING_NS_CC;
 
@@ -25,36 +25,36 @@ public:
 
     static Myhouse* create();
 
-    // ÅĞ¶Ï½ÇÉ«µÄÎ»ÖÃ
+    // åˆ¤æ–­è§’è‰²çš„ä½ç½®
     void checkPlayerPosition();
 
-    // ÉèÖÃÊäÈëÃüÁî°ó¶¨
+    // è®¾ç½®è¾“å…¥å‘½ä»¤ç»‘å®š
     void setupInputCommands();
 
-    // ÇåÀíÊäÈëÃüÁî°ó¶¨
+    // æ¸…ç†è¾“å…¥å‘½ä»¤ç»‘å®š
     void cleanupInputCommands();
 
-    // ´´½¨Ò»¸öÁĞ±í£¬ÓÃÓÚ±£´æËùÓĞ·ÇÍ¸Ã÷ÏñËØµÄ×ø±ê
+    // åˆ›å»ºä¸€ä¸ªåˆ—è¡¨ï¼Œç”¨äºä¿å­˜æ‰€æœ‰éé€æ˜åƒç´ çš„åæ ‡
     std::vector<cocos2d::Vec2> nonTransparentPixels;
 
-    // ³öÃÅÇøÓò
+    // å‡ºé—¨åŒºåŸŸ
     Rect OutDoor = Rect(510, 210, 150, 70);
-    // Ë¯¾õÇøÓò
+    // ç¡è§‰åŒºåŸŸ
     Rect GoBed = Rect(1035, 385, 245, 390);
 
 
 private:
 
   
-    /* ÍË³ö°´Å¥ */
+    /* é€€å‡ºæŒ‰é’® */
     Sprite* button;
 
-    // ÍË³ö°´Å¥
+    // é€€å‡ºæŒ‰é’®
     cocos2d::MenuItemImage* closeItem;
 
     cocos2d::Menu* menu;
 
-    // Command PatternÏà¹ØµÄ³ÉÔ±±äÁ¿
+    // Command Patternç›¸å…³çš„æˆå‘˜å˜é‡
     std::vector<std::shared_ptr<KeyCommand>> boundCommands;
 
 };

@@ -1,8 +1,8 @@
 // StoreUI.cpp  
 #include "StoreUI.h"  
 #include "ui/CocosGUI.h"  
-#include "Item.h"  
-#include "AppDelegate.h"
+#include "../Items/Item.h"  
+#include "../Core/AppDelegate.h"
 
 
 USING_NS_CC;
@@ -33,12 +33,12 @@ void StoreUI::backgroundcreate () {
     float currentx = position.x , currenty = position.y;
     updateCoordinate ( currentx , currenty );
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
-    // ´´½¨Ò»¸ö°ëÍ¸Ã÷µÄºÚÉ«ÕÚÕÖ
-    auto darkLayer = cocos2d::LayerColor::create ( cocos2d::Color4B ( 0 , 0 , 0 , 120 ) , 5 * visibleSize.width , 5 * visibleSize.height );  // ºÚÉ«£¬Í¸Ã÷¶ÈÎª120
-    darkLayer->setPosition ( Vec2 ( currentx , currenty ) - visibleSize / 2 );// ÉèÖÃÕÚÕÖ²ãµÄÎ»ÖÃ
+    // åˆ›å»ºä¸€ä¸ªåŠé€æ˜çš„é»‘è‰²é®ç½©
+    auto darkLayer = cocos2d::LayerColor::create ( cocos2d::Color4B ( 0 , 0 , 0 , 120 ) , 5 * visibleSize.width , 5 * visibleSize.height );  // é»‘è‰²ï¼Œé€æ˜åº¦ä¸º120
+    darkLayer->setPosition ( Vec2 ( currentx , currenty ) - visibleSize / 2 );// è®¾ç½®é®ç½©å±‚çš„ä½ç½®
     this->addChild ( darkLayer , 0 );
 
-    //±³°ü
+    //èƒŒåŒ…
     auto mybag = Sprite::create ( "UIresource/supermarket/wupinlan.png" );
     mybag->setTag ( 101 );
     if (mybag == nullptr)
@@ -47,26 +47,26 @@ void StoreUI::backgroundcreate () {
     }
     else
     {
-        // »ñÈ¡Ô­Ê¼Í¼Æ¬µÄ¿í¸ß
+        // è·å–åŸå§‹å›¾ç‰‡çš„å®½é«˜
         float originalWidth = mybag->getContentSize ().width;
         float originalHeight = mybag->getContentSize ().height;
-        // ¸ù¾İÆÁÄ»¿í¶ÈºÍÍ¼Æ¬Ô­Ê¼¿í¸ß¼ÆËã±ÈÀı
+        // æ ¹æ®å±å¹•å®½åº¦å’Œå›¾ç‰‡åŸå§‹å®½é«˜è®¡ç®—æ¯”ä¾‹
         float scaleX = visibleSize.width / originalWidth;
         float scaleY = visibleSize.height / originalHeight;
-        // Ñ¡Ôñ×îĞ¡µÄËõ·Å±ÈÀı£¬ÒÔ±£Ö¤Í¼Æ¬ÍêÈ«ÏÔÊ¾ÔÚÆÁÄ»ÉÏÇÒ²»±äĞÎ
+        // é€‰æ‹©æœ€å°çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œä»¥ä¿è¯å›¾ç‰‡å®Œå…¨æ˜¾ç¤ºåœ¨å±å¹•ä¸Šä¸”ä¸å˜å½¢
         float scale = std::min ( scaleX , scaleY );
         mybag->setScale ( scale / 2 );
         mybag->setPosition ( Vec2 ( currentx + visibleSize.width * 0.2 , currenty - visibleSize.height * 0.25 ) );
         this->addChild ( mybag , 1 );
 
         auto listener = EventListenerMouse::create ();
-        // ¼ì²éÊó±êÊÇ·ñµã»÷ÁË±³°üÎïÆ·²Û  
-           // Ìí¼ÓÊó±ê°´ÏÂÊÂ¼ş  
+        // æ£€æŸ¥é¼ æ ‡æ˜¯å¦ç‚¹å‡»äº†èƒŒåŒ…ç‰©å“æ§½  
+           // æ·»åŠ é¼ æ ‡æŒ‰ä¸‹äº‹ä»¶  
         listener->onMouseDown = [this , mybag]( EventMouse* event ) {
             Vec2 mousePos = Vec2 ( event->getCursorX () , event->getCursorY () );
             mousePos = this->convertToNodeSpace ( mousePos );
 
-            // ¼ì²éÊó±êÊÇ·ñµã»÷ÁË mybag  
+            // æ£€æŸ¥é¼ æ ‡æ˜¯å¦ç‚¹å‡»äº† mybag  
             if (mybag->getBoundingBox ().containsPoint ( mousePos )) {
                 if (isClick) {
                     //economicSystem->buyItem ( chosen_Item->GetName () );
@@ -74,20 +74,20 @@ void StoreUI::backgroundcreate () {
                     CCLOG ( "goldAmount: %d , Value: %d" , goldAmount , chosen_Item->GetValue () );
                     std::string chosen_item_name = chosen_Item->GetName ();
                     if (goldAmount >= chosen_Item->GetValue ()) {
-                        //ÈôËùÑ¡ÎïÆ·Îª¶¯Îï
+                        //è‹¥æ‰€é€‰ç‰©å“ä¸ºåŠ¨ç‰©
                         if (chosen_item_name.find ( "Animal" )!=std::string::npos) {
                             std::pair<Rect , bool>* space = nullptr;
                             for (auto& pair : barn_space) {
-                                //ĞóÅïÈÔÓĞ¿Õ¼ä
+                                //ç•œæ£šä»æœ‰ç©ºé—´
                                 if (!pair.second) {
                                     space = &pair;
                                     break;
                                 }
                             }
-                            //ÈôÓĞ¿Õ¼ä
+                            //è‹¥æœ‰ç©ºé—´
                             if (space != nullptr) {
                                 Livestock* livestock = nullptr;
-                                //¼ì²éÆ·ÖÖ
+                                //æ£€æŸ¥å“ç§
                                 if (chosen_item_name == "AnimalChicken") {
                                     livestock = Chicken::create ( space->first );
                                 }
@@ -130,7 +130,7 @@ void StoreUI::backgroundcreate () {
         _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , mybag );
     }
 
-    //Í·Ïñ¿ò
+    //å¤´åƒæ¡†
     auto Characterframe = Sprite::create ( "UIresource/supermarket/frame.png" );
     if (Characterframe == nullptr)
     {
@@ -147,7 +147,7 @@ void StoreUI::backgroundcreate () {
         Characterframe->setPosition ( Vec2 ( currentx - visibleSize.width / 2.7 , currenty + visibleSize.height * 0.24 ) );
         this->addChild ( Characterframe , 1 );
     }
-    //ÈËÎïÍ·Ïñ
+    //äººç‰©å¤´åƒ
     auto Characterpicture = Sprite::create ( "Portraits/Pierre/Pierre-0.png" );
     if (Characterpicture == nullptr)
     {
@@ -164,7 +164,7 @@ void StoreUI::backgroundcreate () {
         Characterpicture->setPosition ( Vec2 ( currentx - visibleSize.width / 2.7 , currenty + visibleSize.height * 0.24 ) );
         this->addChild ( Characterpicture , 2 );
     }
-    //ÉÌµêÓ­½ÓÓï
+    //å•†åº—è¿æ¥è¯­
     auto welcomeframe = Sprite::create ( "UIresource/supermarket/wupinlan.png" );
     if (welcomeframe == nullptr)
     {
@@ -182,11 +182,11 @@ void StoreUI::backgroundcreate () {
         this->addChild ( welcomeframe , 1 );
     }
     auto welcome = cocos2d::Label::createWithSystemFont ( "Welcome to the\nPierre store" , "fonts/Arial Bold.ttf" , 25 );
-    welcome->setTextColor ( cocos2d::Color4B::BLACK );  // ³õÊ¼ÑÕÉ«ÊÇºÚÉ«
+    welcome->setTextColor ( cocos2d::Color4B::BLACK );  // åˆå§‹é¢œè‰²æ˜¯é»‘è‰²
     welcome->setPosition ( Vec2 ( currentx - visibleSize.width / 2.7 , currenty + visibleSize.height * 0.06316 ) );
     this->addChild ( welcome , 2 );
 
-    //ÓµÓĞ½ğ±Ò¿ò
+    //æ‹¥æœ‰é‡‘å¸æ¡†
     auto moneyFrame = Sprite::create ( "UIresource/supermarket/moneyFrame_new.png" );
     if (moneyFrame == nullptr)
     {
@@ -210,104 +210,104 @@ void StoreUI::ProductDisplay ( Inventory* mybag , Inventory* goods ) {
     float currentx = position.x , currenty = position.y;
     updateCoordinate ( currentx , currenty );
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
-    //ÉÌÆ·¿ò
+    //å•†å“æ¡†
     auto Productcolumn = Sprite::create ( "UIresource/supermarket/wupinlan.png" );
 
-        // »ñÈ¡Ô­Ê¼Í¼Æ¬µÄ¿í¸ß
+        // è·å–åŸå§‹å›¾ç‰‡çš„å®½é«˜
         float originalWidth = Productcolumn->getContentSize ().width;
         float originalHeight = Productcolumn->getContentSize ().height;
-        // ¸ù¾İÆÁÄ»¿í¶ÈºÍÍ¼Æ¬Ô­Ê¼¿í¸ß¼ÆËã±ÈÀı
+        // æ ¹æ®å±å¹•å®½åº¦å’Œå›¾ç‰‡åŸå§‹å®½é«˜è®¡ç®—æ¯”ä¾‹
         float scaleX = visibleSize.width / originalWidth;
         float scaleY = visibleSize.height / originalHeight;
-        // Ñ¡Ôñ×îĞ¡µÄËõ·Å±ÈÀı£¬ÒÔ±£Ö¤Í¼Æ¬ÍêÈ«ÏÔÊ¾ÔÚÆÁÄ»ÉÏÇÒ²»±äĞÎ
+        // é€‰æ‹©æœ€å°çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œä»¥ä¿è¯å›¾ç‰‡å®Œå…¨æ˜¾ç¤ºåœ¨å±å¹•ä¸Šä¸”ä¸å˜å½¢
         float scale = std::min ( scaleX , scaleY );
         Productcolumn->setScale ( scale / 1.4 );
         Productcolumn->setPosition ( Vec2 ( currentx + visibleSize.width / 9.5 , currenty + visibleSize.height * 0.1684 ) );
         this->addChild ( Productcolumn , 0 );
 
-    //´´½¨ ScrollView
+    //åˆ›å»º ScrollView
     auto scrollView = cocos2d::ui::ScrollView::create ();
-    scrollView->setDirection ( cocos2d::ui::ScrollView::Direction::VERTICAL ); // ÉèÖÃÎª´¹Ö±¹ö¶¯
-    scrollView->setContentSize ( Size ( 1630 , 400 ) ); // ÉèÖÃScrollView ¿í¶È£¬¸ß¶È
-    scrollView->setPosition ( Vec2 ( currentx - visibleSize.width * 0.389 , currenty + visibleSize.height * 0.01368 ) ); // ÉèÖÃÎ»ÖÃ
-    scrollView->setBounceEnabled ( true ); // ÆôÓÃµ¯ĞÔĞ§¹û
-    scrollView->setScrollBarEnabled ( false );    // ½ûÓÃ´¹Ö±ºÍË®Æ½»¬¶¯Ìõ
+    scrollView->setDirection ( cocos2d::ui::ScrollView::Direction::VERTICAL ); // è®¾ç½®ä¸ºå‚ç›´æ»šåŠ¨
+    scrollView->setContentSize ( Size ( 1630 , 400 ) ); // è®¾ç½®ScrollView å®½åº¦ï¼Œé«˜åº¦
+    scrollView->setPosition ( Vec2 ( currentx - visibleSize.width * 0.389 , currenty + visibleSize.height * 0.01368 ) ); // è®¾ç½®ä½ç½®
+    scrollView->setBounceEnabled ( true ); // å¯ç”¨å¼¹æ€§æ•ˆæœ
+    scrollView->setScrollBarEnabled ( false );    // ç¦ç”¨å‚ç›´å’Œæ°´å¹³æ»‘åŠ¨æ¡
 
-    // ¼ÆËãÉÌÆ·µÄ×Ü¸ß¶È  
+    // è®¡ç®—å•†å“çš„æ€»é«˜åº¦  
     float totalItemHeight = 0;
-    const int itemCount = 24; // ¼ÙÉèÓĞ24¸öÉÌÆ·  
-    const float itemHeight = 105; // Ã¿¸öÉÌÆ·µÄ¸ß¶È  
-    totalItemHeight = itemCount * itemHeight; // ¼ÆËã×Ü¸ß¶È  
+    const int itemCount = 24; // å‡è®¾æœ‰24ä¸ªå•†å“  
+    const float itemHeight = 105; // æ¯ä¸ªå•†å“çš„é«˜åº¦  
+    totalItemHeight = itemCount * itemHeight; // è®¡ç®—æ€»é«˜åº¦  
 
-    // ÉèÖÃÄÚ²¿ÈİÆ÷µÄ´óĞ¡  
-    scrollView->setInnerContainerSize ( Size ( 1630 , totalItemHeight ) ); // ÉèÖÃÄÚ²¿ÈİÆ÷µÄ´óĞ¡
+    // è®¾ç½®å†…éƒ¨å®¹å™¨çš„å¤§å°  
+    scrollView->setInnerContainerSize ( Size ( 1630 , totalItemHeight ) ); // è®¾ç½®å†…éƒ¨å®¹å™¨çš„å¤§å°
 
-    // ¼àÌıÊó±ê¹öÂÖÊÂ¼ş
+    // ç›‘å¬é¼ æ ‡æ»šè½®äº‹ä»¶
     auto listener = cocos2d::EventListenerMouse::create ();
     listener->onMouseScroll = [scrollView]( cocos2d::EventMouse* event ) {
-        // »ñÈ¡Êó±ê¹öÂÖµÄÆ«ÒÆÁ¿  
+        // è·å–é¼ æ ‡æ»šè½®çš„åç§»é‡  
         float scrollDelta = event->getScrollY ();
 
-        // »ñÈ¡µ±Ç°µÄ innerContainer  
+        // è·å–å½“å‰çš„ innerContainer  
         auto innerContainer = scrollView->getInnerContainer ();
 
-        // ¼ÆËãĞÂµÄ Y Î»ÖÃ  
+        // è®¡ç®—æ–°çš„ Y ä½ç½®  
         float currentPosY = innerContainer->getPositionY ();
-        float newPosY = currentPosY + scrollDelta * 105; // µ÷ÕûÁéÃô¶È  
+        float newPosY = currentPosY + scrollDelta * 105; // è°ƒæ•´çµæ•åº¦  
 
-        // ÏŞÖÆ¹ö¶¯µÄÉÏÏÂ±ß½ç  
+        // é™åˆ¶æ»šåŠ¨çš„ä¸Šä¸‹è¾¹ç•Œ  
         float lowerLimit = scrollView->getContentSize ().height - innerContainer->getContentSize ().height;
         float upperLimit = -20;
 
         //CCLOG ( "currentPosY: %f, newPosY: %f, lowerLimit: %f, upperLimit: %f" , currentPosY , newPosY , lowerLimit , upperLimit );
 
-        // Ê¹ÓÃ std::max ºÍ std::min È·±£ newPosY ÔÚ±ß½çÄÚ  
+        // ä½¿ç”¨ std::max å’Œ std::min ç¡®ä¿ newPosY åœ¨è¾¹ç•Œå†…  
         newPosY = std::max ( newPosY , lowerLimit );
         newPosY = std::min ( newPosY , upperLimit );
 
-        // ÉèÖÃĞÂµÄÎ»ÖÃ  
+        // è®¾ç½®æ–°çš„ä½ç½®  
         innerContainer->setPositionY ( newPosY );
 
         };
-    // ½«¼àÌıÆ÷Ìí¼Óµ½ÊÂ¼ş·Ö·¢Æ÷
+    // å°†ç›‘å¬å™¨æ·»åŠ åˆ°äº‹ä»¶åˆ†å‘å™¨
     _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , this );
     
-    //Ã¿¸öÉÌÆ·
-    float offsetY = 0;  // ÓÃÀ´´æ´¢ÉÌÆ·¼äµÄ×İÏò¼ä¾à
+    //æ¯ä¸ªå•†å“
+    float offsetY = 0;  // ç”¨æ¥å­˜å‚¨å•†å“é—´çš„çºµå‘é—´è·
     for (int i = 0; i < 24; ++i) {
-        //Ìí¼ÓÎïÆ·¿ò
+        //æ·»åŠ ç‰©å“æ¡†
         auto itemframe = Sprite::create ( "UIresource/supermarket/goodframe.png" );
             itemframe->setScale ( scale / 1.4 );
             itemframe->setPosition ( Vec2 ( visibleSize.width * 0.4933 , 539 + visibleSize.height * 1.51 - offsetY ) );
             scrollView->addChild ( itemframe , 1 );
 
-        // »ñÈ¡²ÛÎ»ÎïÆ· 
-        auto item = _goods->GetItemAt ( i + 1 ); // »ñÈ¡ÌØ¶¨²ÛÎ»µÄÎïÆ·£¬×¢Òâ²ÛÎ»´Ó1¿ªÊ¼ 
+        // è·å–æ§½ä½ç‰©å“ 
+        auto item = _goods->GetItemAt ( i + 1 ); // è·å–ç‰¹å®šæ§½ä½çš„ç‰©å“ï¼Œæ³¨æ„æ§½ä½ä»1å¼€å§‹ 
         auto itemSprite = Sprite::create ( item->initial_pic );
         if (itemSprite == nullptr) {
             CCLOG ( "Error loading item sprite: %s" , item->initial_pic.c_str () );
-            continue;  // Ìø¹ıµ±Ç°ÉÌÆ·£¬¼ÌĞø´¦ÀíÏÂÒ»¸öÉÌÆ·
+            continue;  // è·³è¿‡å½“å‰å•†å“ï¼Œç»§ç»­å¤„ç†ä¸‹ä¸€ä¸ªå•†å“
         }
         if (itemSprite) {
-            //Ìí¼ÓÎïÆ·Ãû³Æ
+            //æ·»åŠ ç‰©å“åç§°
             std::string itemname = item->GetName ();
             auto Item_name = cocos2d::Label::createWithSystemFont ( itemname , "fonts/Comic Sans MS.ttf" , 30 );
             Item_name->setAnchorPoint ( Vec2 ( 0 , 0.5 ) );
-            Item_name->setTextColor ( cocos2d::Color4B::BLACK );  // ³õÊ¼ÑÕÉ«
+            Item_name->setTextColor ( cocos2d::Color4B::BLACK );  // åˆå§‹é¢œè‰²
             Item_name->setPosition ( Vec2 (  visibleSize.width * 0.2386 ,539+ visibleSize.height * 1.51 - offsetY ) );
             scrollView->addChild ( Item_name , 2 );
 
-            //Ìí¼ÓÎïÆ·Í¼Æ¬
+            //æ·»åŠ ç‰©å“å›¾ç‰‡
             itemSprite->setPosition ( Vec2 ( visibleSize.width * 0.1783 ,539+ visibleSize.height * 1.51 - offsetY ) );
             itemSprite->setScale ( 0.7f );
             scrollView->addChild ( itemSprite , 2 );
 
-            //Ìí¼ÓÎïÆ·¼ÛÖµ
+            //æ·»åŠ ç‰©å“ä»·å€¼
             int itemvalue = item->GetValue ();
             std::string ItemValue = std::to_string ( itemvalue );
             auto item_value = cocos2d::Label::createWithSystemFont ( ItemValue , "fonts/Comic Sans MS.ttf" , 30 );
             item_value->setAnchorPoint ( Vec2 ( 0 , 0.5 ) );
-            item_value->setTextColor ( cocos2d::Color4B::BLACK );  // ³õÊ¼ÑÕÉ«
+            item_value->setTextColor ( cocos2d::Color4B::BLACK );  // åˆå§‹é¢œè‰²
             item_value->setPosition ( Vec2 (visibleSize.width * 0.6750 , 539 + visibleSize.height * 1.51 - offsetY ) );
             scrollView->addChild ( item_value , 2 );
             //CCLOG ( "Loading item sprite: %s" , item->initial_pic.c_str () );
@@ -362,11 +362,11 @@ void StoreUI::ProductDisplay ( Inventory* mybag , Inventory* goods ) {
 
             _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , itemframe );
 
-            // ¸üĞÂÏÂÒ»¸öÉÌÆ·µÄÎ»ÖÃÆ«ÒÆÁ¿
-            offsetY += 105;  // 105 ÊÇÉÌÆ·¼äµÄ¼ä¾à
+            // æ›´æ–°ä¸‹ä¸€ä¸ªå•†å“çš„ä½ç½®åç§»é‡
+            offsetY += 105;  // 105 æ˜¯å•†å“é—´çš„é—´è·
     }
 
-    // ½«¹ö¶¯ÊÓÍ¼Ìí¼Óµ½³¡¾°ÖĞ
+    // å°†æ»šåŠ¨è§†å›¾æ·»åŠ åˆ°åœºæ™¯ä¸­
     this->addChild ( scrollView , 2 );
 }
 
@@ -375,7 +375,7 @@ void StoreUI::SliderDisplay () {
     float currentx = position.x , currenty = position.y;
     updateCoordinate ( currentx , currenty );
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
-    //»¬¶¯ÌõºÍ»¬¶¯¿é
+    //æ»‘åŠ¨æ¡å’Œæ»‘åŠ¨å—
     auto Sliders = Sprite::create ( "UIresource/supermarket/huadongtiao.png" );
     if (Sliders == nullptr)
     {
@@ -408,32 +408,32 @@ void StoreUI::SliderDisplay () {
         Slider->setPosition ( Vec2 ( currentx + visibleSize.width * 0.478 , currenty + visibleSize.height * 0.34375 ) );
         this->addChild ( Slider , 6 );
     }
-    // ¼àÌı¹öÂÖÊÂ¼ş
+    // ç›‘å¬æ»šè½®äº‹ä»¶
     auto listener = cocos2d::EventListenerMouse::create ();
     listener->onMouseScroll = [Slider,currenty,visibleSize]( cocos2d::EventMouse* event ) {
         float _minY = currenty + visibleSize.height * 0.34375 - 20 * 23.8;
         float _maxY = currenty + visibleSize.height * 0.34375;
 
-        // »ñÈ¡¹öÂÖ¹ö¶¯µÄÔöÁ¿£¨µ¥Î»£ºÏñËØ£©
+        // è·å–æ»šè½®æ»šåŠ¨çš„å¢é‡ï¼ˆå•ä½ï¼šåƒç´ ï¼‰
         float scrollDelta = event->getScrollY ();
 
-        // »ñÈ¡µ±Ç°¾«ÁéµÄÎ»ÖÃ
+        // è·å–å½“å‰ç²¾çµçš„ä½ç½®
         cocos2d::Vec2 currentPos = Slider->getPosition ();
 
-        // ¸ù¾İ¹öÂÖµÄ¹ö¶¯·½ÏòÀ´µ÷Õû¾«ÁéµÄÎ»ÖÃ
-        float newY = currentPos.y - scrollDelta * 23.8; // Ã¿´Î¹ö¶¯µÄÏñËØ
+        // æ ¹æ®æ»šè½®çš„æ»šåŠ¨æ–¹å‘æ¥è°ƒæ•´ç²¾çµçš„ä½ç½®
+        float newY = currentPos.y - scrollDelta * 23.8; // æ¯æ¬¡æ»šåŠ¨çš„åƒç´ 
 
-        // ÏŞÖÆ¾«ÁéµÄ´¹Ö±Î»ÖÃÔÚ[minY, maxY]·¶Î§ÄÚ
+        // é™åˆ¶ç²¾çµçš„å‚ç›´ä½ç½®åœ¨[minY, maxY]èŒƒå›´å†…
         if (newY < _minY)
             newY = _minY;
         if (newY > _maxY)
             newY = _maxY;
 
-        // ÉèÖÃĞÂµÄÎ»ÖÃ
+        // è®¾ç½®æ–°çš„ä½ç½®
         Slider->setPosition ( cocos2d::Vec2 ( currentPos.x , newY ) );
         };
 
-    // »ñÈ¡µ±Ç°ÊÂ¼ş·Ö·¢Æ÷²¢Ìí¼Ó¼àÌıÆ÷
+    // è·å–å½“å‰äº‹ä»¶åˆ†å‘å™¨å¹¶æ·»åŠ ç›‘å¬å™¨
     _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , this );
 }
 
@@ -442,7 +442,7 @@ void StoreUI::moneyDisplay () {
     float currentx = position.x , currenty = position.y;
     updateCoordinate ( currentx , currenty );
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
-    //½ğ±Ò¸üĞÂ
+    //é‡‘å¸æ›´æ–°
     static Label* Gold_Amount = nullptr;
     int goldAmount = economicSystem->getGoldAmount ();
     if (Gold_Amount == nullptr) {
@@ -471,7 +471,7 @@ bool StoreUI::init ( Inventory* mybag , Inventory* goods ) {
 
     _mybag = mybag;
     _goods = goods;
-    economicSystem = std::make_shared<EconomicSystem> ( _mybag , _goods); // ÔÚÕâÀï³õÊ¼»¯  
+    economicSystem = std::make_shared<EconomicSystem> ( _mybag , _goods); // åœ¨è¿™é‡Œåˆå§‹åŒ–  
     CCLOG ( "%d" , economicSystem->getGoldAmount () );
 
     backgroundcreate ();
@@ -488,13 +488,13 @@ bool StoreUI::init ( Inventory* mybag , Inventory* goods ) {
   
     if (_itemLabel) {
         _itemLabel->setPosition ( visibleSize.width / 2 , visibleSize.height / 4 );
-        this->addChild ( _itemLabel , 10 ); // Ìí¼Óµ½²ã¼¶ÖĞ  
+        this->addChild ( _itemLabel , 10 ); // æ·»åŠ åˆ°å±‚çº§ä¸­  
     }
     else {
         CCLOG ( "Failed to create _itemLabel" );
     }
 
-    updateDisplay (); // ¸üĞÂÏÔÊ¾ÄÚÈİ  
+    updateDisplay (); // æ›´æ–°æ˜¾ç¤ºå†…å®¹  
 
     return true;
 }
@@ -515,28 +515,28 @@ void StoreUI::Itemblock ( Inventory* mybag , Inventory* goods ) {
     updateCoordinate ( currentx , currenty );
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
     Vec2 origin = Director::getInstance ()->getVisibleOrigin ();
-    _selectedSlot = 1; // Ä¬ÈÏÑ¡ÖĞµÚÒ»¸ö²ÛÎ»  
+    _selectedSlot = 1; // é»˜è®¤é€‰ä¸­ç¬¬ä¸€ä¸ªæ§½ä½  
 
 
-    // ³õÊ¼»¯ÎïÆ·²Û Sprite 
+    // åˆå§‹åŒ–ç‰©å“æ§½ Sprite 
     for (int m = 0; m < 3; m++)
     {
         for (int i = 0; i < kRowSize; ++i) {
             auto slot = Sprite::create ( "UIresource/beibao/wupincao.png" );
             auto bag = getChildByTag ( 101 );
-            // »ñÈ¡Ô­Ê¼Í¼Æ¬µÄ¿í¸ß
+            // è·å–åŸå§‹å›¾ç‰‡çš„å®½é«˜
             float originalWidth = slot->getContentSize ().width;
             float originalHeight = slot->getContentSize ().height;
-            // ¸ù¾İÆÁÄ»¿í¶ÈºÍÍ¼Æ¬Ô­Ê¼¿í¸ß¼ÆËã±ÈÀı
+            // æ ¹æ®å±å¹•å®½åº¦å’Œå›¾ç‰‡åŸå§‹å®½é«˜è®¡ç®—æ¯”ä¾‹
             float scaleX = visibleSize.width / originalWidth;
             float scaleY = visibleSize.height / originalHeight;
-            // Ñ¡Ôñ×îĞ¡µÄËõ·Å±ÈÀı£¬ÒÔ±£Ö¤Í¼Æ¬ÍêÈ«ÏÔÊ¾ÔÚÆÁÄ»ÉÏÇÒ²»±äĞÎ
+            // é€‰æ‹©æœ€å°çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œä»¥ä¿è¯å›¾ç‰‡å®Œå…¨æ˜¾ç¤ºåœ¨å±å¹•ä¸Šä¸”ä¸å˜å½¢
             float scale = std::min ( scaleX , scaleY );
             slot->setScale ( scale / 22 );
             float bagWidth = bag->getContentSize ().width;
             float bagHeight = bag->getContentSize ().height;
-            slot->setPosition ( currentx - bagWidth * 0.12 + (originalWidth * scale / 22 + 5) * i , currenty - bagHeight * 2.7 - m * (originalHeight * scale / 22 + 23) ); // ¼ÆËã²ÛÎ»Î»ÖÃ  
-            slot->setTag ( i + 1 ); // ÉèÖÃ²ÛÎ»µÄ±êÇ©  
+            slot->setPosition ( currentx - bagWidth * 0.12 + (originalWidth * scale / 22 + 5) * i , currenty - bagHeight * 2.7 - m * (originalHeight * scale / 22 + 23) ); // è®¡ç®—æ§½ä½ä½ç½®  
+            slot->setTag ( i + 1 ); // è®¾ç½®æ§½ä½çš„æ ‡ç­¾  
             slot->setOpacity ( 128 );
             this->addChild ( slot , 2 );
 
@@ -550,24 +550,24 @@ void StoreUI::updateDisplay () {
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
     if (!_mybag) {
         CCLOG ( "Warning: _inventory is nullptr" );
-        return; // ÍË³ö·½·¨  
+        return; // é€€å‡ºæ–¹æ³•  
     }
 
-    //½ğ±Ò¸üĞÂ
+    //é‡‘å¸æ›´æ–°
     moneyDisplay ();
 
     for (int m = 0; m < 3; m++) {
-        // »ñÈ¡µ±Ç°Ñ¡ÔñµÄÎïÆ·µÄ²ÛÎ»  
+        // è·å–å½“å‰é€‰æ‹©çš„ç‰©å“çš„æ§½ä½  
         for (int i = 0; i < kRowSize; ++i) {
             int serial_number = i + m * 12;
             auto slot = _itemSlots.at ( serial_number );
-            slot->setVisible ( true ); // È·±£ÏÔÊ¾ËùÓĞ²ÛÎ»  
+            slot->setVisible ( true ); // ç¡®ä¿æ˜¾ç¤ºæ‰€æœ‰æ§½ä½  
 
-            // »ñÈ¡²ÛÎ»ÎïÆ·  
-            auto item = _mybag->GetItemAt ( serial_number + 1 ); // »ñÈ¡ÌØ¶¨²ÛÎ»µÄÎïÆ·£¬×¢Òâ²ÛÎ»´Ó1¿ªÊ¼ 
+            // è·å–æ§½ä½ç‰©å“  
+            auto item = _mybag->GetItemAt ( serial_number + 1 ); // è·å–ç‰¹å®šæ§½ä½çš„ç‰©å“ï¼Œæ³¨æ„æ§½ä½ä»1å¼€å§‹ 
 
-            // »ñÈ¡ÎïÆ·ÊıÁ¿   
-            int itemCount = _mybag->GetItemCountAt ( serial_number + 1 ); // »ñÈ¡¸Ã²ÛÎ»µÄÎïÆ·ÊıÁ¿  
+            // è·å–ç‰©å“æ•°é‡   
+            int itemCount = _mybag->GetItemCountAt ( serial_number + 1 ); // è·å–è¯¥æ§½ä½çš„ç‰©å“æ•°é‡  
 
             if (item) {
                 //CCLOG ( "Item in slot %d: %s" , serial_number + 1 , item->GetName ().c_str () );
@@ -576,14 +576,14 @@ void StoreUI::updateDisplay () {
                 //CCLOG ( "No item in slot %d" , serial_number + 1 );
             }
 
-            // Èç¹ûĞèÒª»ñÈ¡ÌØ¶¨²ÛÎ»µÄÎïÆ·£¬Ê¹ÓÃ GetItemAt(int position) ¶¨ÒåĞÂº¯Êı  
+            // å¦‚æœéœ€è¦è·å–ç‰¹å®šæ§½ä½çš„ç‰©å“ï¼Œä½¿ç”¨ GetItemAt(int position) å®šä¹‰æ–°å‡½æ•°  
 
-            // ¸üĞÂ²ÛÎ»ÊÓ¾õ±íÏÖ  
+            // æ›´æ–°æ§½ä½è§†è§‰è¡¨ç°  
             if (item) {
-                // Çå³ıÖ®Ç°µÄ×Ó½Úµã  
+                // æ¸…é™¤ä¹‹å‰çš„å­èŠ‚ç‚¹  
                 slot->removeAllChildren ();
 
-                // Í¼Æ¬Â·¾¶  
+                // å›¾ç‰‡è·¯å¾„  
                 auto itemSprite = Sprite::create ( item->initial_pic );
                 if (itemSprite) {
                     itemSprite->setPosition ( slot->getContentSize () / 2 );
@@ -596,29 +596,29 @@ void StoreUI::updateDisplay () {
                     CCLOG ( "Error loading item sprite: %s" , item->initial_pic.c_str () );
                 }
 
-                // ¸ù¾İ item ÀïµÄÊıÁ¿À´ÉèÖÃÊıÁ¿±êÇ©£¨Èç¹ûĞèÒª£©¡£  
-                // ¿ÉÒÔÔÚÕâÀï´´½¨Ò»¸ö Label ÏÔÊ¾ÊıÁ¿  
-                auto countLabel = static_cast<Label*>(slot->getChildByTag ( 200 + serial_number )); // Ê¹ÓÃ²ÛÎ»µÄ±êÇ©Éú³ÉÊıÁ¿±êÇ©µÄÎ¨Ò»ID  
+                // æ ¹æ® item é‡Œçš„æ•°é‡æ¥è®¾ç½®æ•°é‡æ ‡ç­¾ï¼ˆå¦‚æœéœ€è¦ï¼‰ã€‚  
+                // å¯ä»¥åœ¨è¿™é‡Œåˆ›å»ºä¸€ä¸ª Label æ˜¾ç¤ºæ•°é‡  
+                auto countLabel = static_cast<Label*>(slot->getChildByTag ( 200 + serial_number )); // ä½¿ç”¨æ§½ä½çš„æ ‡ç­¾ç”Ÿæˆæ•°é‡æ ‡ç­¾çš„å”¯ä¸€ID  
                 if (!countLabel) {
-                    // Èç¹û±êÇ©²»´æÔÚ£¬´´½¨ĞÂµÄ±êÇ©  
+                    // å¦‚æœæ ‡ç­¾ä¸å­˜åœ¨ï¼Œåˆ›å»ºæ–°çš„æ ‡ç­¾  
                     countLabel = Label::createWithSystemFont ( std::to_string ( itemCount ) , "fonts/Comic Sans MS.ttf" , 8 );
                     countLabel->setTextColor ( Color4B ( 255 , 153 , 0 , 255 ) );
-                    countLabel->setPosition ( slot->getContentSize ().width * 0.8 , slot->getContentSize ().height * 0.2 ); // ÉèÖÃÎ»ÖÃÔÚ²ÛÎ»ÓÒÏÂ·½  
-                    countLabel->setTag ( 200 + serial_number ); // ÉèÖÃ±êÇ©  
-                    slot->addChild ( countLabel , 4 ); // Ìí¼Óµ½²ã¼¶ÖĞ  
+                    countLabel->setPosition ( slot->getContentSize ().width * 0.8 , slot->getContentSize ().height * 0.2 ); // è®¾ç½®ä½ç½®åœ¨æ§½ä½å³ä¸‹æ–¹  
+                    countLabel->setTag ( 200 + serial_number ); // è®¾ç½®æ ‡ç­¾  
+                    slot->addChild ( countLabel , 4 ); // æ·»åŠ åˆ°å±‚çº§ä¸­  
                 }
                 else {
-                    // Èç¹û±êÇ©´æÔÚ£¬¸üĞÂÊıÁ¿  
+                    // å¦‚æœæ ‡ç­¾å­˜åœ¨ï¼Œæ›´æ–°æ•°é‡  
                     countLabel->setString ( std::to_string ( itemCount ) );
                 }
             }
             else {
-                slot->removeAllChildren (); // Çå¿Õ²ÛÎ»  
+                slot->removeAllChildren (); // æ¸…ç©ºæ§½ä½  
 
-                // Çå³ıÊıÁ¿±êÇ©  
+                // æ¸…é™¤æ•°é‡æ ‡ç­¾  
                 auto countLabel = static_cast<Label*>(slot->getChildByTag ( 200 + i ));
                 if (countLabel) {
-                    countLabel->removeFromParent (); // ÒÆ³ıÊıÁ¿±êÇ©  
+                    countLabel->removeFromParent (); // ç§»é™¤æ•°é‡æ ‡ç­¾  
                 }
             }
         }
@@ -630,12 +630,12 @@ void StoreUI::updateDisplay () {
 
 void StoreUI::onItemSlotClicked ( cocos2d::Ref* sender ) {
     auto slot = static_cast<Sprite*>(sender);
-    int position = slot->getTag (); // »ñÈ¡²ÛÎ»Î»ÖÃ  
+    int position = slot->getTag (); // è·å–æ§½ä½ä½ç½®  
 
-    // ÉèÖÃÎªÑ¡ÖĞ×´Ì¬²¢¸üĞÂ Inventory Êı¾İ  
+    // è®¾ç½®ä¸ºé€‰ä¸­çŠ¶æ€å¹¶æ›´æ–° Inventory æ•°æ®  
     _mybag->SetSelectedItem ( position );
     _selectedSlot = position;
 
-    // ¸üĞÂÏÔÊ¾  
+    // æ›´æ–°æ˜¾ç¤º  
     updateDisplay ();
 }

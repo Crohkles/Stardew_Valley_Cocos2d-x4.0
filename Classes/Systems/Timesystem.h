@@ -1,10 +1,10 @@
 #pragma once
 #include "cocos2d.h"  
-#include "AppDelegate.h"
-#include <NPC.h>
-#include "GameStateObserver.h"
+#include "../Core/AppDelegate.h"
+#include "../Entities/NPC.h"
+#include "../Core/GameStateObserver.h"
 
-class Timesystem : public cocos2d::Node, public GameStateObserver {  // ¼Ì³Ğ×ÔNodeºÍGameStateObserver
+class Timesystem : public cocos2d::Node, public GameStateObserver {  // ç»§æ‰¿è‡ªNodeå’ŒGameStateObserver
 public:
     bool init ( std::string place );
     virtual ~Timesystem();
@@ -13,11 +13,11 @@ public:
 
     void UpdateEnergy();
     
-    // Observer½Ó¿ÚÊµÏÖ
+    // Observeræ¥å£å®ç°
     virtual void onEconomicStateChanged(int newGoldAmount, int delta) override;
     virtual void onEnergyStateChanged(int newEnergy, int maxEnergy) override;
 
-    // ÆäËû³ÉÔ±±äÁ¿ºÍ·½·¨
+    // å…¶ä»–æˆå‘˜å˜é‡å’Œæ–¹æ³•
     cocos2d::Label* timer_label_day;
     cocos2d::Label* timer_label_hour;
     cocos2d::Label* timer_label_season;
@@ -32,6 +32,6 @@ public:
 
     cocos2d::Sprite* daily_record;
 
-    // Ëù´¦µÄ³¡¾°
+    // æ‰€å¤„çš„åœºæ™¯
     std::string Place;
 };

@@ -1,7 +1,7 @@
 #include "Timesystem.h"  
 #include "ui/CocosGUI.h"  
-#include "Item.h"  
-#include "DailyRecordUI.h"
+#include "../Items/Item.h"  
+#include "../UI/DailyRecordUI.h"
 #include "EnergySystem.h"
 
 USING_NS_CC;
@@ -9,12 +9,12 @@ USING_NS_CC;
 
 
 bool Timesystem::init( std::string place ) {
-    // µ÷ÓÃ¸¸ÀàµÄinit()
-    if (!Node::init()) {  // Èç¹û¼Ì³Ð×ÔNode£¬µ÷ÓÃNodeµÄinit
+    // è°ƒç”¨çˆ¶ç±»çš„init()
+    if (!Node::init()) {  // å¦‚æžœç»§æ‰¿è‡ªNodeï¼Œè°ƒç”¨Nodeçš„init
         return false;
     }
     Place = place;
-    // ÉèÖÃ¼ÆÊ±Æ÷±êÇ©
+    // è®¾ç½®è®¡æ—¶å™¨æ ‡ç­¾
     timer_label_day = Label::createWithTTF("Day: 0", "fonts/Marker Felt.ttf", 24);
     this->addChild(timer_label_day, 2);
     timer_label_day->setScale(1.7f);
@@ -40,12 +40,12 @@ bool Timesystem::init( std::string place ) {
     timer_label_festival->setScale(1.5f);
     timer_label_festival->setString(Festival);
 
-    // ´´½¨Ê±¼ä±³¾°Í¼Æ¬
+    // åˆ›å»ºæ—¶é—´èƒŒæ™¯å›¾ç‰‡
     time_pic = Sprite::create("UIresource/TimePic.png");
     time_pic->setScale(1.7f);
-    this->addChild(time_pic, 1);  // ÉèÖÃÍ¼Æ¬²ã¼¶ÔÚ±êÇ©ÏÂ·½
+    this->addChild(time_pic, 1);  // è®¾ç½®å›¾ç‰‡å±‚çº§åœ¨æ ‡ç­¾ä¸‹æ–¹
 
-    // ´´½¨ÌåÁ¦±ß¿ò
+    // åˆ›å»ºä½“åŠ›è¾¹æ¡†
     energy_frame = Sprite::create("UIresource/strength.png");
     energy_frame->setScale(3.7f);
     this->addChild(energy_frame, 1);
@@ -58,7 +58,7 @@ bool Timesystem::init( std::string place ) {
     this->addChild(energy_bar, 3);
     energy_bar->setPosition(435, 405);
 
-    // ÉèÖÃ¸÷ÔªËØµÄÎ»ÖÃ
+    // è®¾ç½®å„å…ƒç´ çš„ä½ç½®
     timer_label_day->setPosition(585, 575);
     timer_label_hour->setPosition(690, 575);
     timer_label_season->setPosition(570, 500);
@@ -67,7 +67,7 @@ bool Timesystem::init( std::string place ) {
     time_pic->setPosition(630, 490);
    
 
-    //½ð±ÒÏÔÊ¾
+    //é‡‘å¸æ˜¾ç¤º
     currency_frame = Sprite::create ( "UIresource/supermarket/moneyFrame_new.png" );
     currency_frame->setScale ( 3.5f );
     this->addChild ( currency_frame , 1 );
@@ -81,7 +81,7 @@ bool Timesystem::init( std::string place ) {
         this->addChild ( currency_num , 4 );
     }
 
-    //ÈÕÖ¾ÏÔÊ¾
+    //æ—¥å¿—æ˜¾ç¤º
     daily_record = Sprite::create ( "UIresource/rizhi.png" );
     this->addChild ( daily_record , 1 );
     daily_record->setScale ( 1.5f );
@@ -102,7 +102,7 @@ bool Timesystem::init( std::string place ) {
         mousePos = this->convertToNodeSpace ( mousePos );
         if (daily_record->getBoundingBox ().containsPoint ( mousePos )) {
             DailyRecordUI* Dailyrecord = DailyRecordUI::create(place);
-            // »ñÈ¡µ±Ç°ÔËÐÐµÄ³¡¾°
+            // èŽ·å–å½“å‰è¿è¡Œçš„åœºæ™¯
             Scene* currentScene = Director::getInstance ()->getRunningScene ();
             currentScene->addChild ( Dailyrecord , 20 );
         }
@@ -113,10 +113,10 @@ bool Timesystem::init( std::string place ) {
         timer_label_day->setString("Day: " + std::to_string(day));
         timer_label_hour->setString(std::to_string(remainingTime / 1800) + ":00");
         timer_label_season->setString(Season);
-        // currency_numµÄ¸üÐÂÏÖÔÚÍ¨¹ýObserverÄ£Ê½´¦Àí
+        // currency_numçš„æ›´æ–°çŽ°åœ¨é€šè¿‡Observeræ¨¡å¼å¤„ç†
         }, 0.01f, "updatetime");
     
-    // ×¢²áÎªÌåÁ¦ÏµÍ³µÄ¹Û²ìÕß
+    // æ³¨å†Œä¸ºä½“åŠ›ç³»ç»Ÿçš„è§‚å¯Ÿè€…
     EnergySystem::getInstance()->addObserver(this);
 
     return true;
@@ -136,24 +136,24 @@ void Timesystem::UpdateEnergy () {
     TimeUI->energy_bar->setScaleY ( strength / 100.0 * 16.5f );
 }
 
-// Observer½Ó¿ÚÊµÏÖ
+// ObserveræŽ¥å£å®žçŽ°
 void Timesystem::onEconomicStateChanged(int newGoldAmount, int delta) {
-    // ¸üÐÂ½ðÇ®ÏÔÊ¾
+    // æ›´æ–°é‡‘é’±æ˜¾ç¤º
     if (currency_num) {
         currency_num->setString(std::to_string(newGoldAmount));
     }
 }
 
 void Timesystem::onEnergyStateChanged(int newEnergy, int maxEnergy) {
-    // ¸üÐÂÌåÁ¦ÌõÏÔÊ¾
+    // æ›´æ–°ä½“åŠ›æ¡æ˜¾ç¤º
     if (energy_bar) {
         float scale = (float)newEnergy / (float)maxEnergy * 16.5f;
         energy_bar->setScaleY(scale);
     }
 }
 
-// Îö¹¹º¯ÊýÊµÏÖ
+// æžæž„å‡½æ•°å®žçŽ°
 Timesystem::~Timesystem() {
-    // ´ÓÌåÁ¦ÏµÍ³ÖÐÒÆ³ý×Ô¼º×÷Îª¹Û²ìÕß
+    // ä»Žä½“åŠ›ç³»ç»Ÿä¸­ç§»é™¤è‡ªå·±ä½œä¸ºè§‚å¯Ÿè€…
     EnergySystem::getInstance()->removeObserver(this);
 }

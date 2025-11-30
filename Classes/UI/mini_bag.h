@@ -1,9 +1,9 @@
 // mini_bag.h
 #pragma once  
 #include "cocos2d.h"  
-#include "Inventory.h"  
-#include "AppDelegate.h"
-#include "GameStateObserver.h"
+#include "../Systems/Inventory.h"  
+#include "../Core/AppDelegate.h"
+#include "../Core/GameStateObserver.h"
 class mini_bag : public cocos2d::Layer, public GameStateObserver {
 public:
     virtual bool init ( Inventory* inventory);
@@ -15,9 +15,9 @@ public:
 
     void Itemblock ( Inventory* inventory );
 
-    void updateDisplay (); // ¸üĞÂÏÔÊ¾ÄÚÈİ  
+    void updateDisplay (); // æ›´æ–°æ˜¾ç¤ºå†…å®¹  
     
-    // Observer½Ó¿ÚÊµÏÖ
+    // Observeræ¥å£å®ç°
     virtual void onInventoryStateChanged() override;
 
     int getSelectedSlot () { return _selectedSlot; }
@@ -27,18 +27,18 @@ public:
     std::shared_ptr<Item> getSelectedItem();
 
 private:
-    Inventory* _inventory; // Ö¸Ïò Inventory ÊµÀıµÄÖ¸Õë  
+    Inventory* _inventory; // æŒ‡å‘ Inventory å®ä¾‹çš„æŒ‡é’ˆ  
 
-    cocos2d::Label* _itemLabel;  // ÏÔÊ¾ÎïÆ·ĞÅÏ¢µÄ±êÇ© 
+    cocos2d::Label* _itemLabel;  // æ˜¾ç¤ºç‰©å“ä¿¡æ¯çš„æ ‡ç­¾ 
 
-    cocos2d::Vector<cocos2d::Sprite*> _itemSlots; // ´æ´¢ÎïÆ·²ÛµÄ Sprite  
+    cocos2d::Vector<cocos2d::Sprite*> _itemSlots; // å­˜å‚¨ç‰©å“æ§½çš„ Sprite  
 
-    int _selectedSlot = 0; // µ±Ç°Ñ¡ÖĞµÄ²ÛÎ» 
+    int _selectedSlot = 0; // å½“å‰é€‰ä¸­çš„æ§½ä½ 
 
-    bool isClick = false;  // ±êÖ¾£¬±íÊ¾ÊÇ·ñ±»µã»÷
+    bool isClick = false;  // æ ‡å¿—ï¼Œè¡¨ç¤ºæ˜¯å¦è¢«ç‚¹å‡»
 
-	bool is_key_e_pressed = false; // ±êÖ¾£¬±íÊ¾ÊÇ·ñ°´ÏÂÁË E ¼ü
+	bool is_key_e_pressed = false; // æ ‡å¿—ï¼Œè¡¨ç¤ºæ˜¯å¦æŒ‰ä¸‹äº† E é”®
 
-    cocos2d::Sprite* currentItemSprite = nullptr; // ±êÊ¶µ±Ç°Ñ¡ÔñµÄÎïÆ·
+    cocos2d::Sprite* currentItemSprite = nullptr; // æ ‡è¯†å½“å‰é€‰æ‹©çš„ç‰©å“
 
 };

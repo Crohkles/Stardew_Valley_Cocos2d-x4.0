@@ -2,9 +2,9 @@
 #define __PLAYER_H__
 
 #include "cocos2d.h"
-#include "Inventory.h"
+#include "../Systems/Inventory.h"
 #include "Crop.h"
-#include "AppDelegate.h"
+#include "../Core/AppDelegate.h"
 
 const int kDefaultEnergy = 100;
 
@@ -16,27 +16,27 @@ public:
     Player();
     ~Player();
 
-    // ´´½¨ Player ¶ÔÏóµÄ·½·¨
+    // åˆ›å»º Player å¯¹è±¡çš„æ–¹æ³•
     static Player* create();
 
-    // ³õÊ¼»¯½ÇÉ«
+    // åˆå§‹åŒ–è§’è‰²
     bool init();
 
-    // °´¼ü°´ÏÂÊ±´¥·¢µÄ»Øµ÷º¯Êı£¨ÒÑ·ÏÆú£¬±£ÁôÓÃÓÚ¼æÈİĞÔ£©
+    // æŒ‰é”®æŒ‰ä¸‹æ—¶è§¦å‘çš„å›è°ƒå‡½æ•°ï¼ˆå·²åºŸå¼ƒï¼Œä¿ç•™ç”¨äºå…¼å®¹æ€§ï¼‰
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 
-    // °´¼üÊÍ·ÅÊ±´¥·¢µÄ»Øµ÷º¯Êı£¨ÒÑ·ÏÆú£¬±£ÁôÓÃÓÚ¼æÈİĞÔ£©
+    // æŒ‰é”®é‡Šæ”¾æ—¶è§¦å‘çš„å›è°ƒå‡½æ•°ï¼ˆå·²åºŸå¼ƒï¼Œä¿ç•™ç”¨äºå…¼å®¹æ€§ï¼‰
     void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
     
-    // ÉèÖÃÊäÈë°ó¶¨µÄ·½·¨£¨ĞÂCommandÏµÍ³£©
+    // è®¾ç½®è¾“å…¥ç»‘å®šçš„æ–¹æ³•ï¼ˆæ–°Commandç³»ç»Ÿï¼‰
     void setupInputBindings();
     
-    // ĞÂÔö£ºCommandÏµÍ³ÓÃµÄÒÆ¶¯×´Ì¬¿ØÖÆ·½·¨
+    // æ–°å¢ï¼šCommandç³»ç»Ÿç”¨çš„ç§»åŠ¨çŠ¶æ€æ§åˆ¶æ–¹æ³•
     void startMove(int direction);  // direction: 0=down, 1=left, 2=right, 3=up
     void stopMove(int direction);
     bool canMove(int direction) const;
     
-    // Åö×²ÉÏÏÂÎÄ¹ÜÀí·½·¨
+    // ç¢°æ’ä¸Šä¸‹æ–‡ç®¡ç†æ–¹æ³•
     void setCollisionContext(const std::vector<cocos2d::Vec2>& collisionPoints);
     void updateMovementPermissions();
 
@@ -49,7 +49,7 @@ public:
 
     bool leftpressed = false, downpressed = false, uppressed = false, rightpressed = false;
 
-    // ½ÇÉ«µÄÒÆ¶¯ËÙ¶È
+    // è§’è‰²çš„ç§»åŠ¨é€Ÿåº¦
     float speed;
 
     int look_state = 0;
@@ -60,9 +60,9 @@ public:
     //int current_energy = kDefaultEnergy;
 
 private:
-    // Åö×²¼ì²âÏà¹Ø
+    // ç¢°æ’æ£€æµ‹ç›¸å…³
     std::vector<cocos2d::Vec2> collisionPoints;
-    float collisionRadius = 15.0f;  // Åö×²¼ì²â°ë¾¶
+    float collisionRadius = 15.0f;  // ç¢°æ’æ£€æµ‹åŠå¾„
 
 };
 

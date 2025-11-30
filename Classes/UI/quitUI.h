@@ -1,10 +1,10 @@
 #pragma once
 //quitUI.h
-//ÍË³ö½çÃæ
+//é€€å‡ºç•Œé¢
 #include "cocos2d.h"  
-#include "AppDelegate.h"
-#include "InputManager.h"
-#include "UICommand.h"
+#include "../Core/AppDelegate.h"
+#include "../Core/InputManager.h"
+#include "../Commands/UICommand.h"
 #include <memory>
 
 class quitUI : public cocos2d::Layer {

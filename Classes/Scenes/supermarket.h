@@ -2,16 +2,16 @@
 #define __supermarket_H__
 
 #include "cocos2d.h"
-#include "Player.h"
+#include "../Entities/Player.h"
 #include "AppDelegate.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
-#include "Inventory.h"
-#include "Generaltem.h"
-#include "KeyCommand.h"
+#include "../Systems/Inventory.h"
+#include "../Items/Generaltem.h"
+#include "../Commands/KeyCommand.h"
 #include "InputManager.h"
-#include "SceneInteractionCommand.h"
-#include "UICommand.h"
+#include "../Commands/SceneInteractionCommand.h"
+#include "../Commands/UICommand.h"
 
 class supermarket : public cocos2d::Scene
 {
@@ -28,24 +28,24 @@ public:
 
     static supermarket* create();
 
-    // ÅĞ¶Ï½ÇÉ«µÄÎ»ÖÃ
+    // åˆ¤æ–­è§’è‰²çš„ä½ç½®
     void checkPlayerPosition();
     
-    // ´´½¨Ò»¸öÁĞ±í£¬ÓÃÓÚ±£´æËùÓĞ·ÇÍ¸Ã÷ÏñËØµÄ×ø±ê
+    // åˆ›å»ºä¸€ä¸ªåˆ—è¡¨ï¼Œç”¨äºä¿å­˜æ‰€æœ‰éé€æ˜åƒç´ çš„åæ ‡
     std::vector<cocos2d::Vec2> nonTransparentPixels;
 
     cocos2d::Sprite* button;
 
-    /* ¿ªÃÅ°´Å¥ */
+    /* å¼€é—¨æŒ‰é’® */
     Sprite* opendoor;
     
-    // ´´½¨³ö¿ÚÇøÓò
+    // åˆ›å»ºå‡ºå£åŒºåŸŸ
     cocos2d::Rect Region_Out = Rect(1343, 818, 50, 868);
   
 
 private:
 
-    // ÍË³ö°´Å¥
+    // é€€å‡ºæŒ‰é’®
     cocos2d::MenuItemImage* closeItem;
 
     cocos2d::Menu* menu;

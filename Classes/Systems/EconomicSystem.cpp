@@ -1,27 +1,27 @@
 #include "EconomicSystem.h"  
-#include "cocos2d.h"  // È·±£°üº¬ cocos2d.h À´Ê¹ÓÃ CCLOG  
+#include "cocos2d.h"  // ç¡®ä¿åŒ…å« cocos2d.h æ¥ä½¿ç”¨ CCLOG  
 #include <iostream>  
 
 extern int GoldAmount;
 
-// ¹¹Ôìº¯Êı³õÊ¼»¯½ğ±ÒÊıÁ¿Îª4000  
+// æ„é€ å‡½æ•°åˆå§‹åŒ–é‡‘å¸æ•°é‡ä¸º4000  
 EconomicSystem::EconomicSystem ( Inventory* mybag , Inventory* goods)
     : goldAmount (GoldAmount) , _mybag ( mybag ) , _goods ( goods ) {
-    // ³õÊ¼»¯´úÂë¿ÉÒÔÔÚÕâÀïÖ´ĞĞ  
+    // åˆå§‹åŒ–ä»£ç å¯ä»¥åœ¨è¿™é‡Œæ‰§è¡Œ  
 }
 
-// Îö¹¹º¯Êı  
+// ææ„å‡½æ•°  
 EconomicSystem::~EconomicSystem () {
-    // ÇåÀí´úÂë  
+    // æ¸…ç†ä»£ç   
     GoldAmount = goldAmount;
 }
 
-// Ôö¼Ó½ğ±ÒµÄº¯Êı  
+// å¢åŠ é‡‘å¸çš„å‡½æ•°  
 void EconomicSystem::addGold ( int amount ) {
     if (amount > 0) {
         goldAmount += amount;
         CCLOG ( "Added %d gold. Total: %d gold." , amount , goldAmount );
-        // Í¨ÖªËùÓĞ¹Û²ìÕß½ğÇ®×´Ì¬±ä»¯
+        // é€šçŸ¥æ‰€æœ‰è§‚å¯Ÿè€…é‡‘é’±çŠ¶æ€å˜åŒ–
         notifyEconomicStateChanged(goldAmount, amount);
     }
     else {
@@ -29,12 +29,12 @@ void EconomicSystem::addGold ( int amount ) {
     }
 }
 
-// ¼õÉÙ½ğ±ÒµÄº¯Êı  
+// å‡å°‘é‡‘å¸çš„å‡½æ•°  
 void EconomicSystem::subtractGold ( int amount ) {
     if (amount > 0 && amount <= goldAmount) {
         goldAmount -= amount;
         CCLOG ( "Subtracted %d gold. Total: %d gold." , amount , goldAmount );
-        // Í¨ÖªËùÓĞ¹Û²ìÕß½ğÇ®×´Ì¬±ä»¯
+        // é€šçŸ¥æ‰€æœ‰è§‚å¯Ÿè€…é‡‘é’±çŠ¶æ€å˜åŒ–
         notifyEconomicStateChanged(goldAmount, -amount);
     }
     else {
@@ -47,12 +47,12 @@ void EconomicSystem::subtractGold ( int amount ) {
     }
 }
 
-// ¶ÁÈ¡ÓµÓĞ½ğ±ÒÊıÁ¿µÄº¯Êı  
+// è¯»å–æ‹¥æœ‰é‡‘å¸æ•°é‡çš„å‡½æ•°  
 int EconomicSystem::getGoldAmount () const {
     return goldAmount;
 }
 
-// ¹ºÂòº¯Êı  
+// è´­ä¹°å‡½æ•°  
 void EconomicSystem::buyItem ( const string& itemName ) {
     Item item = _goods->GetItemByName ( itemName );
 
@@ -66,11 +66,11 @@ void EconomicSystem::buyItem ( const string& itemName ) {
     }
 }
 
-// ³öÊÛº¯Êı  
+// å‡ºå”®å‡½æ•°  
 void EconomicSystem::sellItem ( const string& itemName , int count) {
-    Item item = _mybag->GetItemByName ( itemName ); // ´Ó±³°üÖĞ»ñÈ¡ÎïÆ·  
+    Item item = _mybag->GetItemByName ( itemName ); // ä»èƒŒåŒ…ä¸­è·å–ç‰©å“  
 
-    int itemValue = item.GetValue (); // »ñÈ¡Âô³ö¼Û¸ñ  
+    int itemValue = item.GetValue (); // è·å–å–å‡ºä»·æ ¼  
     addGold ( itemValue * count );
     _mybag->RemoveItem ( item , count );
     CCLOG ( "Sold item: %s for %d gold." , itemName.c_str () , itemValue * count );

@@ -2,14 +2,14 @@
 #define __Town_H__
 
 #include "cocos2d.h"
-#include "Player.h"
-#include "AppDelegate.h"
-#include "mini_bag.h"
+#include "../Entities/Player.h"
+#include "../Core/AppDelegate.h"
+#include "../UI/mini_bag.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
-#include "InputManager.h"
-#include "SceneInteractionCommand.h"
-#include "UICommand.h"
+#include "../Core/InputManager.h"
+#include "../Commands/SceneInteractionCommand.h"
+#include "../Commands/UICommand.h"
 
 USING_NS_CC;
 
@@ -24,25 +24,25 @@ public:
 
     static Town* create();
 
-    // ÅĞ¶Ï½ÇÉ«µÄÎ»ÖÃ
+    // åˆ¤æ–­è§’è‰²çš„ä½ç½®
     void checkPlayerPosition();
 
-    // ÉèÖÃÊäÈëÃüÁî°ó¶¨
+    // è®¾ç½®è¾“å…¥å‘½ä»¤ç»‘å®š
     void setupInputCommands();
 
-    // ÇåÀíÊäÈëÃüÁî°ó¶¨
+    // æ¸…ç†è¾“å…¥å‘½ä»¤ç»‘å®š
     void cleanupInputCommands();
 
-    // ÏÂÓêĞ§¹û
+    // ä¸‹é›¨æ•ˆæœ
     void createRainEffect();
 
-    // ¸ü¸ÄÓêµÎÉúÃüÖÜÆÚ
+    // æ›´æ”¹é›¨æ»´ç”Ÿå‘½å‘¨æœŸ
     void updaterain(float deltaTime);
     
-    // ´´½¨Ò»¸öÁĞ±í£¬ÓÃÓÚ±£´æËùÓĞ·ÇÍ¸Ã÷ÏñËØµÄ×ø±ê
+    // åˆ›å»ºä¸€ä¸ªåˆ—è¡¨ï¼Œç”¨äºä¿å­˜æ‰€æœ‰éé€æ˜åƒç´ çš„åæ ‡
     std::vector<cocos2d::Vec2> nonTransparentPixels;
 
-    // ´´½¨·¿×ÓµÄÇøÓò
+    // åˆ›å»ºæˆ¿å­çš„åŒºåŸŸ
     cocos2d::Rect Region_supermarket = Rect(163, 518, 130, 60);
     cocos2d::Rect Region_forest = Rect(-940, -400, 200, 110);
     cocos2d::Rect Region_beach = Rect(490, -750, 50, 100);
@@ -51,13 +51,13 @@ public:
 
 private:
 
-    /* ÍË³ö°´Å¥ */
+    /* é€€å‡ºæŒ‰é’® */
     Sprite* button;
 
-    /* ¿ªÃÅ°´Å¥ */
+    /* å¼€é—¨æŒ‰é’® */
     Sprite* opendoor;
 
-    // ÍË³ö°´Å¥
+    // é€€å‡ºæŒ‰é’®
     cocos2d::MenuItemImage* closeItem;
 
     cocos2d::Menu* menu;
@@ -66,7 +66,7 @@ private:
 
     Sprite* Box;
 
-    // Command PatternÏà¹ØµÄ³ÉÔ±±äÁ¿
+    // Command Patternç›¸å…³çš„æˆå‘˜å˜é‡
     std::vector<std::shared_ptr<KeyCommand>> boundCommands;
 
 };

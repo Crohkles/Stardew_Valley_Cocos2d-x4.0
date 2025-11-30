@@ -2,7 +2,7 @@
 #define __INPUT_MANAGER_H__
 
 #include "cocos2d.h"
-#include "KeyCommand.h"
+#include "../Commands/KeyCommand.h"
 #include <map>
 #include <vector>
 #include <memory>

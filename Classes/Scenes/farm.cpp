@@ -1,19 +1,19 @@
-#include "AppDelegate.h"
+#include "../Core/AppDelegate.h"
 #include "Myhouse.h"
 #include "Barn.h"
 #include "farm.h"
 #include "Cave.h"
-#include "Crop.h"
-#include "CookingPot.h"
-#include "Player.h"
-#include "BasicInformation.h" 
+#include "../Entities/Crop.h"
+#include "../Items/CookingPot.h"
+#include "../Entities/Player.h"
+#include "../Core/BasicInformation.h" 
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
 #include "vector"
-#include "mailBoxUI.h"
-#include "InputManager.h"
-#include "SceneInteractionCommand.h"
-#include "UICommand.h"
+#include "../UI/mailBoxUI.h"
+#include "../Core/InputManager.h"
+#include "../Commands/SceneInteractionCommand.h"
+#include "../Commands/UICommand.h"
 #include "Myhouse.h"
 #include "Barn.h"
 #include "Cave.h"
@@ -42,19 +42,19 @@ bool farm::init ()
     button = cocos2d::Sprite::create ( "CloseNormal.png" );
     this->addChild ( button , 11 );
 
-    // ÉèÖÃ¼ÆÊ±Æ÷±êÇ©
+    // è®¾ç½®è®¡æ—¶å™¨æ ‡ç­¾
     TimeUI = Timesystem::create ( "farm" );
     this->addChild ( TimeUI , 13 );
 
-    // »Ö¸´ÖÖÖ²
+    // æ¢å¤ç§æ¤
     AllInitialize_crop ();
 
     if (Weather == "Rainy") {
-        // ÏÂÓê
+        // ä¸‹é›¨
         createRainEffect ();
     }
 
-    // ÉèÖÃ±³¾°Í¼Æ¬
+    // è®¾ç½®èƒŒæ™¯å›¾ç‰‡
     auto background_real = Sprite::create ( "farm/farm.png" );
     background_real->setPosition ( Vec2 ( visibleSize.width / 2 , visibleSize.height / 2 ) );
     this->addChild ( background_real , 1 );
@@ -66,14 +66,14 @@ bool farm::init ()
     background->setScale ( 1.5f );
 
 
-    Vec2 spritePosition = background->getPosition ();   // »ñÈ¡¾«ÁéµÄÎ»ÖÃ£¨ÖĞĞÄµã£©
-    Size spriteSize = background->getContentSize ();    // »ñÈ¡¾«ÁéµÄ³ß´ç£¨¿í¶ÈºÍ¸ß¶È£©
+    Vec2 spritePosition = background->getPosition ();   // è·å–ç²¾çµçš„ä½ç½®ï¼ˆä¸­å¿ƒç‚¹ï¼‰
+    Size spriteSize = background->getContentSize ();    // è·å–ç²¾çµçš„å°ºå¯¸ï¼ˆå®½åº¦å’Œé«˜åº¦ï¼‰
 
 
-    // ¼ÆËã×óÏÂ½ÇµÄ×ø±ê
+    // è®¡ç®—å·¦ä¸‹è§’çš„åæ ‡
     Vec2 leftBottomPosition = Vec2 (
-        spritePosition.x - background->getScaleX () * spriteSize.width / 2 ,   // ÖĞĞÄµã x ×ø±ê¼õÈ¥¿í¶ÈµÄÒ»°ë
-        spritePosition.y - background->getScaleY () * spriteSize.height / 2   // ÖĞĞÄµã y ×ø±ê¼õÈ¥¸ß¶ÈµÄÒ»°ë
+        spritePosition.x - background->getScaleX () * spriteSize.width / 2 ,   // ä¸­å¿ƒç‚¹ x åæ ‡å‡å»å®½åº¦çš„ä¸€åŠ
+        spritePosition.y - background->getScaleY () * spriteSize.height / 2   // ä¸­å¿ƒç‚¹ y åæ ‡å‡å»é«˜åº¦çš„ä¸€åŠ
     );
 
 
@@ -83,50 +83,50 @@ bool farm::init ()
         int width = img.getWidth ();
         int height = img.getHeight ();
 
-        // »ñÈ¡ÏñËØÊı¾İ
+        // è·å–åƒç´ æ•°æ®
         unsigned char* data = img.getData ();
 
-        // ±éÀúËùÓĞÏñËØ£¬¼ì²éÊÇ·ñÓĞÄÚÈİ£¨Í¸Ã÷¶È´óÓÚ0£©
+        // éå†æ‰€æœ‰åƒç´ ï¼Œæ£€æŸ¥æ˜¯å¦æœ‰å†…å®¹ï¼ˆé€æ˜åº¦å¤§äº0ï¼‰
         for (int y = 0; y < height; y = y + 8)
         {
             for (int x = 0; x < width; x = x + 8)
             {
-                // »ñÈ¡µ±Ç°ÏñËØµÄ RGBA Öµ
-                int index = (y * width + x) * 4;  // Ã¿¸öÏñËØÕ¼ÓÃ 4 ¸ö×Ö½Ú (RGBA)
-                unsigned char a = data[index + 3];  // Í¸Ã÷¶È
+                // è·å–å½“å‰åƒç´ çš„ RGBA å€¼
+                int index = (y * width + x) * 4;  // æ¯ä¸ªåƒç´ å ç”¨ 4 ä¸ªå­—èŠ‚ (RGBA)
+                unsigned char a = data[index + 3];  // é€æ˜åº¦
 
-                // Èç¹ûÍ¸Ã÷¶È (alpha) ´óÓÚ 0£¬±íÊ¾´ËÏñËØÓĞÄÚÈİ
+                // å¦‚æœé€æ˜åº¦ (alpha) å¤§äº 0ï¼Œè¡¨ç¤ºæ­¤åƒç´ æœ‰å†…å®¹
                 if (a > 0)
                 {
                     float screenX = leftBottomPosition.x + x * background->getScaleX ();
-                    float screenY = leftBottomPosition.y + (height - y - 1) * background->getScaleY ();  // ×¢Òâ Y Öá·´Ïò
-                    nonTransparentPixels.push_back ( Vec2 ( screenX , screenY ) );  // ¼ÇÂ¼ÆÁÄ»×ø±ê
+                    float screenY = leftBottomPosition.y + (height - y - 1) * background->getScaleY ();  // æ³¨æ„ Y è½´åå‘
+                    nonTransparentPixels.push_back ( Vec2 ( screenX , screenY ) );  // è®°å½•å±å¹•åæ ‡
                 }
             }
         }
     }
 
-    // ³õÊ¼»¯½ÇÉ«²¢½«ÆäÌí¼Óµ½³¡¾°
+    // åˆå§‹åŒ–è§’è‰²å¹¶å°†å…¶æ·»åŠ åˆ°åœºæ™¯
     if (player1->getParent () == NULL) {
         this->addChild ( player1 , 17 );
-        // ÔÚÌí¼Óµ½³¡¾°ºóÉèÖÃÊäÈë°ó¶¨
+        // åœ¨æ·»åŠ åˆ°åœºæ™¯åè®¾ç½®è¾“å…¥ç»‘å®š
         player1->setupInputBindings();
-        // ÉèÖÃÅö×²ÉÏÏÂÎÄ
+        // è®¾ç½®ç¢°æ’ä¸Šä¸‹æ–‡
         player1->setCollisionContext(nonTransparentPixels);
         for (auto& pair : F_lastplace) {
-            if (pair.second == true) {  // ¼ì²é bool ÖµÊÇ·ñÎª true
+            if (pair.second == true) {  // æ£€æŸ¥ bool å€¼æ˜¯å¦ä¸º true
                 player1->setPosition ( pair.first.second );
                 pair.second = false;
             }
         }
          player1->speed = 4.7f;
-         //½öÎª·½±ã²âÊÔ
+         //ä»…ä¸ºæ–¹ä¾¿æµ‹è¯•
        /* player1->speed = 20.0f;*/
         player1->setScale ( 1.5f );
         player1->setAnchorPoint ( Vec2 ( 0.5f , 0.2f ) );
     }
 
-    // Æô¶¯ÈËÎïµÄ¶¨Ê±Æ÷
+    // å¯åŠ¨äººç‰©çš„å®šæ—¶å™¨
     player1->schedule ( [=]( float dt ) {
         player1->player1_move ();
         } , 0.05f , "player1_move" );
@@ -136,36 +136,36 @@ bool farm::init ()
         } , 0.3f , "player_change" );
 
 
-    // ¼ÆËã±³¾°¾«ÁéµÄËõ·Åºó·¶Î§
+    // è®¡ç®—èƒŒæ™¯ç²¾çµçš„ç¼©æ”¾åèŒƒå›´
     float scaledWidth = background->getContentSize ().width * background->getScaleX ();
     float scaledHeight = background->getContentSize ().height * background->getScaleY ();
 
-    // ¹¹Ôì Follow µÄ±ß½ç Rect
+    // æ„é€  Follow çš„è¾¹ç•Œ Rect
     auto followRect = cocos2d::Rect ( leftBottomPosition.x , leftBottomPosition.y , scaledWidth , scaledHeight );
 
-    // ´´½¨ Follow ¶¯×÷²¢ÏŞÖÆÍæ¼ÒÔÚ±³¾°·¶Î§ÄÚÒÆ¶¯
+    // åˆ›å»º Follow åŠ¨ä½œå¹¶é™åˆ¶ç©å®¶åœ¨èƒŒæ™¯èŒƒå›´å†…ç§»åŠ¨
     auto followAction = Follow::create ( player1 , followRect );
     this->runAction ( followAction );
 
-    // ¶¨ÆÚ¸üĞÂÍæ¼Ò×´Ì¬
+    // å®šæœŸæ›´æ–°ç©å®¶çŠ¶æ€
     this->schedule ( [this]( float dt ) {
-        this->checkPlayerPosition ();  // ¼ì²éÍæ¼ÒÊÇ·ñ½Ó½üÂÖÀªµã
+        this->checkPlayerPosition ();  // æ£€æŸ¥ç©å®¶æ˜¯å¦æ¥è¿‘è½®å»“ç‚¹
         } , 0.01f , "check_position_key" );
 
-    //ĞÅÏäÌí¼Ó£¬ÓÃÀ´ÁìÈ¡ÈÎÎñ
+    //ä¿¡ç®±æ·»åŠ ï¼Œç”¨æ¥é¢†å–ä»»åŠ¡
     auto mailBox = Sprite::create ( "UIresource/xinxiang/xinxiang.png" );
     mailBox->setPosition ( Vec2 ( 260 , 1050 ) );
     mailBox->setScale ( 0.7f );
     this->addChild ( mailBox , 10 );
 
-    //Ïä×ÓÌí¼Ó£¬ÓÃÀ´Âô¶«Î÷
+    //ç®±å­æ·»åŠ ï¼Œç”¨æ¥å–ä¸œè¥¿
     Box = Sprite::create ( "UIresource/xiangzi/xiangzi.png" );
     Box->setPosition ( Vec2 ( 260 , 1150 ) );
     Box->setAnchorPoint ( Vec2 ( 0 , 0 ) );
     Box->setScale ( 0.7f );
     this->addChild ( Box , 10 );
 
-    //´ó¹øÌí¼Ó ÓÃÀ´×ö·¹
+    //å¤§é”…æ·»åŠ  ç”¨æ¥åšé¥­
     auto cooking_pot = CookingPot::create ();
     cooking_pot->setPosition ( -50 , 1000 );
     cooking_pot->setAnchorPoint ( Vec2 ( 0 , 0 ) );
@@ -173,28 +173,28 @@ bool farm::init ()
     this->addChild ( cooking_pot , 10 );
     
 
-    //½»»¥¾àÀë
+    //äº¤äº’è·ç¦»
     float interactionRadius = 200.0f;
 
     auto listener = EventListenerMouse::create ();
     listener->onMouseDown = [this , mailBox , interactionRadius, cooking_pot]( Event* event ) {
 
-        // »ñÈ¡Êó±êµã»÷µÄÎ»ÖÃ
+        // è·å–é¼ æ ‡ç‚¹å‡»çš„ä½ç½®
         auto mouseEvent = static_cast<EventMouse*>(event);
         Vec2 clickPos ( mouseEvent->getCursorX () , mouseEvent->getCursorY () );
         clickPos = this->convertToNodeSpace ( clickPos );
 
         if (Box->getBoundingBox ().containsPoint ( clickPos )) {
 
-            // »ñÈ¡Íæ¼ÒµÄÎ»ÖÃ  
+            // è·å–ç©å®¶çš„ä½ç½®  
             Vec2 playerPos = player1->getPosition ();
 
             Vec2 BoxPos = Box->getPosition ();
 
-            // ¼ÆËãÍæ¼ÒÓëNPCÖ®¼äµÄ¾àÀë  
+            // è®¡ç®—ç©å®¶ä¸NPCä¹‹é—´çš„è·ç¦»  
             float distance = playerPos.distance ( BoxPos );
 
-            // ¼ì²é¾àÀëÊÇ·ñÔÚÔÊĞíµÄ·¶Î§ÄÚ  
+            // æ£€æŸ¥è·ç¦»æ˜¯å¦åœ¨å…è®¸çš„èŒƒå›´å†…  
             if (distance <= interactionRadius) {
                 if (miniBag->getSelectedSlot ()) {
                     GoldAmount += inventory->GetItemAt ( miniBag->getSelectedSlot () )->GetValue ();
@@ -205,7 +205,7 @@ bool farm::init ()
             }
         }
 
-        //ÅĞ¶ÏÊó±êµã»÷µÄÎ»ÖÃ
+        //åˆ¤æ–­é¼ æ ‡ç‚¹å‡»çš„ä½ç½®
         if (cooking_pot->getBoundingBox ().containsPoint ( clickPos )) {
             auto selected_item = miniBag->getSelectedItem ();
             if (selected_item != nullptr && std::dynamic_pointer_cast<Food>(selected_item) != nullptr) {
@@ -233,17 +233,17 @@ bool farm::init ()
             cooking_pot->DisplayPotInCCLOG ();
         }
 
-        // ÅĞ¶Ïµã»÷Î»ÖÃÊÇ·ñÔÚĞÅÏä¸½½ü·¶Î§ÄÚ
+        // åˆ¤æ–­ç‚¹å‡»ä½ç½®æ˜¯å¦åœ¨ä¿¡ç®±é™„è¿‘èŒƒå›´å†…
         if (button != nullptr && button->getBoundingBox ().containsPoint ( clickPos )) {
             Director::getInstance ()->end ();
         }
         if (mailBox->getBoundingBox ().containsPoint ( clickPos )) {
-            // »ñÈ¡Íæ¼ÒµÄÎ»ÖÃ  
+            // è·å–ç©å®¶çš„ä½ç½®  
             Vec2 playerPos = player1->getPosition ();
 
-            // ¼ÆËãÍæ¼ÒÓëĞÅÏäÖ®¼äµÄ¾àÀë  
+            // è®¡ç®—ç©å®¶ä¸ä¿¡ç®±ä¹‹é—´çš„è·ç¦»  
             float distance = playerPos.distance ( mailBox->getPosition () );
-            // ¼ì²é¾àÀëÊÇ·ñÔÚÔÊĞíµÄ·¶Î§ÄÚ  
+            // æ£€æŸ¥è·ç¦»æ˜¯å¦åœ¨å…è®¸çš„èŒƒå›´å†…  
             if (distance <= interactionRadius) {
                 mailBoxUI* mailbox = mailBoxUI::create ();
                 this->addChild ( mailbox , 20 );
@@ -253,12 +253,12 @@ bool farm::init ()
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , this );
 
-    // ¾ÉµÄ¼üÅÌ¼àÌıÆ÷ÒÑÌæ»»ÎªCommand Pattern
+    // æ—§çš„é”®ç›˜ç›‘å¬å™¨å·²æ›¿æ¢ä¸ºCommand Pattern
     
-    // ÉèÖÃCommand PatternÊäÈë°ó¶¨
+    // è®¾ç½®Command Patternè¾“å…¥ç»‘å®š
     setupInputCommands();
 
-    //½çÃæÏÂµÄ±³°üÏÔÊ¾
+    //ç•Œé¢ä¸‹çš„èƒŒåŒ…æ˜¾ç¤º
     miniBag = mini_bag::create ( inventory );
     miniBag->setScale ( 1.0f );
     Vec2 pos = miniBag->getPosition ();
@@ -270,9 +270,9 @@ bool farm::init ()
     }
 
 
-    // ¸üĞÂÎïÆ·À¸
-    // Ê¹ÓÃObserverÄ£Ê½×Ô¶¯¸üĞÂÎïÆ·À¸£¨ÎŞĞèÂÖÑ¯£©
-    // ×¢²á¹Û²ìÕß
+    // æ›´æ–°ç‰©å“æ 
+    // ä½¿ç”¨Observeræ¨¡å¼è‡ªåŠ¨æ›´æ–°ç‰©å“æ ï¼ˆæ— éœ€è½®è¯¢ï¼‰
+    // æ³¨å†Œè§‚å¯Ÿè€…
     if (inventory && miniBag) {
         inventory->addObserver(miniBag);
     }
@@ -298,15 +298,15 @@ void farm::AllInitialize_crop () {
 
     for (auto it = Crop_information.begin (); it != Crop_information.end (); /* no increment here */) {
 
-        auto crop = *it;  // ½âÒıÓÃµü´úÆ÷ÒÔ·ÃÎÊ Crop ¶ÔÏó
+        auto crop = *it;  // è§£å¼•ç”¨è¿­ä»£å™¨ä»¥è®¿é—® Crop å¯¹è±¡
         int nums = crop->nums;
 
         cocos2d::log ( "set nums = %d" , nums );
 
-        // »ñÈ¡ÀàĞÍ
+        // è·å–ç±»å‹
         std::string type = crop->GetName ();
 
-        // ¸ù¾İÖ²ÎïµÄ×´Ì¬Ñ¡ÔñÏÔÊ¾µÄ¾«Áé
+        // æ ¹æ®æ¤ç‰©çš„çŠ¶æ€é€‰æ‹©æ˜¾ç¤ºçš„ç²¾çµ
         if (crop->GetPhase () == Phase::MATURE) {
             auto test = Sprite::create ( crop->mature_pic );
             this->addChild ( test , 15 - nums / 19 );
@@ -332,20 +332,20 @@ void farm::AllInitialize_crop () {
             test->setScale ( 2.1f );
         }
 
-        // ±éÀúÏÂÒ»¸öÔªËØ
+        // éå†ä¸‹ä¸€ä¸ªå…ƒç´ 
         ++it;
     }
 
 
 }
 
-// ¼ì²éÍæ¼ÒÊÇ·ñ½Ó½ü±³¾°µÄÂÖÀªµã
+// æ£€æŸ¥ç©å®¶æ˜¯å¦æ¥è¿‘èƒŒæ™¯çš„è½®å»“ç‚¹
 void farm::checkPlayerPosition ()
 {
 
-    // »ñÈ¡Íæ¼ÒµÄÎ»ÖÃ
+    // è·å–ç©å®¶çš„ä½ç½®
     Vec2 playerPos = player1->getPosition ();
-    //ÌØÊâÎ»ÖÃÏä×ÓÏûÊ§
+    //ç‰¹æ®Šä½ç½®ç®±å­æ¶ˆå¤±
     if (playerPos.y < 0) {
         miniBag->setLocalZOrder ( 0 );
     }
@@ -354,9 +354,9 @@ void farm::checkPlayerPosition ()
     }
 
 
-    // ¼ÆËãÍæ¼ÒÓëÏä×ÓÖ®¼äµÄ¾àÀë  
+    // è®¡ç®—ç©å®¶ä¸ç®±å­ä¹‹é—´çš„è·ç¦»  
     float distance = playerPos.distance ( Box->getPosition () );
-    // ¼ì²é¾àÀëÊÇ·ñÔÚÔÊĞíµÄ·¶Î§ÄÚ  
+    // æ£€æŸ¥è·ç¦»æ˜¯å¦åœ¨å…è®¸çš„èŒƒå›´å†…  
     if (distance <= 200.0f) {
         Box->setTexture ( "UIresource/xiangzi/Open.png" );
     }
@@ -364,7 +364,7 @@ void farm::checkPlayerPosition ()
         Box->setTexture ( "UIresource/xiangzi/xiangzi.png" );
     }
 
-    // ¸üĞÂ¼ÆÊ±Æ÷ÏÔÊ¾
+    // æ›´æ–°è®¡æ—¶å™¨æ˜¾ç¤º
     remainingTime++;
     if (remainingTime == 43200 || strength == 0) {
 
@@ -402,7 +402,7 @@ void farm::checkPlayerPosition ()
 
         for (auto it = Crop_information.begin (); it != Crop_information.end ();) {
 
-            auto crop = *it;  // ½âÒıÓÃµü´úÆ÷ÒÔ·ÃÎÊ Crop ¶ÔÏó
+            auto crop = *it;  // è§£å¼•ç”¨è¿­ä»£å™¨ä»¥è®¿é—® Crop å¯¹è±¡
 
             if (day == 1) {
                 crop->watered = true;
@@ -411,22 +411,22 @@ void farm::checkPlayerPosition ()
                 crop->watered = true;
             }
 
-            // ÅĞ¶ÏÇ°Ò»ÌìÊÇ·ñ½½Ë®
+            // åˆ¤æ–­å‰ä¸€å¤©æ˜¯å¦æµ‡æ°´
             if ((crop->watered == false) && (crop->GetPhase () != Phase::MATURE)) {
-                // ÅĞ¶ÏÊÇ·ñÒÑ¾­½øÈë¿İÎ®×´Ì¬
+                // åˆ¤æ–­æ˜¯å¦å·²ç»è¿›å…¥æ¯èçŠ¶æ€
                 if (crop->GetPhase () != Phase::SAPLESS) {
                     crop->ChangePhase ( Phase::SAPLESS );
-                    crop->ChangMatureNeeded ( 2 ); // ÑÓ³ÙÁ½ÌìÊÕ»ñ
+                    crop->ChangMatureNeeded ( 2 ); // å»¶è¿Ÿä¸¤å¤©æ”¶è·
                     it++;
                 }
                 else {
-                    // É¾³ıÔªËØ²¢¸üĞÂµü´úÆ÷
+                    // åˆ é™¤å…ƒç´ å¹¶æ›´æ–°è¿­ä»£å™¨
                     it = Crop_information.erase ( it );
                 }
 
             }
             else {
-                // ¸üĞÂ×´Ì¬
+                // æ›´æ–°çŠ¶æ€
                 crop->UpdateGrowth ();
                 it++;
             }
@@ -434,7 +434,7 @@ void farm::checkPlayerPosition ()
         }
 
         for (auto& pair : F_lastplace) {
-            if (pair.first.first == "myhouse") {  // ¼ì²é bool ÖµÊÇ·ñÎª true
+            if (pair.first.first == "myhouse") {  // æ£€æŸ¥ bool å€¼æ˜¯å¦ä¸º true
                 pair.second = true;
             }
         }
@@ -447,7 +447,7 @@ void farm::checkPlayerPosition ()
         Director::getInstance ()->replaceScene ( nextday );
 
     }
-    // ¸üĞÂ±êÇ©Î»ÖÃ
+    // æ›´æ–°æ ‡ç­¾ä½ç½®
     float currentx = 0 , currenty = 0;
     if (playerPos.x <= 637) {
         currentx = 637;
@@ -473,55 +473,55 @@ void farm::checkPlayerPosition ()
     button->setPosition ( currentx + 730 , currenty - 590 );
     miniBag->setPosition ( currentx , currenty );
 
-    // ÓëÖÖÖ²ÓĞ¹ØµÄ²Ù×÷
+    // ä¸ç§æ¤æœ‰å…³çš„æ“ä½œ
     if (plant_area.containsPoint ( playerPos )) {
 
-        // ÖÖÖ²Âß¼­ÏÖÒÑÍ¨¹ıP¼üCommand´¦Àí
-        // ½½Ë®Âß¼­ÏÖÒÑÍ¨¹ıW¼üCommand´¦Àí
-        // ÊÕ»ñÂß¼­ÏÖÒÑÍ¨¹ıG¼üCommand´¦Àí
+        // ç§æ¤é€»è¾‘ç°å·²é€šè¿‡Pé”®Commandå¤„ç†
+        // æµ‡æ°´é€»è¾‘ç°å·²é€šè¿‡Wé”®Commandå¤„ç†
+        // æ”¶è·é€»è¾‘ç°å·²é€šè¿‡Gé”®Commandå¤„ç†
 
     }
 
-    // ½øÈë·¿Îİ³¡¾°ÇĞ»»ÏÖÒÑÍ¨¹ıENTER¼üCommand´¦Àí
+    // è¿›å…¥æˆ¿å±‹åœºæ™¯åˆ‡æ¢ç°å·²é€šè¿‡ENTERé”®Commandå¤„ç†
 
-    // Àë¿ªÅ©³¡³¡¾°ÇĞ»»ÏÖÒÑÍ¨¹ıENTER¼üCommand´¦Àí
+    // ç¦»å¼€å†œåœºåœºæ™¯åˆ‡æ¢ç°å·²é€šè¿‡ENTERé”®Commandå¤„ç†
 
-    // ½øÈëĞóÅï³¡¾°ÇĞ»»ÏÖÒÑÍ¨¹ıENTER¼üCommand´¦Àí
+    // è¿›å…¥ç•œæ£šåœºæ™¯åˆ‡æ¢ç°å·²é€šè¿‡ENTERé”®Commandå¤„ç†
 
-    // ½øÈëÉ½¶´³¡¾°ÇĞ»»ÏÖÒÑÍ¨¹ıENTER¼üCommand´¦Àí
+    // è¿›å…¥å±±æ´åœºæ™¯åˆ‡æ¢ç°å·²é€šè¿‡ENTERé”®Commandå¤„ç†
 
-    // ½øÈëÉ­ÁÖ³¡¾°ÇĞ»»ÏÖÒÑÍ¨¹ıENTER¼üCommand´¦Àí
+    // è¿›å…¥æ£®æ—åœºæ™¯åˆ‡æ¢ç°å·²é€šè¿‡ENTERé”®Commandå¤„ç†
 
-    // Åö×²¼ì²âÂß¼­ÒÑÒÆµ½PlayerÀàµÄupdateMovementPermissions·½·¨ÖĞ
-    // Í¨¹ısetCollisionContextÉèÖÃÅö×²µã¼´¿É
-    // Åö×²È¨ÏŞ»áÔÚPlayerµÄplayer1_move()ÖĞ×Ô¶¯¸üĞÂ
+    // ç¢°æ’æ£€æµ‹é€»è¾‘å·²ç§»åˆ°Playerç±»çš„updateMovementPermissionsæ–¹æ³•ä¸­
+    // é€šè¿‡setCollisionContextè®¾ç½®ç¢°æ’ç‚¹å³å¯
+    // ç¢°æ’æƒé™ä¼šåœ¨Playerçš„player1_move()ä¸­è‡ªåŠ¨æ›´æ–°
 }
 
 int farm::getRegionNumber ( Vec2 pos ) {
 
-    // ¶¨Òå¾ØĞÎÇøÓòµÄ²ÎÊı
-    int left_bottom_x = 496;  // ×óÏÂ½Çx×ø±ê
-    int left_bottom_y = 467;  // ×óÏÂ½Çy×ø±ê
-    int width = 912;          // ¾ØĞÎ¿í¶È
-    int height = 480;         // ¾ØĞÎ¸ß¶È
-    int block_size = 48;      // Ã¿¿éµÄ´óĞ¡
+    // å®šä¹‰çŸ©å½¢åŒºåŸŸçš„å‚æ•°
+    int left_bottom_x = 496;  // å·¦ä¸‹è§’xåæ ‡
+    int left_bottom_y = 467;  // å·¦ä¸‹è§’yåæ ‡
+    int width = 912;          // çŸ©å½¢å®½åº¦
+    int height = 480;         // çŸ©å½¢é«˜åº¦
+    int block_size = 48;      // æ¯å—çš„å¤§å°
 
-    // ¼ÆËã×ÜµÄĞĞÊıºÍÁĞÊı
-    int rows = height / block_size;  // ĞĞÊı
-    int cols = width / block_size;   // ÁĞÊı
+    // è®¡ç®—æ€»çš„è¡Œæ•°å’Œåˆ—æ•°
+    int rows = height / block_size;  // è¡Œæ•°
+    int cols = width / block_size;   // åˆ—æ•°
 
-    // ¼ÆËã¸ø¶¨×ø±êµÄÁĞºÍĞĞ±àºÅ
+    // è®¡ç®—ç»™å®šåæ ‡çš„åˆ—å’Œè¡Œç¼–å·
     int col = (pos.x - left_bottom_x) / block_size;
     int row = (left_bottom_y + height - pos.y) / block_size;
-    // ·ÀÖ¹Ô½½ç
+    // é˜²æ­¢è¶Šç•Œ
     if (col < 0) {
         col = 0;
     }
     if (row < 0) {
         row = 0;
     }
-    // ¼ÆËãÇøÓò±àºÅ£ºÏÈĞĞºóÁĞ
-    int region_number = (row)*cols + col + 1;  // ±àºÅ´Ó1¿ªÊ¼
+    // è®¡ç®—åŒºåŸŸç¼–å·ï¼šå…ˆè¡Œååˆ—
+    int region_number = (row)*cols + col + 1;  // ç¼–å·ä»1å¼€å§‹
 
     return region_number;
 }
@@ -536,7 +536,7 @@ void farm::createRainEffect () {
 
     addChild ( emitter , 10 );
 
-    // Ã¿Ö¡¸üĞÂÁ£×ÓÉúÃüÖÜÆÚ
+    // æ¯å¸§æ›´æ–°ç²’å­ç”Ÿå‘½å‘¨æœŸ
     schedule ( [this]( float dt ) {
         updaterain ( dt );
         } , "update_rain_key" );
@@ -546,10 +546,10 @@ void farm::createRainEffect () {
 
 void farm::updaterain ( float deltaTime ) {
     if (emitter) {
-        // Ëæ»úÉú³ÉÒ»¸öÉúÃüÖÜÆÚ£¨·¶Î§ 1 µ½ 1.5 ÃëÖ®¼ä£©
+        // éšæœºç”Ÿæˆä¸€ä¸ªç”Ÿå‘½å‘¨æœŸï¼ˆèŒƒå›´ 1 åˆ° 1.5 ç§’ä¹‹é—´ï¼‰
         float newLife = cocos2d::rand_0_1 () * 1.5f;
 
-        // ÉèÖÃĞÂµÄÉúÃüÖÜÆÚ
+        // è®¾ç½®æ–°çš„ç”Ÿå‘½å‘¨æœŸ
         emitter->setLife ( newLife );
 
         emitter->setEmissionRate ( emitter->getTotalParticles () / emitter->getLife () * 1.3 );
@@ -559,7 +559,7 @@ void farm::updaterain ( float deltaTime ) {
 void farm::setupInputCommands() {
     auto inputManager = InputManager::getInstance();
 
-    // ´´½¨¾ßÌåµÄÅ©³¡ÃüÁî¶ÔÏó
+    // åˆ›å»ºå…·ä½“çš„å†œåœºå‘½ä»¤å¯¹è±¡
     auto plantCommand = std::make_shared<PlantCommand>(this);
     auto waterCommand = std::make_shared<WaterCommand>(this);
     auto harvestCommand = std::make_shared<HarvestCommand>(this);
@@ -567,7 +567,7 @@ void farm::setupInputCommands() {
         this, inventory, "farm"
     );
 
-    // ´´½¨³¡¾°ÇĞ»»ÃüÁî - Ê¹ÓÃConditionalSceneTransitionCommand
+    // åˆ›å»ºåœºæ™¯åˆ‡æ¢å‘½ä»¤ - ä½¿ç”¨ConditionalSceneTransitionCommand
     auto exitFarmCommand = std::make_shared<ConditionalSceneTransitionCommand>(
         player1, 
         []() -> cocos2d::Scene* { return HelloWorld::create(); },
@@ -582,7 +582,7 @@ void farm::setupInputCommands() {
     auto enterHouseCommand = std::make_shared<ConditionalSceneTransitionCommand>(
         player1,
         [this]() -> cocos2d::Scene* { 
-            // ÉèÖÃÎ»ÖÃ×´Ì¬
+            // è®¾ç½®ä½ç½®çŠ¶æ€
             for (auto& pair : F_lastplace) {
                 if (pair.first.first == "myhouse") {
                     pair.second = true;
@@ -602,7 +602,7 @@ void farm::setupInputCommands() {
     auto enterBarnCommand = std::make_shared<ConditionalSceneTransitionCommand>(
         player1,
         [this]() -> cocos2d::Scene* {
-            // ÉèÖÃÎ»ÖÃ×´Ì¬
+            // è®¾ç½®ä½ç½®çŠ¶æ€
             for (auto& pair : F_lastplace) {
                 if (pair.first.first == "barn") {
                     pair.second = true;
@@ -622,7 +622,7 @@ void farm::setupInputCommands() {
     auto enterCaveCommand = std::make_shared<ConditionalSceneTransitionCommand>(
         player1,
         [this]() -> cocos2d::Scene* {
-            // ÉèÖÃÎ»ÖÃ×´Ì¬
+            // è®¾ç½®ä½ç½®çŠ¶æ€
             for (auto& pair : F_lastplace) {
                 if (pair.first.first == "cave") {
                     pair.second = true;
@@ -642,7 +642,7 @@ void farm::setupInputCommands() {
     auto enterForestCommand = std::make_shared<ConditionalSceneTransitionCommand>(
         player1,
         [this]() -> cocos2d::Scene* {
-            // ÉèÖÃÎ»ÖÃ×´Ì¬
+            // è®¾ç½®ä½ç½®çŠ¶æ€
             for (auto& pair : F_lastplace) {
                 if (pair.first.first == "forest") {
                     pair.second = true;
@@ -659,13 +659,13 @@ void farm::setupInputCommands() {
         "farm_to_forest"
     );
 
-    // °ó¶¨ÃüÁîµ½¼üÅÌ - Ê¹ÓÃbindPressCommand
+    // ç»‘å®šå‘½ä»¤åˆ°é”®ç›˜ - ä½¿ç”¨bindPressCommand
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_P, plantCommand);
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_W, waterCommand);
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_G, harvestCommand);
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ESCAPE, toggleInventoryCommand);
     
-    // ENTER¼ü°ó¶¨¶à¸ö³¡¾°×ª»»ÃüÁî
+    // ENTERé”®ç»‘å®šå¤šä¸ªåœºæ™¯è½¬æ¢å‘½ä»¤
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, exitFarmCommand);
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, exitFarmCommand);
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, enterHouseCommand);
@@ -677,7 +677,7 @@ void farm::setupInputCommands() {
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ENTER, enterForestCommand);
     inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, enterForestCommand);
 
-    // ±£´æÃüÁîÒıÓÃÒÔ±ãÇåÀí
+    // ä¿å­˜å‘½ä»¤å¼•ç”¨ä»¥ä¾¿æ¸…ç†
     boundCommands.push_back(plantCommand);
     boundCommands.push_back(waterCommand);
     boundCommands.push_back(harvestCommand);
@@ -692,7 +692,7 @@ void farm::setupInputCommands() {
 void farm::cleanupInputCommands() {
     auto inputManager = InputManager::getInstance();
     
-    // ÖğÒ»½â°óÃüÁî
+    // é€ä¸€è§£ç»‘å‘½ä»¤
     for (auto& command : boundCommands) {
         inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ESCAPE, command);
         inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_P, command);
@@ -702,7 +702,7 @@ void farm::cleanupInputCommands() {
         inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_KP_ENTER, command);
     }
     
-    // ÇåÀíÃüÁîÒıÓÃ
+    // æ¸…ç†å‘½ä»¤å¼•ç”¨
     boundCommands.clear();
 }
 

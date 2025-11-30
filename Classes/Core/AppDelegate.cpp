@@ -3,33 +3,33 @@
 
  http://www.cocos2d-x.org
 
- ÔÊĞíÈÎºÎÈËÃâ·ÑÊ¹ÓÃ¸ÃÈí¼ş£¬°üÀ¨ĞŞ¸Ä¡¢ºÏ²¢¡¢·¢²¼¡¢·Ö·¢¡¢ÔÙĞí¿ÉÒÔ¼°ÏúÊÛ¸ÃÈí¼şµÄ¸±±¾£¬Ç°ÌáÊÇËùÓĞ¸±±¾»òÕßÖØÒª²¿·Ö¶¼±ØĞë°üº¬±¾°æÈ¨ÉùÃ÷ºÍĞí¿ÉÉùÃ÷¡£
+ å…è®¸ä»»ä½•äººå…è´¹ä½¿ç”¨è¯¥è½¯ä»¶ï¼ŒåŒ…æ‹¬ä¿®æ”¹ã€åˆå¹¶ã€å‘å¸ƒã€åˆ†å‘ã€å†è®¸å¯ä»¥åŠé”€å”®è¯¥è½¯ä»¶çš„å‰¯æœ¬ï¼Œå‰ææ˜¯æ‰€æœ‰å‰¯æœ¬æˆ–è€…é‡è¦éƒ¨åˆ†éƒ½å¿…é¡»åŒ…å«æœ¬ç‰ˆæƒå£°æ˜å’Œè®¸å¯å£°æ˜ã€‚
 
- ¸ÃÈí¼ş°´"Ô­Ñù"Ìá¹©£¬²»¸½´øÈÎºÎĞÎÊ½µÄ±£Ö¤£¬°üÀ¨µ«²»ÏŞÓÚ¶ÔÊÊÏúĞÔ¡¢ÌØ¶¨ÓÃÍ¾ÊÊÓÃĞÔºÍ²»ÇÖÈ¨µÄ±£Ö¤¡£ÔÚÈÎºÎÇé¿öÏÂ£¬×÷Õß»ò°æÈ¨³ÖÓĞÕß¾ù²»¶ÔÒòÊ¹ÓÃ¸ÃÈí¼ş»òÓë¸ÃÈí¼şÏà¹ØµÄÈÎºÎË÷Åâ¡¢Ëğº¦»òÆäËûÔğÈÎ³Ğµ£ÔğÈÎ£¬ÎŞÂÛÊÇºÏÍ¬¡¢ÇÖÈ¨ĞĞÎª»òÆäËû·½Ê½¡£
+ è¯¥è½¯ä»¶æŒ‰"åŸæ ·"æä¾›ï¼Œä¸é™„å¸¦ä»»ä½•å½¢å¼çš„ä¿è¯ï¼ŒåŒ…æ‹¬ä½†ä¸é™äºå¯¹é€‚é”€æ€§ã€ç‰¹å®šç”¨é€”é€‚ç”¨æ€§å’Œä¸ä¾µæƒçš„ä¿è¯ã€‚åœ¨ä»»ä½•æƒ…å†µä¸‹ï¼Œä½œè€…æˆ–ç‰ˆæƒæŒæœ‰è€…å‡ä¸å¯¹å› ä½¿ç”¨è¯¥è½¯ä»¶æˆ–ä¸è¯¥è½¯ä»¶ç›¸å…³çš„ä»»ä½•ç´¢èµ”ã€æŸå®³æˆ–å…¶ä»–è´£ä»»æ‰¿æ‹…è´£ä»»ï¼Œæ— è®ºæ˜¯åˆåŒã€ä¾µæƒè¡Œä¸ºæˆ–å…¶ä»–æ–¹å¼ã€‚
  ****************************************************************************/
 
 #include "AppDelegate.h"
-#include "GameBeginUI.h"
-#include "Player.h"
+#include "../UI/GameBeginUI.h"
+#include "../Entities/Player.h"
 //#include "Town.h"
-#include "Barn.h"
+#include "../Scenes/Barn.h"
 //#include "supermarket.h"
-#include "CreateCharacterUI.h"
-#include "EnergySystem.h"
+#include "../UI/CreateCharacterUI.h"
+#include "../Systems/EnergySystem.h"
 #include "InputManager.h"
-#include "InputTestScene.h"
+#include "../Scenes/InputTestScene.h"
 
-// #define USE_AUDIO_ENGINE 1   // Èç¹ûĞèÒªÊ¹ÓÃÒôÆµÒıÇæ£¬¿ÉÒÔÈ¡Ïû×¢ÊÍÕâÒ»ĞĞ
+// #define USE_AUDIO_ENGINE 1   // å¦‚æœéœ€è¦ä½¿ç”¨éŸ³é¢‘å¼•æ“ï¼Œå¯ä»¥å–æ¶ˆæ³¨é‡Šè¿™ä¸€è¡Œ
 
 #if USE_AUDIO_ENGINE
-#include "audio/include/AudioEngine.h"  // Èç¹ûÆôÓÃÁËÒôÆµÒıÇæ£¬ÔòÒıÈëÒôÆµÒıÇæµÄÍ·ÎÄ¼ş
-// using namespace cocos2d::experimental;  // Ê¹ÓÃÒôÆµÒıÇæµÄÃüÃû¿Õ¼ä
+#include "audio/include/AudioEngine.h"  // å¦‚æœå¯ç”¨äº†éŸ³é¢‘å¼•æ“ï¼Œåˆ™å¼•å…¥éŸ³é¢‘å¼•æ“çš„å¤´æ–‡ä»¶
+// using namespace cocos2d::experimental;  // ä½¿ç”¨éŸ³é¢‘å¼•æ“çš„å‘½åç©ºé—´
 #endif
 
-USING_NS_CC;  // Ê¹ÓÃcocos2dµÄÃüÃû¿Õ¼ä
+USING_NS_CC;  // ä½¿ç”¨cocos2dçš„å‘½åç©ºé—´
 
-/******************************** È«¾Ö±äÁ¿ÉùÃ÷Çø ****************************************/
-// ÔÚ´ËÎÄ¼şÖĞ¶¨Òå²¢³õÊ¼»¯È«¾Ö±äÁ¿
+/******************************** å…¨å±€å˜é‡å£°æ˜åŒº ****************************************/
+// åœ¨æ­¤æ–‡ä»¶ä¸­å®šä¹‰å¹¶åˆå§‹åŒ–å…¨å±€å˜é‡
 int remainingTime = 10800;
 int day = 1;
 int GoldAmount = 4000;
@@ -61,7 +61,7 @@ std::map<std::pair<std::string , Vec2>, bool> W_lastplace;
 std::string protagonistName = "player";
 std::string FarmName = "An ordinary farm";
 
-// È«¾ÖÖ¸Õë±äÁ¿¶¨Òå
+// å…¨å±€æŒ‡é’ˆå˜é‡å®šä¹‰
 Player* player1 = nullptr;
 mini_bag* miniBag = nullptr;
 Timesystem* TimeUI = nullptr;
@@ -74,45 +74,45 @@ std::vector<std::pair<Rect , bool>> barn_space;
 std::vector<Livestock*> livestocks;
 SkillTree* skill_tree = new SkillTree ();
 
-// ´´½¨ÈÎÎñ¹ÜÀíÆ÷
+// åˆ›å»ºä»»åŠ¡ç®¡ç†å™¨
 TaskManagement* taskManager = new TaskManagement();
 /****************************************************************************************/
 
 
 AppDelegate::AppDelegate() {
-    // ¹¹Ôìº¯Êı£ºAppDelegate¹¹ÔìÊ±»áµ÷ÓÃ
+    // æ„é€ å‡½æ•°ï¼šAppDelegateæ„é€ æ—¶ä¼šè°ƒç”¨
 }
 
 AppDelegate::~AppDelegate() {
-    // Îö¹¹º¯Êı£º³ÌĞò½áÊøÊ±»áµ÷ÓÃ
+    // ææ„å‡½æ•°ï¼šç¨‹åºç»“æŸæ—¶ä¼šè°ƒç”¨
     
-    // ÇåÀí InputManager
+    // æ¸…ç† InputManager
     InputManager::destroyInstance();
     CCLOG("InputManager destroyed");
     
 #if USE_AUDIO_ENGINE
-    AudioEngine::end();  // Èç¹ûÊ¹ÓÃÁËÒôÆµÒıÇæ£¬Í£Ö¹ÒôÆµÒıÇæ
+    AudioEngine::end();  // å¦‚æœä½¿ç”¨äº†éŸ³é¢‘å¼•æ“ï¼Œåœæ­¢éŸ³é¢‘å¼•æ“
 #endif
 }
 
-// ³õÊ¼»¯ OpenGL ÉÏÏÂÎÄÊôĞÔ
+// åˆå§‹åŒ– OpenGL ä¸Šä¸‹æ–‡å±æ€§
 void AppDelegate::initGLContextAttrs() {
-    // ÉèÖÃOpenGLÉÏÏÂÎÄµÄÊôĞÔ£ººì¡¢ÂÌ¡¢À¶¡¢Í¸Ã÷Í¨µÀµÄÎ»Éî£¬Éî¶È¡¢Ä£°åºÍ¶àÖØ²ÉÑù
-    GLContextAttrs glContextAttrs = { 8, 8, 8, 8, 24, 8, 0 };  // ÉèÖÃ OpenGL ÉÏÏÂÎÄµÄÑÕÉ«ºÍÉî¶È»º³åµÈÊôĞÔ
+    // è®¾ç½®OpenGLä¸Šä¸‹æ–‡çš„å±æ€§ï¼šçº¢ã€ç»¿ã€è“ã€é€æ˜é€šé“çš„ä½æ·±ï¼Œæ·±åº¦ã€æ¨¡æ¿å’Œå¤šé‡é‡‡æ ·
+    GLContextAttrs glContextAttrs = { 8, 8, 8, 8, 24, 8, 0 };  // è®¾ç½® OpenGL ä¸Šä¸‹æ–‡çš„é¢œè‰²å’Œæ·±åº¦ç¼“å†²ç­‰å±æ€§
 
-    GLView::setGLContextAttrs(glContextAttrs);  // ½«ÉèÖÃµÄÉÏÏÂÎÄÊôĞÔÓ¦ÓÃµ½ GLView
+    GLView::setGLContextAttrs(glContextAttrs);  // å°†è®¾ç½®çš„ä¸Šä¸‹æ–‡å±æ€§åº”ç”¨åˆ° GLView
 }
 
-// Èç¹ûÏëÍ¨¹ı°ü¹ÜÀíÆ÷°²×°¸ü¶à°ü£¬²»ÒªĞŞ¸Ä»òÉ¾³ıÕâ¸öº¯Êı
+// å¦‚æœæƒ³é€šè¿‡åŒ…ç®¡ç†å™¨å®‰è£…æ›´å¤šåŒ…ï¼Œä¸è¦ä¿®æ”¹æˆ–åˆ é™¤è¿™ä¸ªå‡½æ•°
 static int register_all_packages() {
-    return 0;  // ±êÖ¾Î»£¬ÓÃÓÚ°ü¹ÜÀíÆ÷
+    return 0;  // æ ‡å¿—ä½ï¼Œç”¨äºåŒ…ç®¡ç†å™¨
 }
 
-// Ó¦ÓÃÆô¶¯Íê³Éºóµ÷ÓÃ
+// åº”ç”¨å¯åŠ¨å®Œæˆåè°ƒç”¨
 bool AppDelegate::applicationDidFinishLaunching() {
-    // ³õÊ¼»¯ Director£¨µ¼ÑİÀà£¬ÓÃÓÚ¹ÜÀí³¡¾°ºÍ»æÖÆ£©
-    auto director = Director::getInstance();  // »ñÈ¡ Director ÊµÀı
-    auto glview = director->getOpenGLView();  // »ñÈ¡ OpenGL ÊÓÍ¼
+    // åˆå§‹åŒ– Directorï¼ˆå¯¼æ¼”ç±»ï¼Œç”¨äºç®¡ç†åœºæ™¯å’Œç»˜åˆ¶ï¼‰
+    auto director = Director::getInstance();  // è·å– Director å®ä¾‹
+    auto glview = director->getOpenGLView();  // è·å– OpenGL è§†å›¾
     
     if (!glview) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
@@ -123,22 +123,22 @@ bool AppDelegate::applicationDidFinishLaunching() {
         director->setOpenGLView(glview);
     }
 
-    // ´ò¿ª FPS ÏÔÊ¾
-    director->setDisplayStats(true);  // ÏÔÊ¾Ö¡ÂÊÍ³¼ÆĞÅÏ¢
+    // æ‰“å¼€ FPS æ˜¾ç¤º
+    director->setDisplayStats(true);  // æ˜¾ç¤ºå¸§ç‡ç»Ÿè®¡ä¿¡æ¯
 
-    // ÉèÖÃÖ¡ÂÊ¡£Ä¬ÈÏÖµÎª 1.0/60£¬¼´ 60 FPS
-    director->setAnimationInterval(1.0f / 60);  // ÉèÖÃ¶¯»­Ö¡ÂÊÎª 60 FPS
+    // è®¾ç½®å¸§ç‡ã€‚é»˜è®¤å€¼ä¸º 1.0/60ï¼Œå³ 60 FPS
+    director->setAnimationInterval(1.0f / 60);  // è®¾ç½®åŠ¨ç”»å¸§ç‡ä¸º 60 FPS
 
-    // ÉèÖÃÉè¼Æ·Ö±æÂÊ
+    // è®¾ç½®è®¾è®¡åˆ†è¾¨ç‡
     glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::NO_BORDER);
     director->setContentScaleFactor(1.0f);
 
-    register_all_packages();  // ×¢²áËùÓĞµÄ°ü
+    register_all_packages();  // æ³¨å†Œæ‰€æœ‰çš„åŒ…
 
-    // ³õÊ¼»¯ InputManager£¨ĞÂÔöµÄ¼üÅÌÊäÈë¹ÜÀíÆ÷£©
+    // åˆå§‹åŒ– InputManagerï¼ˆæ–°å¢çš„é”®ç›˜è¾“å…¥ç®¡ç†å™¨ï¼‰
     auto inputManager = InputManager::getInstance();
     inputManager->initialize();
-    inputManager->enableKeyLogging(true);  // ¿ªÆôµ÷ÊÔÈÕÖ¾
+    inputManager->enableKeyLogging(true);  // å¼€å¯è°ƒè¯•æ—¥å¿—
     CCLOG("InputManager initialized successfully");
 
     runScene(director);
@@ -146,16 +146,16 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // set the background music and continuously play it.
     auto backgroundAudioID = AudioEngine::play2d ( "MUSIC/01 - Stardew Valley Overture.mp3" , true );
 
-    return true;  // ·µ»Ø³É¹¦
+    return true;  // è¿”å›æˆåŠŸ
 }
 
-// ÇĞ»»³¡¾°µÄº¯Êı
+// åˆ‡æ¢åœºæ™¯çš„å‡½æ•°
 void AppDelegate::runScene(cocos2d::Director* director) {
     Initialize ();
     
-    // »ñÈ¡µ±Ç°ÊÓÍ¼µÄ¿É¼û´óĞ¡ºÍÔ­µãÎ»ÖÃ
-    auto visibleSize = Director::getInstance()->getVisibleSize();  // »ñÈ¡ÆÁÄ»¿ÉÊÓÇøÓòµÄ´óĞ¡
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();  // »ñÈ¡ÆÁÄ»Ô­µãµÄÎ»ÖÃ£¨×óÏÂ½Ç£©
+    // è·å–å½“å‰è§†å›¾çš„å¯è§å¤§å°å’ŒåŸç‚¹ä½ç½®
+    auto visibleSize = Director::getInstance()->getVisibleSize();  // è·å–å±å¹•å¯è§†åŒºåŸŸçš„å¤§å°
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();  // è·å–å±å¹•åŸç‚¹çš„ä½ç½®ï¼ˆå·¦ä¸‹è§’ï¼‰
   
 
     std::pair<std::string , Vec2> key = { "initiation",Vec2 ( 350,350 ) };
@@ -163,83 +163,83 @@ void AppDelegate::runScene(cocos2d::Director* director) {
     key = { "seedshop",Vec2 ( 230,470 ) };
     T_lastplace.insert(std::make_pair(key, false));
 
-    // ÔËĞĞÅ©³¡
+    // è¿è¡Œå†œåœº
 	player1 = Player::create ();
     auto farm = farm::create ();
     director->runWithScene ( farm );
 
-    //ÔËĞĞº£Ì²³¡¾°
+    //è¿è¡Œæµ·æ»©åœºæ™¯
      //auto beach = Beach::create ();
      //director->runWithScene ( beach );
 
-    // ÔËĞĞ¼ÒµÄ³¡¾°
+    // è¿è¡Œå®¶çš„åœºæ™¯
      //auto test = Myhouse::create();
      //director->runWithScene(test); 
 
-    // ÔËĞĞĞ¡ÕòµÄ³¡¾°
+    // è¿è¡Œå°é•‡çš„åœºæ™¯
      //auto test = Town::create ();
      //director->runWithScene(test);
 
-    // ÔİÊ±ÔËĞĞÊäÈë²âÊÔ³¡¾°À´ÑéÖ¤ĞÂµÄCommandÏµÍ³
+    // æš‚æ—¶è¿è¡Œè¾“å…¥æµ‹è¯•åœºæ™¯æ¥éªŒè¯æ–°çš„Commandç³»ç»Ÿ
     //auto testScene = InputTestScene::createScene();
     //director->runWithScene(testScene);
     
-    // ÔËĞĞÉÌµêµÄ³¡¾°£¨Ô­ÓĞ´úÂë£¬ÔİÊ±×¢ÊÍ£©
+    // è¿è¡Œå•†åº—çš„åœºæ™¯ï¼ˆåŸæœ‰ä»£ç ï¼Œæš‚æ—¶æ³¨é‡Šï¼‰
      //auto test = supermarket::create();
      //director->runWithScene(test);
 
-    // ÔËĞĞCave
+    // è¿è¡ŒCave
      //auto test = Cave::create();
      //director->runWithScene(test);
 
-    // ÔËĞĞBeach
+    // è¿è¡ŒBeach
      //auto test = Beach::create();
      //director->runWithScene(test);
     
-    // ÔËĞĞÉ­ÁÖ
+    // è¿è¡Œæ£®æ—
      //auto test = Forest::create();
      //director->runWithScene(test);
 
-     // ÔËĞĞĞóÅï
+     // è¿è¡Œç•œæ£š
      // auto test = Barn::create();
      // director->runWithScene(test);
 
-    //¿ª¾ÖUIÔËĞĞ
+    //å¼€å±€UIè¿è¡Œ
     //director->runWithScene ( BeginScene::create () );
-    //´´½¨ÈËÎï½çÃæÔËĞĞ
+    //åˆ›å»ºäººç‰©ç•Œé¢è¿è¡Œ
     // director->runWithScene ( CreateCharacter::create () );
 }
 
 void AppDelegate::Initialize () {
-    // ³õÊ¼»¯ObserverÏµÍ³
-    // ÉèÖÃ³õÊ¼ÌåÁ¦Öµ
+    // åˆå§‹åŒ–Observerç³»ç»Ÿ
+    // è®¾ç½®åˆå§‹ä½“åŠ›å€¼
     EnergySystem::getInstance()->setEnergy(strength);
     EnergySystem::getInstance()->setMaxEnergy(100);
 
-    // ³õÊ¼»¯´æ´¢×÷ÎïĞÅÏ¢µÄÊı×é
+    // åˆå§‹åŒ–å­˜å‚¨ä½œç‰©ä¿¡æ¯çš„æ•°ç»„
     cropbasicinformation.insert({ "Wheat_Seeds", wheat });
     cropbasicinformation.insert({ "Corn_Seeds", corn });
     cropbasicinformation.insert({ "Potato_Seeds", potato });
     cropbasicinformation.insert({ "Pumpkin_Seeds", pumpkin });
     cropbasicinformation.insert({ "Blueberry_Seeds", blueberry });
 
-    // ³õÊ¼»¯±¦Ê¯ĞÅÏ¢
-    Ore Ruby("Ruby", "Ore/Ruby1.png", "Ore/Ruby2.png", 3, 3, Vec2(350, 500));                   // ºì±¦Ê¯
+    // åˆå§‹åŒ–å®çŸ³ä¿¡æ¯
+    Ore Ruby("Ruby", "Ore/Ruby1.png", "Ore/Ruby2.png", 3, 3, Vec2(350, 500));                   // çº¢å®çŸ³
     Ore_information.push_back(Ruby.GetOreCopy());
     Ruby.position = Vec2(950, 750);
     Ore_information.push_back(Ruby.GetOreCopy());
 
-    Ore Amethyst("Amethyst", "Ore/Amethyst1.png", "Ore/Amethyst2.png", 5, 5, Vec2(800, 250));   // ×Ï±¦Ê¯
+    Ore Amethyst("Amethyst", "Ore/Amethyst1.png", "Ore/Amethyst2.png", 5, 5, Vec2(800, 250));   // ç´«å®çŸ³
     Ore_information.push_back(Amethyst.GetOreCopy());
     Amethyst.position = Vec2(750, 850);
     Ore_information.push_back(Amethyst.GetOreCopy());
 
-    Ore Emerald("Emerald", "Ore/Emerald1.png", "Ore/Emerald2.png", 5, 5, Vec2(900, 150));       // ÂÌ±¦Ê¯
+    Ore Emerald("Emerald", "Ore/Emerald1.png", "Ore/Emerald2.png", 5, 5, Vec2(900, 150));       // ç»¿å®çŸ³
     Ore_information.push_back(Emerald.GetOreCopy());
     Emerald.position = Vec2(1250, 350);
     Ore_information.push_back(Emerald.GetOreCopy());
 
-    // ³õÊ¼»¯Ê÷Ä¾ĞÅÏ¢
+    // åˆå§‹åŒ–æ ‘æœ¨ä¿¡æ¯
     Tree tree("tree", "Tree/tree1.png", "Tree/tree2.png", "Tree/tree3.png", 15, 5, Vec2(50, 950));
     Tree_information.push_back(tree.GetTreeCopy());
     tree.position = Vec2(-400, 700);
@@ -251,7 +251,7 @@ void AppDelegate::Initialize () {
     tree.position = Vec2(1300, 1550);
     Tree_information.push_back(tree.GetTreeCopy());
 
-    // ³õÊ¼»¯Ğ¡Õò¸÷µØÖ·×ø±ê
+    // åˆå§‹åŒ–å°é•‡å„åœ°å€åæ ‡
     std::pair<std::string , Vec2> key = { "initiation",Vec2 (-840,-340) };
     T_lastplace.insert ( std::make_pair ( key , true ) );
     key = { "seedshop",Vec2 ( 230,470 ) };
@@ -261,7 +261,7 @@ void AppDelegate::Initialize () {
     key = { "beach",Vec2(500, -750) };
     T_lastplace.insert(std::make_pair(key, false));
 
-    // ³õÊ¼»¯Å©³¡¸÷µØÖ·×ø±ê
+    // åˆå§‹åŒ–å†œåœºå„åœ°å€åæ ‡
     key = { "initiation",Vec2(70, 920) };
     F_lastplace.insert(std::make_pair(key, true));
     key = { "myhouse",Vec2(70, 920) };
@@ -273,7 +273,7 @@ void AppDelegate::Initialize () {
     key = { "cave",Vec2(635, 1185) };
     F_lastplace.insert(std::make_pair(key, false));
 
-    // ³õÊ¼»¯É­ÁÖ¸÷µØÖ·×ø±ê
+    // åˆå§‹åŒ–æ£®æ—å„åœ°å€åæ ‡
     key = { "initiation",Vec2(1150,2650) };
     W_lastplace.insert(std::make_pair(key, true));
     key = { "town",Vec2(2600, 1900) };
@@ -281,47 +281,47 @@ void AppDelegate::Initialize () {
     key = { "farm",Vec2(1150, 2650) };
     W_lastplace.insert(std::make_pair(key, false));
 
-    // ´´½¨ÈÎÎñ  
+    // åˆ›å»ºä»»åŠ¡  
     TaskManagement::Task task1 (
         "Fetch the Amethyst" ,
         TaskManagement::NPC_TASK ,
-        "Retrieve the Amethyst for Abigail." , // ÏêÏ¸ËµÃ÷  
-        "Spring" , // ³õÊ¼ÈÕÆÚ  
-        "Summer"  // ½ØÖÁÈÕÆÚ  
+        "Retrieve the Amethyst for Abigail." , // è¯¦ç»†è¯´æ˜  
+        "Spring" , // åˆå§‹æ—¥æœŸ  
+        "Summer"  // æˆªè‡³æ—¥æœŸ  
     );
-    task1.npcName = "Abigail"; // ·¢²¼ÈÎÎñµÄ NPC Ãû×Ö  
-    task1.requiredItems.push_back ( Bean_Starter ); // ĞèÒªµÄÎïÆ·  
-    task1.rewardCoins = 500; // ½±Àø½ğ±Ò  
-    task1.relationshipPoints = 10; // NPC ºÃ¸Ğ¶È  
+    task1.npcName = "Abigail"; // å‘å¸ƒä»»åŠ¡çš„ NPC åå­—  
+    task1.requiredItems.push_back ( Bean_Starter ); // éœ€è¦çš„ç‰©å“  
+    task1.rewardCoins = 500; // å¥–åŠ±é‡‘å¸  
+    task1.relationshipPoints = 10; // NPC å¥½æ„Ÿåº¦  
 
     TaskManagement::Task task2 (
         "Collect Emerald" ,
         TaskManagement::SYSTEM_TASK ,
-        "Collect an Emerald for system tasks." , // ÏêÏ¸ËµÃ÷  
-        "Summer" , // ³õÊ¼ÈÕÆÚ  
-        "Autumn"  // ½ØÖÁÈÕÆÚ  
+        "Collect an Emerald for system tasks." , // è¯¦ç»†è¯´æ˜  
+        "Summer" , // åˆå§‹æ—¥æœŸ  
+        "Autumn"  // æˆªè‡³æ—¥æœŸ  
     );
-    task2.requiredItems.push_back ( emerald ); // ĞèÒªµÄÎïÆ·  
-    task2.rewardCoins = 30; // ½±Àø½ğ±Ò  
+    task2.requiredItems.push_back ( emerald ); // éœ€è¦çš„ç‰©å“  
+    task2.rewardCoins = 30; // å¥–åŠ±é‡‘å¸  
 
     TaskManagement::Task task3 (
         "Festival Gathering" ,
         TaskManagement::FESTIVAL_TASK ,
-        "Join the festival and collect special items." , // ÏêÏ¸ËµÃ÷  
-        "Winter" , // ³õÊ¼ÈÕÆÚ  
-        "Summer"  // ½ØÖÁÈÕÆÚ  
+        "Join the festival and collect special items." , // è¯¦ç»†è¯´æ˜  
+        "Winter" , // åˆå§‹æ—¥æœŸ  
+        "Summer"  // æˆªè‡³æ—¥æœŸ  
     );
-    task3.specialRewards.push_back ( Gold_Hoe );   // ÌØÊâ½±Àø  
-    task3.relationshipPoints = 5; // ÓëËùÓĞÈËµÄºÃ¸Ğ¶È  
+    task3.specialRewards.push_back ( Gold_Hoe );   // ç‰¹æ®Šå¥–åŠ±  
+    task3.relationshipPoints = 5; // ä¸æ‰€æœ‰äººçš„å¥½æ„Ÿåº¦  
 
-    // ½«ÈÎÎñÌí¼Óµ½ÈÎÎñ¹ÜÀíÆ÷  
+    // å°†ä»»åŠ¡æ·»åŠ åˆ°ä»»åŠ¡ç®¡ç†å™¨  
     taskManager->createTask ( task1 );
     taskManager->createTask ( task2 );
     taskManager->createTask ( task3 );
 
     // taskManager->AddAcceptTask ( task1 );
 
-    //³õÊ¼»¯BarnÄÚ¿É·ÅÖÃ¼ÒĞó¾ØÕó
+    //åˆå§‹åŒ–Barnå†…å¯æ”¾ç½®å®¶ç•œçŸ©é˜µ
     barn_space.push_back(std::make_pair(Rect(685.714294, 213.333328, 114.285713, 106.666664), false));
     barn_space.push_back(std::make_pair(Rect(800.000000, 213.333328, 114.285713, 106.666664), false));
     barn_space.push_back(std::make_pair(Rect(914.285706, 213.333328, 114.285713, 106.666664), false));
@@ -335,28 +335,28 @@ void AppDelegate::Initialize () {
     barn_space.push_back(std::make_pair(Rect(914.285706, 640.000000, 114.285713, 106.666664), false));
     barn_space.push_back(std::make_pair(Rect(1142.857178, 640.000000, 114.285713, 106.666664), false));
 
-    // ³õÊ¼»¯¼¾½Ú
+    // åˆå§‹åŒ–å­£èŠ‚
     season.insert ( { "Spring", 1 } );
     season.insert ( { "Summer", 2 } );
     season.insert ( { "Autumn", 3 } );
     season.insert ( { "Winter", 4 } );
 
-    // ´´½¨ÈÎÎñ  
+    // åˆ›å»ºä»»åŠ¡  
     //TaskManagement::Task task1 ( "Fetch the Amethyst" , TaskManagement::NPC_TASK );
-    //task1.npcName = "Abigail"; // ·¢²¼ÈÎÎñµÄ NPC Ãû×Ö  
-    //task1.requiredItems.push_back ( amethyst ); // ĞèÒªµÄÎïÆ·  
-    //task1.rewardCoins = 500; // ½±Àø½ğ±Ò  
-    //task1.relationshipPoints = 10; // NPC ºÃ¸Ğ¶È  
+    //task1.npcName = "Abigail"; // å‘å¸ƒä»»åŠ¡çš„ NPC åå­—  
+    //task1.requiredItems.push_back ( amethyst ); // éœ€è¦çš„ç‰©å“  
+    //task1.rewardCoins = 500; // å¥–åŠ±é‡‘å¸  
+    //task1.relationshipPoints = 10; // NPC å¥½æ„Ÿåº¦  
 
     //TaskManagement::Task task2 ( "Collect Emerald" , TaskManagement::SYSTEM_TASK );
-    //task2.requiredItems.push_back ( emerald ); // ĞèÒªµÄÎïÆ·  
-    //task2.rewardCoins = 30; // ½±Àø½ğ±Ò  
+    //task2.requiredItems.push_back ( emerald ); // éœ€è¦çš„ç‰©å“  
+    //task2.rewardCoins = 30; // å¥–åŠ±é‡‘å¸  
 
     //TaskManagement::Task task3 ( "Festival Gathering" , TaskManagement::FESTIVAL_TASK );
-    //task3.specialRewards.push_back ( Gold_Hoe );   // ÌØÊâ½±Àø  
-    //task3.relationshipPoints = 5; // ÓëËùÓĞÈËµÄºÃ¸Ğ¶È  
+    //task3.specialRewards.push_back ( Gold_Hoe );   // ç‰¹æ®Šå¥–åŠ±  
+    //task3.relationshipPoints = 5; // ä¸æ‰€æœ‰äººçš„å¥½æ„Ÿåº¦  
 
-    //// ½«ÈÎÎñÌí¼Óµ½ÈÎÎñ¹ÜÀíÆ÷  
+    //// å°†ä»»åŠ¡æ·»åŠ åˆ°ä»»åŠ¡ç®¡ç†å™¨  
     //taskManager->createTask ( task1 );
     //taskManager->createTask ( task2 );
     //taskManager->createTask ( task3 );
@@ -364,20 +364,20 @@ void AppDelegate::Initialize () {
 
 
 
-// µ±Ó¦ÓÃ³ÌĞò½øÈëºóÌ¨Ê±µ÷ÓÃ
+// å½“åº”ç”¨ç¨‹åºè¿›å…¥åå°æ—¶è°ƒç”¨
 void AppDelegate::applicationDidEnterBackground() {
-    Director::getInstance()->stopAnimation();  // Í£Ö¹¶¯»­
+    Director::getInstance()->stopAnimation();  // åœæ­¢åŠ¨ç”»
 
 #if USE_AUDIO_ENGINE
-    AudioEngine::pauseAll();  // ÔİÍ£ËùÓĞÒôÆµ£¨Èç¹ûÆôÓÃÁËÒôÆµÒıÇæ£©
+    AudioEngine::pauseAll();  // æš‚åœæ‰€æœ‰éŸ³é¢‘ï¼ˆå¦‚æœå¯ç”¨äº†éŸ³é¢‘å¼•æ“ï¼‰
 #endif
 }
 
-// µ±Ó¦ÓÃ³ÌĞòÖØĞÂ½øÈëÇ°Ì¨Ê±µ÷ÓÃ
+// å½“åº”ç”¨ç¨‹åºé‡æ–°è¿›å…¥å‰å°æ—¶è°ƒç”¨
 void AppDelegate::applicationWillEnterForeground() {
-    Director::getInstance()->startAnimation();  // »Ö¸´¶¯»­
+    Director::getInstance()->startAnimation();  // æ¢å¤åŠ¨ç”»
 
 #if USE_AUDIO_ENGINE
-    AudioEngine::resumeAll();  // »Ö¸´ËùÓĞÒôÆµ£¨Èç¹ûÆôÓÃÁËÒôÆµÒıÇæ£©
+    AudioEngine::resumeAll();  // æ¢å¤æ‰€æœ‰éŸ³é¢‘ï¼ˆå¦‚æœå¯ç”¨äº†éŸ³é¢‘å¼•æ“ï¼‰
 #endif
 }

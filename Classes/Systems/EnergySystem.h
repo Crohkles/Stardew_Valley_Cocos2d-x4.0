@@ -1,9 +1,9 @@
 #ifndef ENERGY_SYSTEM_H
 #define ENERGY_SYSTEM_H
 
-#include "GameStateObserver.h"
+#include "../Core/GameStateObserver.h"
 
-// 全局体力状态管理器
+// 鍏ㄥ眬浣撳姏鐘舵�佺鐞嗗櫒
 class EnergySystem : public GameStateSubject {
 private:
     static EnergySystem* instance;

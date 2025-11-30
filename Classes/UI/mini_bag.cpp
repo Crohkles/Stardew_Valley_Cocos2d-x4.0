@@ -1,7 +1,7 @@
 #include "mini_bag.h"  
 #include "ui/CocosGUI.h"  
-#include "Item.h"  
-#include "AppDelegate.h"
+#include "../Items/Item.h"  
+#include "../Core/AppDelegate.h"
 
 
 USING_NS_CC;

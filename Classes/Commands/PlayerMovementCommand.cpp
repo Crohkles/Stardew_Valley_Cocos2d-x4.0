@@ -1,5 +1,5 @@
 #include "PlayerMovementCommand.h"
-#include "Player.h"
+#include "../Entities/Player.h"
 
 // ==================== PlayerMovementCommand 基类实现 ====================
 

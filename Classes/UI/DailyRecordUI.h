@@ -1,8 +1,8 @@
 #pragma once
 //DailyRecordUI.h
-//任务显示界面
+//浠诲姟鏄剧ず鐣岄潰
 #include "cocos2d.h"  
-#include "AppDelegate.h"
+#include "../Core/AppDelegate.h"
 
 class DailyRecordUI : public cocos2d::Layer {
 public:

@@ -1,20 +1,20 @@
 #include "NpcRelationship.h"  
 #include <iostream>  
 
-// ¹¹Ôìº¯Êı  
+// æ„é€ å‡½æ•°  
 NpcRelationship::NpcRelationship() {}
 
-// Îö¹¹º¯Êı  
+// ææ„å‡½æ•°  
 NpcRelationship::~NpcRelationship() {}
 
-// Ìí¼Ó NPC  
+// æ·»åŠ  NPC  
 void NpcRelationship::add_npc(const std::string& npcName) {
     if (relationships.find(npcName) == relationships.end()) {
         relationships[npcName] = std::unordered_map<std::string, double>();
     }
 }
 
-// ÒÆ³ı NPC  
+// ç§»é™¤ NPC  
 void NpcRelationship::remove_npc(const std::string& npcName) {
     relationships.erase(npcName);
     for (auto& pair : relationships) {
@@ -22,31 +22,31 @@ void NpcRelationship::remove_npc(const std::string& npcName) {
     }
 }
 
-// ÉèÖÃ NPC Ö®¼äµÄ¹ØÏµ  
+// è®¾ç½® NPC ä¹‹é—´çš„å…³ç³»  
 void NpcRelationship::setRelationship(const std::string& npcA, const std::string& npcB, double value) {
     add_npc(npcA);
     add_npc(npcB);
     relationships[npcA][npcB] = value;
-    relationships[npcB][npcA] = value; // ¹ØÏµÊÇË«ÏòµÄ  
+    relationships[npcB][npcA] = value; // å…³ç³»æ˜¯åŒå‘çš„  
 }
 
-// Ôö¼Ó NPC Ö®¼äµÄ¹ØÏµ  
+// å¢åŠ  NPC ä¹‹é—´çš„å…³ç³»  
 void NpcRelationship::increaseRelationship(const std::string& npcA, const std::string& npcB, double amount) {
     double newValue = getRelationship(npcA, npcB) + amount;
     setRelationship(npcA, npcB, newValue);
-    // Í¨Öª¹Û²ìÕß¹ØÏµ×´Ì¬±ä»¯
+    // é€šçŸ¥è§‚å¯Ÿè€…å…³ç³»çŠ¶æ€å˜åŒ–
     notifyRelationshipStateChanged(npcB, newValue);
 }
 
-// ¼õÉÙ NPC Ö®¼äµÄ¹ØÏµ  
+// å‡å°‘ NPC ä¹‹é—´çš„å…³ç³»  
 void NpcRelationship::decreaseRelationship(const std::string& npcA, const std::string& npcB, double amount) {
     double newValue = getRelationship(npcA, npcB) - amount;
     setRelationship(npcA, npcB, newValue);
-    // Í¨Öª¹Û²ìÕß¹ØÏµ×´Ì¬±ä»¯
+    // é€šçŸ¥è§‚å¯Ÿè€…å…³ç³»çŠ¶æ€å˜åŒ–
     notifyRelationshipStateChanged(npcB, newValue);
 }
 
-// »ñÈ¡ NPC Ö®¼äµÄ¹ØÏµ  
+// è·å– NPC ä¹‹é—´çš„å…³ç³»  
 double NpcRelationship::getRelationship(const std::string& npcA, const std::string& npcB) const {
     auto itA = relationships.find(npcA);
     if (itA != relationships.end()) {
@@ -55,27 +55,27 @@ double NpcRelationship::getRelationship(const std::string& npcA, const std::stri
             return itB->second;
         }
     }
-    return 0; // Ä¬ÈÏ¹ØÏµÖµ  
+    return 0; // é»˜è®¤å…³ç³»å€¼  
 }
 
-// »ñÈ¡¹ØÏµ²ã¼¶  
+// è·å–å…³ç³»å±‚çº§  
 std::string NpcRelationship::getRelationshipLevel(const std::string& npcA, const std::string& npcB) const {
     int value = getRelationship(npcA, npcB);
     if (value < -50) {
-        return "·Ç³£²î";
+        return "éå¸¸å·®";
     }
     else if (value < 0) {
-        return "Ò»°ã";
+        return "ä¸€èˆ¬";
     }
     else if (value < 50) {
-        return "ÓÑºÃ";
+        return "å‹å¥½";
     }
     else {
-        return "Ç×ÃÜ";
+        return "äº²å¯†";
     }
 }
 
-// ´òÓ¡ËùÓĞ NPC Ö®¼äµÄ¹ØÏµ  
+// æ‰“å°æ‰€æœ‰ NPC ä¹‹é—´çš„å…³ç³»  
 void NpcRelationship::printRelationships() const {
     for (const auto& npcA : relationships) {
         for (const auto& npcB : npcA.second) {
@@ -84,26 +84,26 @@ void NpcRelationship::printRelationships() const {
     }
 }
 
-// Ôö¼ÓÀñÎï½ÓÊÜ´ÎÊı  
+// å¢åŠ ç¤¼ç‰©æ¥å—æ¬¡æ•°  
 void NpcRelationship::AddGiftTime ( const std::string& npc ) {
     add_npc ( npc );
-    // ÕÒµ½¸Ã NPC£¬²¢Ôö¼Ó½ÓÊÜÀñÎïµÄ´ÎÊı  
+    // æ‰¾åˆ°è¯¥ NPCï¼Œå¹¶å¢åŠ æ¥å—ç¤¼ç‰©çš„æ¬¡æ•°  
     GiftTime[npc]++;
 }
 
-// »ñÈ¡¸Ã NPC ½ÓÊÜµÄÀñÎï´ÎÊı  
+// è·å–è¯¥ NPC æ¥å—çš„ç¤¼ç‰©æ¬¡æ•°  
 int NpcRelationship::NpcGiftTIme ( const std::string& npc ) {
-    // ²éÕÒ²¢·µ»ØÀñÎï´ÎÊı£¬Î´¼ÇÂ¼Ôò·µ»Ø 0  
+    // æŸ¥æ‰¾å¹¶è¿”å›ç¤¼ç‰©æ¬¡æ•°ï¼Œæœªè®°å½•åˆ™è¿”å› 0  
     return GiftTime[npc];
 }
 
 void NpcRelationship::updateGiftTime () {
-    // ¼ì²éÊÇ·ñÒÑ¾­¹ıÁËÆßÌì  
+    // æ£€æŸ¥æ˜¯å¦å·²ç»è¿‡äº†ä¸ƒå¤©  
     if ((day - lastUpdateDay) >= 7) {
-        // ÖØÖÃËùÓĞNPCµÄGiftTime  
+        // é‡ç½®æ‰€æœ‰NPCçš„GiftTime  
         for (auto& entry : GiftTime) {
             entry.second = 0; 
         }
-        lastUpdateDay = day; // ¸üĞÂ×îºóÒ»´Î¸üĞÂµÄÌìÊı  
+        lastUpdateDay = day; // æ›´æ–°æœ€åä¸€æ¬¡æ›´æ–°çš„å¤©æ•°  
     }
 }

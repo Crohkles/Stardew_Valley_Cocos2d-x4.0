@@ -1,8 +1,8 @@
 #pragma once
 //Marry.h
-//»éÒöÏÔÊ¾½çÃæ
+//å©šå§»æ˜¾ç¤ºç•Œé¢
 #include "cocos2d.h"  
-#include "AppDelegate.h"
+#include "../Core/AppDelegate.h"
 
 class Marry : public cocos2d::Layer {
 public:

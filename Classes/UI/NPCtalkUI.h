@@ -1,9 +1,9 @@
 //NPCtalkUI.h
 #pragma once
 #include "cocos2d.h"  
-#include "AppDelegate.h"
-#include "NPC.h"
-#include "NpcRelationship.h"
+#include "../Core/AppDelegate.h"
+#include "../Entities/NPC.h"
+#include "../Entities/NpcRelationship.h"
 
 class NPCtalkUI : public cocos2d::Layer {
 public:
