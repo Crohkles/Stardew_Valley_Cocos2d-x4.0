@@ -9,6 +9,8 @@
 class InventoryUI : public cocos2d::Layer {
 public:
     virtual bool init ( Inventory* inventory , std::string sceneName );
+    
+    virtual ~InventoryUI();
 
     static InventoryUI* create ( Inventory* inventory , std::string sceneName );
 

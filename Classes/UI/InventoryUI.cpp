@@ -5,9 +5,14 @@
 #include "../Core/AppDelegate.h"
 #include "quitUI.h"
 #include "../Factories/SceneBoundaryFactory.h"
+#include "../Commands/UICommand.h"
 
 USING_NS_CC;
 
+InventoryUI::~InventoryUI() {
+    // 析构函数中不自动重置状态，让UICommand的检查逻辑处理
+    // 这样可以避免UI切换时意外重置状态
+}
 
 static void problemLoading ( const char* filename )
 {
@@ -207,17 +212,20 @@ void InventoryUI::Buttons_switching () {
         }
         else if (Skillkey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
+            // UI切换时不重置状态，保持UI系统打开
             this->removeFromParent ();
             Director::getInstance ()->getRunningScene ()->addChild ( SkillTreeUI::create ( nowScene ) , 20 );
         }
         else if (intimacykey->getBoundingBox ().containsPoint ( mousePos )) {
             // 移除当前的Layer
             std::string nowScene = SceneName;
+            // UI切换时不重置状态，保持UI系统打开
             this->removeFromParent ();
             Director::getInstance ()->getRunningScene ()->addChild ( intimacyUI::create ( nowScene ) , 20 );
         }
         else if (quitkey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
+            // UI切换时不重置状态，保持UI系统打开
             this->removeFromParent ();
             Director::getInstance ()->getRunningScene ()->addChild ( quitUI::create ( nowScene ) , 20 );
         }
