@@ -4,9 +4,15 @@
 #include "../Items/Item.h"  
 #include "../Core/AppDelegate.h"
 #include "quitUI.h"
+#include "../Factories/SceneBoundaryFactory.h"
+#include "../Commands/UICommand.h"
 
 USING_NS_CC;
 
+InventoryUI::~InventoryUI() {
+    // 析构函数中不自动重置状态，让UICommand的检查逻辑处理
+    // 这样可以避免UI切换时意外重置状态
+}
 
 static void problemLoading ( const char* filename )
 {
@@ -16,64 +22,26 @@ static void problemLoading ( const char* filename )
 
 void InventoryUI::updateCoordinate ( float &x , float &y ) {
     Vec2 position = player1->getPosition ();
-    float  Leftboundary = -10000.0f , rightboundary = 10000.0f , upperboundary = 10000.0f , lowerboundary = 10000.0f;
-    if (SceneName == "Town") {
-        Leftboundary = -170.0f;
-        rightboundary = 1773.0f;
-        upperboundary = 1498.0f;
-        lowerboundary = -222.0f;
+    
+    // 使用工厂模式获取边界配置
+    auto boundary = SceneBoundaryFactory::getBoundaryConfig(SceneName);
+    
+    // 应用边界限制
+    if (x <= boundary.left) {
+        x = boundary.left;
     }
-    else if (SceneName == "Cave") {
-        Leftboundary = 786.0f;
-        rightboundary = 817.0f;
-        upperboundary = 808.0f;
-        lowerboundary = 460.0f;
-    }
-    else if (SceneName == "Beach") {
-        Leftboundary = -315.0f;
-        rightboundary = 20000.0f;
-        upperboundary = 920.0f;
-        lowerboundary = 360.0f;
-    }
-    else if (SceneName == "Forest") {
-        Leftboundary = -600.0f;
-        rightboundary = 2197.0f;
-        upperboundary = 2200.0f;
-        lowerboundary = -850.0f;
-    }
-    else if (SceneName == "farm") {
-        Leftboundary = 637.0f;
-        rightboundary = 960.0f;
-        upperboundary = 777.0f;
-        lowerboundary = 500.0f;
-    }
-    else if (SceneName == "Barn") {
-        Leftboundary = 805.0f;
-        rightboundary = 805.0f;
-        upperboundary = 569.0f;
-        lowerboundary = 569.0f;
-    }
-    else if (SceneName == "Myhouse") {
-        Leftboundary = 800.0f;
-        rightboundary = 800.0f;
-        upperboundary = 580.0f;
-        lowerboundary = 580.0f;
-    }
-    if (x <= Leftboundary) {
-        x = Leftboundary;
-    }
-    else if (x >= rightboundary) {
-        x = rightboundary;
+    else if (x >= boundary.right) {
+        x = boundary.right;
     }
     else {
         x = position.x;
     }
 
-    if (y >= upperboundary) {
-        y = upperboundary;
+    if (y >= boundary.upper) {
+        y = boundary.upper;
     }
-    else if (y <= lowerboundary) {
-        y = lowerboundary;
+    else if (y <= boundary.lower) {
+        y = boundary.lower;
     }
     else {
         y = position.y;
@@ -244,17 +212,20 @@ void InventoryUI::Buttons_switching () {
         }
         else if (Skillkey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
+            // UI切换时不重置状态，保持UI系统打开
             this->removeFromParent ();
             Director::getInstance ()->getRunningScene ()->addChild ( SkillTreeUI::create ( nowScene ) , 20 );
         }
         else if (intimacykey->getBoundingBox ().containsPoint ( mousePos )) {
             // 移除当前的Layer
             std::string nowScene = SceneName;
+            // UI切换时不重置状态，保持UI系统打开
             this->removeFromParent ();
             Director::getInstance ()->getRunningScene ()->addChild ( intimacyUI::create ( nowScene ) , 20 );
         }
         else if (quitkey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
+            // UI切换时不重置状态，保持UI系统打开
             this->removeFromParent ();
             Director::getInstance ()->getRunningScene ()->addChild ( quitUI::create ( nowScene ) , 20 );
         }

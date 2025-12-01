@@ -33,12 +33,29 @@ void ToggleInventoryCommand::execute() {
         return;
     }
     
-    // 检查当前currentInventoryUI是否仍然有效（可能在场景切换后失效）
-    if (currentInventoryUI && !currentInventoryUI->isRunning()) {
-        // 如果currentInventoryUI已经不在运行中，说明它在场景切换时被销毁了
-        CCLOG("Resetting inventory state after scene transition");
-        isInventoryOpen = false;
-        currentInventoryUI = nullptr;
+    // 检查当前currentInventoryUI是否仍然有效
+    if (currentInventoryUI) {
+        // 使用安全的方法检查UI是否仍在场景中
+        bool isValid = false;
+        try {
+            // 检查引用计数，如果对象已被销毁，这里可能会出现问题
+            if (currentScene && currentInventoryUI->getReferenceCount() > 0) {
+                auto parent = currentInventoryUI->getParent();
+                if (parent == currentScene) {
+                    isValid = true;
+                }
+            }
+        } catch (...) {
+            // 如果访问出现异常，说明对象已经无效
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            // InventoryUI已经无效，重置状态
+            CCLOG("InventoryUI is invalid, resetting state");
+            isInventoryOpen = false;
+            currentInventoryUI = nullptr;
+        }
     }
     
     // 如果当前没有打开背包界面，则打开它
@@ -81,6 +98,15 @@ void ToggleInventoryCommand::resetState() {
     currentInventoryUI = nullptr;
 }
 
+void ToggleInventoryCommand::onInventoryUIDestroyed(InventoryUI* ui) {
+    // 当InventoryUI被外部销毁时，重置静态指针
+    if (currentInventoryUI == ui) {
+        CCLOG("InventoryUI destroyed externally, resetting state");
+        isInventoryOpen = false;
+        currentInventoryUI = nullptr;
+    }
+}
+
 // ==================== CloseUICommand 实现 ====================
 
 CloseUICommand::CloseUICommand(cocos2d::Node* ui, cocos2d::Node* parent)
@@ -89,8 +115,14 @@ CloseUICommand::CloseUICommand(cocos2d::Node* ui, cocos2d::Node* parent)
 
 void CloseUICommand::execute() {
     if (uiNode && parentNode) {
+        // 关闭UI时，同时重置整个UI系统状态
+        // 这确保ESC键能正确关闭所有相关UI
+        ToggleInventoryCommand::resetState();
+        
         parentNode->removeChild(uiNode, true);
         uiNode = nullptr;  // 防止重复操作
+        
+        CCLOG("UI closed via ESC key, inventory system state reset");
     }
 }
 

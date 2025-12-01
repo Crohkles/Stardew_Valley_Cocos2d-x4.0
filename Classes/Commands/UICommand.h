@@ -37,6 +37,9 @@ public:
     
     // 静态方法用于重置状态
     static void resetState();
+    
+    // 当InventoryUI被销毁时调用，用于重置静态指针
+    static void onInventoryUIDestroyed(InventoryUI* ui);
 };
 
 /**
