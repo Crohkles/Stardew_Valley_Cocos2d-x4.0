@@ -16,6 +16,7 @@
 //#include "supermarket.h"
 #include "../UI/CreateCharacterUI.h"
 #include "../Systems/EnergySystem.h"
+#include "../Systems/GameInteractionFacade.h"
 #include "InputManager.h"
 #include "../Scenes/InputTestScene.h"
 #include "../Items/Generaltem.h"  // 引入flyweight物品系统
@@ -361,6 +362,18 @@ void AppDelegate::Initialize () {
     //taskManager->createTask ( task1 );
     //taskManager->createTask ( task2 );
     //taskManager->createTask ( task3 );
+    
+    // 初始化GameInteractionFacade外观类
+    auto gameFacade = GameInteractionFacade::getInstance();
+    gameFacade->initialize(
+        nullptr,          // EconomicSystem - 暂时不需要
+        taskManager,      // TaskManagement
+        npc_relationship, // NpcRelationship  
+        inventory,        // Inventory
+        skill_tree,       // SkillTree
+        player1           // Player
+    );
+    CCLOG("GameInteractionFacade initialized successfully");
 }
 
 

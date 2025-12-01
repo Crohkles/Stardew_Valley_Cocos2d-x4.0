@@ -4,6 +4,7 @@
 #include "../Items/Food.h"
 #include "../Core/AppDelegate.h"
 #include "../Systems/EnergySystem.h"
+#include "../Systems/GameInteractionFacade.h"
 #include "cocos2d.h"
 #include <memory>
 #include <algorithm>
@@ -113,29 +114,24 @@ ConsumeFoodCommand::ConsumeFoodCommand(class mini_bag* bag)
 
 void ConsumeFoodCommand::execute() {
     if (!miniBag) {
+        CCLOG("ConsumeFoodCommand: mini_bag is null");
         return;
     }
     
+    // 获取选中的食物
     auto selected_item = std::dynamic_pointer_cast<Food>(miniBag->getSelectedItem());
     if (selected_item != nullptr) {
-        CCLOG("EAT FOOD!");
+        // 使用外观类统一处理食物消费逻辑
+        auto facade = GameInteractionFacade::getInstance();
+        auto result = facade->consumeFood(selected_item, miniBag);
         
-        // 恢复体力
-        extern int strength; // 引用全局变量
-        strength = std::min(100, strength + selected_item->GetEnergy());
-        
-        // 从背包中移除食物
-        Inventory* inventory = miniBag->getInventory();
-        if (inventory) {
-            inventory->RemoveItem(*selected_item);
-            inventory->DisplayPackageInCCLOG();
+        if (result.success) {
+            CCLOG("ConsumeFoodCommand: %s", result.message.c_str());
+        } else {
+            CCLOG("ConsumeFoodCommand: Failed - %s", result.message.c_str());
         }
-        
-        // 更新体力UI显示
-        extern Timesystem* TimeUI; // 引用全局TimeUI
-        if (TimeUI) {
-            TimeUI->UpdateEnergy();
-        }
+    } else {
+        CCLOG("ConsumeFoodCommand: No food item selected");
     }
 }
 

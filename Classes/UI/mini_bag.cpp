@@ -2,6 +2,7 @@
 #include "ui/CocosGUI.h"  
 #include "../Items/Item.h"  
 #include "../Core/AppDelegate.h"
+#include "../Systems/GameInteractionFacade.h"
 
 
 USING_NS_CC;
