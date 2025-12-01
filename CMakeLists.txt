@@ -115,6 +115,7 @@ list(APPEND GAME_SOURCE
      Classes/Systems/EconomicSystem.cpp
      Classes/Systems/EnergySystem.cpp
      Classes/Systems/FishingGame.cpp
+     Classes/Systems/GameInteractionFacade.cpp
      Classes/Systems/Inventroy.cpp
      Classes/Systems/Skill.cpp
      Classes/Systems/SkillTree.cpp
@@ -188,6 +189,7 @@ list(APPEND GAME_HEADER
      Classes/Systems/EconomicSystem.h
      Classes/Systems/EnergySystem.h
      Classes/Systems/FishingGame.h
+     Classes/Systems/GameInteractionFacade.h
      Classes/Systems/Inventory.h
      Classes/Systems/Skill.h
      Classes/Systems/SkillTree.h

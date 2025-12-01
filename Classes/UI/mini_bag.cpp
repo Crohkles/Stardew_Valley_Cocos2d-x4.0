@@ -2,6 +2,7 @@
 #include "ui/CocosGUI.h"  
 #include "../Items/Item.h"  
 #include "../Core/AppDelegate.h"
+#include "../Systems/GameInteractionFacade.h"
 
 
 USING_NS_CC;
@@ -194,13 +195,24 @@ void mini_bag::updateDisplay () {
         keyboard_listener->onKeyPressed = [this]( EventKeyboard::KeyCode keyCode , Event* event ) {
             if (keyCode == EventKeyboard::KeyCode::KEY_E && !is_key_e_pressed) {
                 is_key_e_pressed = true;
-                auto selected_item = std::dynamic_pointer_cast<Food>(this->getSelectedItem ());
-                if (selected_item != nullptr) {
-                    CCLOG ( "EAT FOOD!" );
-                    strength = std::min ( 100 , strength + selected_item->GetEnergy () );
-                    inventory->RemoveItem ( *selected_item );
-                    inventory->DisplayPackageInCCLOG ();
-                    TimeUI->UpdateEnergy ();
+                
+                // 使用外观类统一处理食物消费逻辑
+                auto facade = GameInteractionFacade::getInstance();
+                
+                // 检查是否有选中的槽位
+                if (_selectedSlot > 0) {
+                    auto result = facade->consumeFoodFromSlot(_selectedSlot, this);
+                    
+                    if (result.success) {
+                        CCLOG("mini_bag: %s", result.message.c_str());
+                        
+                        // 显示背包状态（调试用）
+                        if (inventory) {
+                            inventory->DisplayPackageInCCLOG();
+                        }
+                    } else {
+                        CCLOG("mini_bag: %s", result.message.c_str());
+                    }
                 }
             }
             };
