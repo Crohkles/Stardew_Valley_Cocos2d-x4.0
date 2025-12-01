@@ -121,13 +121,8 @@ void PlantCommand::execute() {
         return;
     }
     
-    // 这里需要调用farm类的种植逻辑
-    // 由于原来的逻辑比较复杂，涉及到区域检测、物品检查等
-    // 暂时保留原有的处理逻辑，后续可以进一步重构
-    // 在实际实现中，需要将farm类中的种植逻辑提取为public方法
-    
     CCLOG("Executing plant command");
-    // farmScene->performPlantAction(); // 需要在farm类中添加此方法
+    farmScene->performPlantAction();
 }
 
 void PlantCommand::undo() {
@@ -145,7 +140,7 @@ void HarvestCommand::execute() {
     }
     
     CCLOG("Executing harvest command");
-    // farmScene->performHarvestAction(); // 需要在farm类中添加此方法
+    farmScene->performHarvestAction();
 }
 
 void HarvestCommand::undo() {
@@ -163,7 +158,7 @@ void WaterCommand::execute() {
     }
     
     CCLOG("Executing water command");
-    // farmScene->performWaterAction(); // 需要在farm类中添加此方法
+    farmScene->performWaterAction();
 }
 
 void WaterCommand::undo() {
