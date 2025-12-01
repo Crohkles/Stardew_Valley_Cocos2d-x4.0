@@ -84,6 +84,47 @@ public:
      */
     FoodConsumptionResult consumeFoodFromSlot(int selectedSlot, mini_bag* miniBag);
     
+    // === 物品出售交互外观 ===
+    
+    /**
+     * @brief 物品出售结果结构体
+     */
+    struct ItemSaleResult {
+        bool success;
+        int goldEarned;
+        int currentGold;
+        std::string itemName;
+        int quantity;
+        std::string message;
+        
+        ItemSaleResult() : success(false), goldEarned(0), currentGold(0), quantity(0) {}
+    };
+    
+    /**
+     * @brief 统一的物品出售接口
+     * @param item 要出售的物品
+     * @param quantity 出售数量
+     * @param miniBag 小背包UI引用
+     * @return 出售结果
+     */
+    ItemSaleResult sellItem(std::shared_ptr<Item> item, int quantity, mini_bag* miniBag);
+    
+    /**
+     * @brief 通过背包槽位出售物品
+     * @param selectedSlot 选中的背包槽位（1-based）
+     * @param quantity 出售数量（默认为1）
+     * @param miniBag 小背包UI引用
+     * @return 出售结果
+     */
+    ItemSaleResult sellItemFromSlot(int selectedSlot, int quantity, mini_bag* miniBag);
+    
+    /**
+     * @brief 简化的单个物品出售（出售选中槽位的全部物品）
+     * @param miniBag 小背包UI引用
+     * @return 出售结果
+     */
+    ItemSaleResult sellSelectedItem(mini_bag* miniBag);
+    
     // === 辅助方法 ===
     
     /**
@@ -109,7 +150,9 @@ public:
 private:
     // 内部辅助方法
     bool validateFoodConsumption(std::shared_ptr<Food> food, mini_bag* miniBag);
+    bool validateItemSale(std::shared_ptr<Item> item, int quantity, mini_bag* miniBag);
     void updateEnergySystemUI();
+    void updateEconomicSystemUI();
 };
 
 #endif // __GAME_INTERACTION_FACADE_H__

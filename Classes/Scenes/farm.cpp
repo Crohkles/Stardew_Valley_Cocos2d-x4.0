@@ -14,6 +14,7 @@
 #include "../Core/InputManager.h"
 #include "../Commands/SceneInteractionCommand.h"
 #include "../Commands/UICommand.h"
+#include "../Systems/GameInteractionFacade.h"
 #include "Myhouse.h"
 #include "Barn.h"
 #include "Cave.h"
@@ -191,16 +192,21 @@ bool farm::init ()
 
             Vec2 BoxPos = Box->getPosition ();
 
-            // 计算玩家与NPC之间的距离  
+            // 计算玩家与箱子之间的距离  
             float distance = playerPos.distance ( BoxPos );
 
             // 检查距离是否在允许的范围内  
             if (distance <= interactionRadius) {
                 if (miniBag->getSelectedSlot ()) {
-                    GoldAmount += inventory->GetItemAt ( miniBag->getSelectedSlot () )->GetValue ();
-                    inventory->RemoveItem ( miniBag->getSelectedSlot () );
-                    inventory->is_updated = true;
-                    miniBag->getSelectBack ();
+                    // 使用外观类统一处理物品出售逻辑
+                    auto facade = GameInteractionFacade::getInstance();
+                    auto result = facade->sellSelectedItem(miniBag);
+                    
+                    if (result.success) {
+                        CCLOG("Farm Box Sale: %s", result.message.c_str());
+                    } else {
+                        CCLOG("Farm Box Sale Failed: %s", result.message.c_str());
+                    }
                 }
             }
         }
