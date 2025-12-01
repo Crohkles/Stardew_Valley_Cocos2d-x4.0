@@ -268,7 +268,7 @@ void mini_bag::setupInputCommands() {
 void mini_bag::cleanupInputCommands() {
     // 解绑命令
     if (consumeFoodCommand) {
-        InputManager::getInstance()->unbindReleaseCommand(cocos2d::EventKeyboard::KeyCode::KEY_E);
+        InputManager::getInstance()->unbindCommand(cocos2d::EventKeyboard::KeyCode::KEY_E,consumeFoodCommand);
         consumeFoodCommand = nullptr;
     }
 }

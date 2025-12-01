@@ -740,7 +740,10 @@ void farm::performPlantAction() {
                     inventory->RemoveItem(*temp);
 
                     if (nums == 13 && RainBowfirst) {
-                        inventory->AddItem(RainBow);
+                        auto rainbowItem = GetRainBow();
+                        if (rainbowItem != nullptr) {
+                            inventory->AddItem(*rainbowItem);
+                        }
                         RainBowfirst = false;
                     }
 
