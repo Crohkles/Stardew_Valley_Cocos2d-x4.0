@@ -262,13 +262,13 @@ void mini_bag::setupInputCommands() {
     consumeFoodCommand = std::make_shared<ConsumeFoodCommand>(this);
     
     // 绑定E键到InputManager
-    InputManager::getInstance()->bindPressCommand(cocos2d::EventKeyboard::KeyCode::KEY_E, consumeFoodCommand);
+    InputManager::getInstance()->bindReleaseCommand(cocos2d::EventKeyboard::KeyCode::KEY_E, consumeFoodCommand);
 }
 
 void mini_bag::cleanupInputCommands() {
     // 解绑命令
     if (consumeFoodCommand) {
-        InputManager::getInstance()->unbindPressCommand(cocos2d::EventKeyboard::KeyCode::KEY_E);
+        InputManager::getInstance()->unbindReleaseCommand(cocos2d::EventKeyboard::KeyCode::KEY_E);
         consumeFoodCommand = nullptr;
     }
 }
