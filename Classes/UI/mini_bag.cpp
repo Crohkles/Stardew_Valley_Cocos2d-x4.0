@@ -80,6 +80,9 @@ bool mini_bag::init ( Inventory* inventory ) {
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
 
     updateDisplay (); // 更新显示内容  
+    
+    // 设置Command Pattern输入绑定
+    setupInputCommands();
 
     return true;
 }
@@ -190,26 +193,7 @@ void mini_bag::updateDisplay () {
             }
         }
 
-        auto keyboard_listener = EventListenerKeyboard::create ();
-        keyboard_listener->onKeyPressed = [this]( EventKeyboard::KeyCode keyCode , Event* event ) {
-            if (keyCode == EventKeyboard::KeyCode::KEY_E && !is_key_e_pressed) {
-                is_key_e_pressed = true;
-                auto selected_item = std::dynamic_pointer_cast<Food>(this->getSelectedItem ());
-                if (selected_item != nullptr) {
-                    CCLOG ( "EAT FOOD!" );
-                    strength = std::min ( 100 , strength + selected_item->GetEnergy () );
-                    inventory->RemoveItem ( *selected_item );
-                    inventory->DisplayPackageInCCLOG ();
-                    TimeUI->UpdateEnergy ();
-                }
-            }
-            };
-        keyboard_listener->onKeyReleased = [this]( EventKeyboard::KeyCode keyCode , Event* event ) {
-            if (keyCode == EventKeyboard::KeyCode::KEY_E) {
-                is_key_e_pressed = false;
-            }
-            };
-        _eventDispatcher->addEventListenerWithSceneGraphPriority ( keyboard_listener , this );
+        // 传统键盘监听器已被 Command Pattern 替代
     }
 
     // 更新物品信息标签（用于调试）  
@@ -263,8 +247,28 @@ std::shared_ptr<Item> mini_bag::getSelectedItem () {
 
 // 析构函数实现
 mini_bag::~mini_bag() {
+    // 清理Command绑定
+    cleanupInputCommands();
+    
     // 从背包系统中移除自己作为观察者
     if (_inventory != nullptr) {
         _inventory->removeObserver(this);
+    }
+}
+
+// Command Pattern相关实现
+void mini_bag::setupInputCommands() {
+    // 创建ConsumeFoodCommand实例
+    consumeFoodCommand = std::make_shared<ConsumeFoodCommand>(this);
+    
+    // 绑定E键到InputManager
+    InputManager::getInstance()->bindReleaseCommand(cocos2d::EventKeyboard::KeyCode::KEY_E, consumeFoodCommand);
+}
+
+void mini_bag::cleanupInputCommands() {
+    // 解绑命令
+    if (consumeFoodCommand) {
+        InputManager::getInstance()->unbindCommand(cocos2d::EventKeyboard::KeyCode::KEY_E,consumeFoodCommand);
+        consumeFoodCommand = nullptr;
     }
 }

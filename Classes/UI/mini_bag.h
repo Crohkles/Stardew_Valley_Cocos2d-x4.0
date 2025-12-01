@@ -4,6 +4,8 @@
 #include "../Systems/Inventory.h"  
 #include "../Core/AppDelegate.h"
 #include "../Core/GameStateObserver.h"
+#include "../Commands/KeyCommand.h"
+#include <memory>
 class mini_bag : public cocos2d::Layer, public GameStateObserver {
 public:
     virtual bool init ( Inventory* inventory);
@@ -25,6 +27,11 @@ public:
     void getSelectBack ();
 
     std::shared_ptr<Item> getSelectedItem();
+    
+    // Command Pattern相关方法
+    void setupInputCommands();
+    void cleanupInputCommands();
+    Inventory* getInventory() const { return _inventory; }
 
 private:
     Inventory* _inventory; // 指向 Inventory 实例的指针  
@@ -40,5 +47,8 @@ private:
 	bool is_key_e_pressed = false; // 标志，表示是否按下了 E 键
 
     cocos2d::Sprite* currentItemSprite = nullptr; // 标识当前选择的物品
+    
+    // Command Pattern相关成员
+    std::shared_ptr<KeyCommand> consumeFoodCommand;
 
 };
