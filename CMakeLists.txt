@@ -76,6 +76,9 @@ list(APPEND GAME_SOURCE
      Classes/Commands/SceneInteractionCommand.cpp
      Classes/Commands/UICommand.cpp
      
+     # Factories
+     Classes/Factories/AnimalFactory.cpp
+     
      # Entities
      Classes/Entities/Chicken.cpp
      Classes/Entities/Cow.cpp

@@ -3,6 +3,7 @@
 #include "ui/CocosGUI.h"  
 #include "../Items/Item.h"  
 #include "../Core/AppDelegate.h"
+#include "../Factories/AnimalFactory.h"
 
 
 USING_NS_CC;
@@ -86,17 +87,9 @@ void StoreUI::backgroundcreate () {
                             }
                             //若有空间
                             if (space != nullptr) {
-                                Livestock* livestock = nullptr;
-                                //检查品种
-                                if (chosen_item_name == "AnimalChicken") {
-                                    livestock = Chicken::create ( space->first );
-                                }
-                                else if (chosen_item_name == "AnimalSheep") {
-                                    livestock = Sheep::create ( space->first );
-                                }
-                                else if (chosen_item_name == "AnimalCow") {
-                                    livestock = Cow::create ( space->first );
-                                }
+                                // 使用Factory Method模式创建动物，替代硬编码的if-else链条
+                                Livestock* livestock = AnimalFactory::getInstance()->createAnimal(chosen_item_name, space->first);
+                                
                                 if (livestock != nullptr) {
                                     space->second = true;
                                     livestocks.push_back ( livestock );
@@ -104,6 +97,9 @@ void StoreUI::backgroundcreate () {
                                     economicSystem->subtractGold ( chosen_Item->GetValue () );
                                     updateDisplay ();
                                     CCLOG ( "Purchased item: %s" , chosen_Item->GetName ().c_str () );
+                                }
+                                else {
+                                    CCLOG ( "Failed to create animal of type: %s" , chosen_item_name.c_str () );
                                 }
                             }
                             else {
