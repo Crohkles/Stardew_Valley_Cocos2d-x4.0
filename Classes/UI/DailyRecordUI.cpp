@@ -1,6 +1,7 @@
 #include "ui/CocosGUI.h"  
 #include "DailyRecordUI.h"
 #include "DetailedtaskUI.h"
+#include "../Factories/SceneBoundaryFactory.h"
 
 USING_NS_CC;
 
@@ -12,70 +13,26 @@ static void problemLoading ( const char* filename )
 
 void DailyRecordUI::updateCoordinate ( float& x , float& y ) {
     Vec2 position = player1->getPosition ();
-    float  Leftboundary = -10000.0f , rightboundary = 10000.0f , upperboundary = 10000.0f , lowerboundary = -10000.0f;
-    if (SceneName == "Town") {
-        Leftboundary = -170.0f;
-        rightboundary = 1773.0f;
-        upperboundary = 1498.0f;
-        lowerboundary = -222.0f;
+    
+    // 使用工厂模式获取边界配置
+    auto boundary = SceneBoundaryFactory::getBoundaryConfig(SceneName);
+    
+    // 应用边界限制
+    if (x <= boundary.left) {
+        x = boundary.left;
     }
-    else if (SceneName == "Cave") {
-        Leftboundary = 786.0f;
-        rightboundary = 817.0f;
-        upperboundary = 808.0f;
-        lowerboundary = 460.0f;
-    }
-    else if (SceneName == "Beach") {
-        Leftboundary = -315.0f;
-        rightboundary = 20000.0f;
-        upperboundary = 920.0f;
-        lowerboundary = 360.0f;
-    }
-    else if (SceneName == "Forest") {
-        Leftboundary = -600.0f;
-        rightboundary = 2197.0f;
-        upperboundary = 2200.0f;
-        lowerboundary = -850.0f;
-    }
-    else if (SceneName == "farm") {
-        Leftboundary = 637.0f;
-        rightboundary = 960.0f;
-        upperboundary = 777.0f;
-        lowerboundary = 500.0f;
-    }
-    else if (SceneName == "Barn") {
-        Leftboundary = 805.0f;
-        rightboundary = 805.0f;
-        upperboundary = 569.0f;
-        lowerboundary = 569.0f;
-    }
-    else if (SceneName == "Myhouse") {
-        Leftboundary = 800.0f;
-        rightboundary = 800.0f;
-        upperboundary = 580.0f;
-        lowerboundary = 580.0f;
-    }
-    else if (SceneName == "supermarket") {
-        Leftboundary = 743.0f;
-        rightboundary = 1773.0f;
-        upperboundary = -82.0f;
-        lowerboundary = -82.0f;
-    }
-    if (x <= Leftboundary) {
-        x = Leftboundary;
-    }
-    else if (x >= rightboundary) {
-        x = rightboundary;
+    else if (x >= boundary.right) {
+        x = boundary.right;
     }
     else {
         x = position.x;
     }
 
-    if (y >= upperboundary) {
-        y = upperboundary;
+    if (y >= boundary.upper) {
+        y = boundary.upper;
     }
-    else if (y <= lowerboundary) {
-        y = lowerboundary;
+    else if (y <= boundary.lower) {
+        y = boundary.lower;
     }
     else {
         y = position.y;

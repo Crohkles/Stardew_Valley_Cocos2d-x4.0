@@ -78,6 +78,7 @@ list(APPEND GAME_SOURCE
      
      # Factories
      Classes/Factories/AnimalFactory.cpp
+     Classes/Factories/SceneBoundaryFactory.cpp
      
      # Entities
      Classes/Entities/Chicken.cpp
