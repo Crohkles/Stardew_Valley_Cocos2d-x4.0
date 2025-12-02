@@ -107,6 +107,7 @@ list(APPEND GAME_SOURCE
      Classes/Scenes/Barn.cpp
      Classes/Scenes/Beach.cpp
      Classes/Scenes/Cave.cpp
+     Classes/Scenes/CropSpritePool.cpp
      Classes/Scenes/farm.cpp
      Classes/Scenes/Forest.cpp
      Classes/Scenes/HelloWorldScene.cpp
@@ -181,6 +182,7 @@ list(APPEND GAME_HEADER
      Classes/Scenes/Barn.h
      Classes/Scenes/Beach.h
      Classes/Scenes/Cave.h
+     Classes/Scenes/CropSpritePool.h
      Classes/Scenes/farm.h
      Classes/Scenes/Forest.h
      Classes/Scenes/HelloWorldScene.h

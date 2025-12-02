@@ -15,7 +15,7 @@ public:
     static quitUI* create ( std::string sceneName );
 
 private:
-    // Command Pattern??
+    // Command Pattern：关闭界面的命令
     std::shared_ptr<CloseUICommand> escCloseCommand;
     
     void close ();
