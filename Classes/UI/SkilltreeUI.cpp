@@ -211,46 +211,34 @@ void SkillTreeUI::Buttons_switching () {
         mousePos = this->convertToNodeSpace ( mousePos );
         //CCLOG ( "X:%f,Y:%f" , event->getCursorX () , event->getCursorY () );
         if (bagkey->getBoundingBox ().containsPoint ( mousePos )) {
-            // 移除当前的Layer
             std::string nowScene = SceneName;
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( InventoryUI::create ( inventory , nowScene ) , 20 );
+            auto inventoryUI = InventoryUI::create(inventory, nowScene);
+            Director::getInstance()->getRunningScene()->addChild(inventoryUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::Inventory, inventoryUI);
+            this->removeFromParent();
         }
         else if (Skillkey->getBoundingBox ().containsPoint ( mousePos )) {
 
         }
         else if (intimacykey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( intimacyUI::create ( nowScene ) , 20 );
+            auto intimacyUI = intimacyUI::create(nowScene);
+            Director::getInstance()->getRunningScene()->addChild(intimacyUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::Intimacy, intimacyUI);
+            this->removeFromParent();
         }
         else if (quitkey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( quitUI::create ( nowScene ) , 20 );
+            auto quitUI = quitUI::create(nowScene);
+            Director::getInstance()->getRunningScene()->addChild(quitUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::Quit, quitUI);
+            this->removeFromParent();
         }
         };
     _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , this );
 }
 
 SkillTreeUI::~SkillTreeUI() {
-    // 清理命令绑定
-    if (escCloseCommand) {
-        auto inputManager = InputManager::getInstance();
-        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ESCAPE, escCloseCommand);
-    }
-}
-
-void SkillTreeUI::close () {
-    // 使用Command Pattern绑定ESC键关闭功能
-    auto inputManager = InputManager::getInstance();
-    auto currentScene = Director::getInstance()->getRunningScene();
-    
-    auto closeCommand = std::make_shared<CloseUICommand>(this, currentScene);
-    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ESCAPE, closeCommand);
-    
-    // 保存命令引用以便清理
-    escCloseCommand = closeCommand;
 }
 
 bool SkillTreeUI::init ( std::string sceneName ) {
@@ -261,7 +249,6 @@ bool SkillTreeUI::init ( std::string sceneName ) {
     backgroundcreate ();
 
     Buttons_switching ();
-    close ();
     return true;
 }
 

@@ -17,14 +17,22 @@ USING_NS_CC;
  * 使用静态变量跟踪当前界面状态，避免重复创建
  */
 class ToggleInventoryCommand : public KeyCommand {
+public:
+    enum class UIState {
+        None,
+        Inventory,
+        SkillTree,
+        Intimacy,
+        Quit
+    };
+
 private:
     cocos2d::Node* parentNode;           // 父节点，用于添加/移除UI
     Inventory* inventory;       // 背包数据
     std::string sceneType;      // 场景类型，用于创建对应的背包UI
     
-    // 静态变量跟踪当前状态
-    static bool isInventoryOpen;
-    static InventoryUI* currentInventoryUI;
+    static UIState currentState;
+    static cocos2d::Node* currentUI;
     
 public:
     ToggleInventoryCommand(cocos2d::Node* parent, Inventory* inv, const std::string& scene);
@@ -38,8 +46,11 @@ public:
     // 静态方法用于重置状态
     static void resetState();
     
-    // 当InventoryUI被销毁时调用，用于重置静态指针
-    static void onInventoryUIDestroyed(InventoryUI* ui);
+    // 更新状态和当前UI指针
+    static void updateState(UIState newState, cocos2d::Node* ui);
+
+    // 当UI被销毁时调用，用于重置静态指针（如果被销毁的UI是当前记录的UI）
+    static void onUIDestroyed(cocos2d::Node* ui);
 };
 
 /**

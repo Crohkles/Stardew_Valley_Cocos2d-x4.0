@@ -212,22 +212,24 @@ void InventoryUI::Buttons_switching () {
         }
         else if (Skillkey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
-            // UI切换时不重置状态，保持UI系统打开
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( SkillTreeUI::create ( nowScene ) , 20 );
+            auto skillTreeUI = SkillTreeUI::create(nowScene);
+            Director::getInstance()->getRunningScene()->addChild(skillTreeUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::SkillTree, skillTreeUI);
+            this->removeFromParent();
         }
         else if (intimacykey->getBoundingBox ().containsPoint ( mousePos )) {
-            // 移除当前的Layer
             std::string nowScene = SceneName;
-            // UI切换时不重置状态，保持UI系统打开
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( intimacyUI::create ( nowScene ) , 20 );
+            auto intimacyUI = intimacyUI::create(nowScene);
+            Director::getInstance()->getRunningScene()->addChild(intimacyUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::Intimacy, intimacyUI);
+            this->removeFromParent();
         }
         else if (quitkey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
-            // UI切换时不重置状态，保持UI系统打开
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( quitUI::create ( nowScene ) , 20 );
+            auto quitUI = quitUI::create(nowScene);
+            Director::getInstance()->getRunningScene()->addChild(quitUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::Quit, quitUI);
+            this->removeFromParent();
         }
         };
     _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , this );
