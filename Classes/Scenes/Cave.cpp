@@ -10,6 +10,7 @@
 #include "../Commands/UICommand.h"
 #include "../Commands/GameActionCommand.h"
 #include "Town.h"
+#include "../Systems/EnergySystem.h"
 
 USING_NS_CC;
 

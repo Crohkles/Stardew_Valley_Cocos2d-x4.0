@@ -5,6 +5,7 @@
 #include "../Entities/Player.h"
 #include "physics/CCPhysicsWorld.h"
 #include "ui/CocosGUI.h"
+#include "../Systems/EnergySystem.h"
 
 
 USING_NS_CC;
@@ -26,14 +27,14 @@ bool Myhouse::init()
     
     if (frombed) {
         if (IsSleep) {
-            strength = 100.0f;
+            EnergySystem::getInstance()->setEnergy(100);
         }
         else {
             GoldAmount -= 150;
             if (GoldAmount <= 0) {
                 GoldAmount = 0;
             }
-            strength = 70.0f;
+            EnergySystem::getInstance()->setEnergy(70);
         }
         frombed = false;
         IsSleep = false;
@@ -189,6 +190,7 @@ void Myhouse::setupInputCommands()
             
             IsNextDay = true;
             day++;
+            frombed = true;
             
             if (day == 8) {
                 if (Season == "Spring") {

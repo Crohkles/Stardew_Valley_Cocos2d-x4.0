@@ -439,25 +439,17 @@ void StoreUI::moneyDisplay () {
     updateCoordinate ( currentx , currenty );
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
     //金币更新
-    static Label* Gold_Amount = nullptr;
     int goldAmount = economicSystem->getGoldAmount ();
-    if (Gold_Amount == nullptr) {
-        Gold_Amount = Label::createWithSystemFont ( std::to_string ( goldAmount ) , "fonts/Comic Sans MS.ttf" , 45 );
-        Gold_Amount->setTextColor ( Color4B::BLACK );
-        Gold_Amount->setPosition ( Vec2 ( currentx - visibleSize.width * 0.1 , currenty - visibleSize.height * 0.0425 ) );
-        this->addChild ( Gold_Amount , 4 );
+    if (Gold_Amount_Label == nullptr) {
+        Gold_Amount_Label = Label::createWithSystemFont ( std::to_string ( goldAmount ) , "fonts/Comic Sans MS.ttf" , 45 );
+        Gold_Amount_Label->setTextColor ( Color4B::BLACK );
+        Gold_Amount_Label->setPosition ( Vec2 ( currentx - visibleSize.width * 0.1 , currenty - visibleSize.height * 0.0425 ) );
+        this->addChild ( Gold_Amount_Label , 4 );
     }
     else {
-        Gold_Amount->setString ( std::to_string ( goldAmount ) );
+        Gold_Amount_Label->setString ( std::to_string ( goldAmount ) );
     }
-    auto listenerWithPlayer = EventListenerKeyboard::create ();
-    listenerWithPlayer->onKeyPressed = [this, goldAmount]( EventKeyboard::KeyCode keyCode , Event* event )
-        {
-            if (keyCode == EventKeyboard::KeyCode::KEY_P) {
-                Gold_Amount = nullptr;
-            }
-        };
-    _eventDispatcher->addEventListenerWithSceneGraphPriority ( listenerWithPlayer , this );
+    // 移除旧的键盘监听器逻辑，因为它可能导致空指针
 }
 
 bool StoreUI::init ( Inventory* mybag , Inventory* goods ) {
@@ -469,6 +461,12 @@ bool StoreUI::init ( Inventory* mybag , Inventory* goods ) {
     _goods = goods;
     economicSystem = std::make_shared<EconomicSystem> ( _mybag , _goods); // 在这里初始化  
     CCLOG ( "%d" , economicSystem->getGoldAmount () );
+
+    // 注册观察者
+    economicSystem->addObserver(this);
+    if (TimeUI) {
+        economicSystem->addObserver(TimeUI);
+    }
 
     backgroundcreate ();
 
@@ -634,4 +632,10 @@ void StoreUI::onItemSlotClicked ( cocos2d::Ref* sender ) {
 
     // 更新显示  
     updateDisplay ();
+}
+
+void StoreUI::onEconomicStateChanged(int newGoldAmount, int delta) {
+    if (Gold_Amount_Label) {
+        Gold_Amount_Label->setString(std::to_string(newGoldAmount));
+    }
 }

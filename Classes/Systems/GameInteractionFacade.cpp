@@ -86,9 +86,6 @@ GameInteractionFacade::consumeFood(std::shared_ptr<Food> food, mini_bag* miniBag
         energySystem->setEnergy(newEnergy);
     }
     
-    // 同时更新全局变量（兼容现有系统）
-    strength = newEnergy;
-    
     // 从背包中移除食物
     bool removedFromInventory = false;
     if (playerInventory) {
@@ -170,10 +167,7 @@ bool GameInteractionFacade::validateFoodConsumption(std::shared_ptr<Food> food, 
 }
 
 void GameInteractionFacade::updateEnergySystemUI() {
-    // 更新TimeUI中的能量显示
-    if (TimeUI) {
-        TimeUI->UpdateEnergy();
-    }
+    // UI更新现在通过Observer模式自动处理
 }
 
 bool GameInteractionFacade::hasEnoughEnergy(int requiredEnergy) {

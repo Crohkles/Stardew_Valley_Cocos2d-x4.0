@@ -52,7 +52,10 @@ bool Timesystem::init( std::string place ) {
     energy_frame->setPosition(435, 500);
 
     energy_bar = Sprite::create("Beach/green_bar.png");
-    energy_bar->setScaleY(strength / 100.0 * 16.5f);
+    // 使用EnergySystem获取当前体力
+    int currentEnergy = EnergySystem::getInstance()->getCurrentEnergy();
+    int maxEnergy = EnergySystem::getInstance()->getMaxEnergy();
+    energy_bar->setScaleY((float)currentEnergy / maxEnergy * 16.5f);
     energy_bar->setScaleX(3.1f);
     energy_bar->setAnchorPoint(Vec2(0.5f, 0.0f));
     this->addChild(energy_bar, 3);
@@ -133,7 +136,13 @@ Timesystem* Timesystem::create( std::string place ) {
 }
 
 void Timesystem::UpdateEnergy () {
-    TimeUI->energy_bar->setScaleY ( strength / 100.0 * 16.5f );
+    // 使用EnergySystem获取当前体力并更新UI
+    // 注意：现在推荐使用Observer模式自动更新，此方法保留为了兼容性
+    int currentEnergy = EnergySystem::getInstance()->getCurrentEnergy();
+    int maxEnergy = EnergySystem::getInstance()->getMaxEnergy();
+    if (TimeUI && TimeUI->energy_bar) {
+        TimeUI->energy_bar->setScaleY((float)currentEnergy / maxEnergy * 16.5f);
+    }
 }
 
 // Observer接口实现

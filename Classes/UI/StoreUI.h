@@ -4,13 +4,19 @@
 #include "../Systems/Inventory.h"  
 #include "../Core/AppDelegate.h"
 #include "../Systems/EconomicSystem.h"
+#include "../Core/GameStateObserver.h"
 
 USING_NS_CC;
 
-class StoreUI : public cocos2d::Layer {
+class StoreUI : public cocos2d::Layer, public GameStateObserver {
 public:
     virtual bool init ( Inventory* mybag , Inventory* goods );
     static StoreUI* create ( Inventory* mybag , Inventory* goods );
+    
+    // Observer接口实现
+    virtual void onEconomicStateChanged(int newGoldAmount, int delta) override;
+    virtual void onEnergyStateChanged(int newEnergy, int maxEnergy) override {} // 不需要处理体力变化
+
     //背景图展示
     void backgroundcreate ();
     //商品展示
@@ -45,4 +51,6 @@ private:
     shared_ptr<Item> chosen_Item = nullptr;
 
     std::shared_ptr<EconomicSystem> economicSystem;
+    
+    cocos2d::Label* Gold_Amount_Label = nullptr; // 金币显示标签
 };

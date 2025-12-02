@@ -8,6 +8,7 @@
 #include "../Core/InputManager.h"
 #include "../Commands/SceneInteractionCommand.h"
 #include "../Commands/UICommand.h"
+#include "../Systems/EnergySystem.h"
 
 USING_NS_CC;
 
@@ -254,7 +255,7 @@ void  Forest::checkPlayerPosition()
     
     // 更新计时器显示
     remainingTime++;
-    if (remainingTime == 43200 || strength == 0) {
+    if (remainingTime == 43200 || EnergySystem::getInstance()->getCurrentEnergy() == 0) {
 
         day++;
 

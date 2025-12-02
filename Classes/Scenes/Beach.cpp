@@ -8,6 +8,7 @@
 #include "../Commands/UICommand.h"
 #include "../Commands/GameActionCommand.h"
 #include "../Items/Generaltem.h"  // 引入flyweight物品系统
+#include "../Systems/EnergySystem.h"
 
 
 USING_NS_CC;
@@ -438,7 +439,7 @@ void Beach::CheckPlayerPosition ()
 
     // 更新计时器显示
     remainingTime++;
-    if (remainingTime == 43200 || strength == 0) {
+    if (remainingTime == 43200 || EnergySystem::getInstance()->getCurrentEnergy() == 0) {
 
         day++;
 
