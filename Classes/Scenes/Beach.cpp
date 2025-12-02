@@ -172,13 +172,6 @@ bool Beach::init ()
         this->addChild ( miniBag , 10 , "mini_bag" );
     }
 
-
-    // 使用Observer模式自动更新物品栏（无需轮询）
-    // 注册观察者
-    if (inventory && miniBag) {
-        inventory->addObserver(miniBag);
-    }
-
     if (Festival == "Fishing Festival") {
         string cloth = Season;
         cloth = "Beach";
@@ -371,7 +364,6 @@ bool Beach::init ()
                                 Vec2 playerPos = player1->getPosition();
                                 npc_relationship->increaseRelationship("player", npc->GetName(), 15.2);
                                 inventory->RemoveItem(miniBag->getSelectedSlot());
-                                inventory->is_updated = true;
                                 npc_relationship->AddGiftTime(npc->GetName());
                                 // 这里改成礼物的图
                                 auto ItemClickByminiBag = Sprite::create("npc/gift.png");

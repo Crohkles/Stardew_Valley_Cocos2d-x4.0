@@ -126,13 +126,7 @@ bool Town::init()
     }
 
 
-    // 更新物品栏
-    schedule([=](float deltaTime) {
-        if (inventory->is_updated == true) {
-            miniBag->updateDisplay();
-            inventory->is_updated = false;
-        }
-        }, 0.1f, "item_update_key");
+    // 移除更新物品栏轮询，交给Observer
 
     //箱子添加，用来完成任务
     Box = Sprite::create ( "UIresource/xiangzi/xiangzi.png" );
@@ -416,7 +410,6 @@ bool Town::init()
                                 Vec2 playerPos = player1->getPosition ();
                                 npc_relationship->increaseRelationship ( "player" , npc->GetName () , 15.2 );
                                 inventory->RemoveItem ( miniBag->getSelectedSlot () );
-                                inventory->is_updated = true;
                                 npc_relationship->AddGiftTime ( npc->GetName () );
                                 // 这里改成礼物的图
                                 auto ItemClickByminiBag = Sprite::create ( "npc/gift.png" );

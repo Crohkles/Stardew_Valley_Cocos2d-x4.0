@@ -92,7 +92,6 @@ GameInteractionFacade::consumeFood(std::shared_ptr<Food> food, mini_bag* miniBag
         // 尝试从主背包移除
         if (playerInventory->RemoveItem(*food) != -1) {
             removedFromInventory = true;
-            playerInventory->is_updated = true;
         }
     }
     
@@ -232,7 +231,6 @@ GameInteractionFacade::sellItem(std::shared_ptr<Item> item, int quantity, mini_b
         if (removeResult != -1) {
             // 成功移除物品（removeResult: 0=部分移除, 1=完全清空槽位）
             removedFromInventory = true;
-            playerInventory->is_updated = true;
         } else {
             result.message = "Item not found in inventory: " + result.itemName;
             return result;

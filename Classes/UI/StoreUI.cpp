@@ -110,7 +110,6 @@ void StoreUI::backgroundcreate () {
                         else {
                             economicSystem->subtractGold ( chosen_Item->GetValue () );
                             _mybag->AddItem ( *chosen_Item );
-                            _mybag->is_updated = true;
                             updateDisplay ();
                             CCLOG ( "Purchased item: %s" , chosen_Item->GetName ().c_str () );
                         }

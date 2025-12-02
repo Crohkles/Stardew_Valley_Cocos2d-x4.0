@@ -28,8 +28,6 @@ public:
 
 	~Inventory ();
 
-	bool is_updated = false;//检测背包是否更新过
-
 	//成功添加时返回true,添加失败时返回false
 	bool AddItem ( const Item& item );
 
@@ -87,7 +85,6 @@ public:
 		for (auto it = package.begin (); it != package.end (); ++it) {
 			if (it->second.first->GetName () == item.GetName ()) {
 				// 如果移除数量超过现有数量  
-				is_updated = true;
 				if (remove_num >= it->second.second) {
 					
 					package.erase ( it ); // 清空该格子  

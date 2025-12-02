@@ -43,8 +43,6 @@ void mini_bag::Itemblock ( Inventory* inventory ) {
     Vec2 position = player1->getPosition ();
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
     Vec2 origin = Director::getInstance ()->getVisibleOrigin ();
-    _inventory = inventory;
-
 
     // 初始化物品槽 Sprite 
     for (int i = 0; i < kRowSize; ++i) {
@@ -74,12 +72,17 @@ bool mini_bag::init ( Inventory* inventory ) {
     if (!Layer::init ()) {
         return false;
     }
-    backgroundcreate ();
 
+    _inventory = inventory;
+
+    if (_inventory) {
+        _inventory->addObserver(this);
+    }
+
+    backgroundcreate ();
     Itemblock ( inventory );
 
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
-
     updateDisplay (); // 更新显示内容  
     
     // 设置Command Pattern输入绑定

@@ -277,12 +277,6 @@ bool farm::init ()
         this->addChild ( miniBag , 10 , "mini_bag" );
     }
 
-
-    // 通过 Observer 模式：当背包内容发生变化时自动刷新小背包显示
-    if (inventory && miniBag) {
-        inventory->addObserver(miniBag);
-    }
-
     return true;
 }
 

@@ -160,13 +160,6 @@ bool Cave::init()
         this->addChild ( miniBag , 10 , "mini_bag" );
     }
 
-
-    // 使用Observer模式自动更新物品栏（无需轮询）
-    // 注册观察者
-    if (inventory && miniBag) {
-        inventory->addObserver(miniBag);
-    }
-
     return true;
 }
 
