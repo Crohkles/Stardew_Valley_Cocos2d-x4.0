@@ -3,6 +3,7 @@
 #include "../Items/Item.h"  
 #include "../UI/DailyRecordUI.h"
 #include "EnergySystem.h"
+#include "EconomicSystem.h"
 
 USING_NS_CC;
 
@@ -70,19 +71,18 @@ bool Timesystem::init( std::string place ) {
     time_pic->setPosition(630, 490);
    
 
-    //金币显示
+    // 金币初始化逻辑更新
     currency_frame = Sprite::create ( "UIresource/supermarket/moneyFrame_new.png" );
     currency_frame->setScale ( 3.5f );
     this->addChild ( currency_frame , 1 );
     currency_frame->setPosition ( 630 , 330 );
-    currency_num = nullptr;
-    int goldAmount = GoldAmount;
-    if (currency_num == nullptr) {
-        currency_num = Label::createWithTTF ( std::to_string ( goldAmount ) , "fonts/Marker Felt.ttf" , 45 );
-        currency_num->setTextColor ( Color4B::WHITE );
-        currency_num->setPosition ( 630 , 320 );
-        this->addChild ( currency_num , 4 );
-    }
+    
+    // 从单例获取当前金币
+    int currentGold = EconomicSystem::getInstance()->getGoldAmount();
+    currency_num = Label::createWithTTF ( std::to_string ( currentGold ) , "fonts/Marker Felt.ttf" , 45 );
+    currency_num->setTextColor ( Color4B::WHITE );
+    currency_num->setPosition ( 630 , 320 );
+    this->addChild ( currency_num , 4 );
 
     //日志显示
     daily_record = Sprite::create ( "UIresource/rizhi.png" );
@@ -119,9 +119,9 @@ bool Timesystem::init( std::string place ) {
         // currency_num的更新现在通过Observer模式处理
         }, 0.01f, "updatetime");
     
-    // 注册为体力系统的观察者
+    // 注册为体力系统和经济系统的观察者
     EnergySystem::getInstance()->addObserver(this);
-
+    EconomicSystem::getInstance()->addObserver(this);
     return true;
 }
 
@@ -147,7 +147,6 @@ void Timesystem::UpdateEnergy () {
 
 // Observer接口实现
 void Timesystem::onEconomicStateChanged(int newGoldAmount, int delta) {
-    // 更新金钱显示
     if (currency_num) {
         currency_num->setString(std::to_string(newGoldAmount));
     }
@@ -163,6 +162,11 @@ void Timesystem::onEnergyStateChanged(int newEnergy, int maxEnergy) {
 
 // 析构函数实现
 Timesystem::~Timesystem() {
-    // 从体力系统中移除自己作为观察者
-    EnergySystem::getInstance()->removeObserver(this);
+    // 注销观察者
+    if (EnergySystem::getInstance()) {
+        EnergySystem::getInstance()->removeObserver(this);
+    }
+    if (EconomicSystem::getInstance()) {
+        EconomicSystem::getInstance()->removeObserver(this);
+    }
 }

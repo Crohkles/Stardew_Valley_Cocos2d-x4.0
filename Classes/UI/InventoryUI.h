@@ -6,7 +6,7 @@
 #include "intimacyUI.h"
 #include "SkillTreeUI.h"
 
-class InventoryUI : public cocos2d::Layer {
+class InventoryUI : public cocos2d::Layer, public GameStateObserver {
 public:
     virtual bool init ( Inventory* inventory , std::string sceneName );
     
@@ -23,6 +23,8 @@ public:
     void Buttons_switching ();
 
     void updateCoordinate ( float &x , float &y );
+    
+    virtual void onInventoryStateChanged() override;
 private:
     Inventory* _inventory; // 指向 Inventory 实例的指针  
 

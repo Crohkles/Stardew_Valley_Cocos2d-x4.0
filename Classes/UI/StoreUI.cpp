@@ -13,6 +13,15 @@ static void problemLoading ( const char* filename )
     printf ( "Depending on how you compiled you might have to add 'Resources/' in front of filenames in CreateCharacterScene.cpp\n" );
 }
 
+StoreUI::~StoreUI() {
+    if (_mybag) {
+        _mybag->removeObserver(this);
+    }
+    if (EconomicSystem::getInstance()) {
+        EconomicSystem::getInstance()->removeObserver(this);
+    }
+}
+
 void StoreUI::updateCoordinate ( float& x , float& y ) {
     Vec2 position = player1->getPosition ();
     if (x <= 725) {
@@ -60,68 +69,70 @@ void StoreUI::backgroundcreate () {
         mybag->setPosition ( Vec2 ( currentx + visibleSize.width * 0.2 , currenty - visibleSize.height * 0.25 ) );
         this->addChild ( mybag , 1 );
 
-        auto listener = EventListenerMouse::create ();
-        // 检查鼠标是否点击了背包物品槽  
-           // 添加鼠标按下事件  
-        listener->onMouseDown = [this , mybag]( EventMouse* event ) {
-            Vec2 mousePos = Vec2 ( event->getCursorX () , event->getCursorY () );
-            mousePos = this->convertToNodeSpace ( mousePos );
+        // 购买逻辑修改
+        auto listener = EventListenerMouse::create();
+        listener->onMouseDown = [this, mybag](EventMouse* event) {
+            Vec2 mousePos = Vec2(event->getCursorX(), event->getCursorY());
+            mousePos = this->convertToNodeSpace(mousePos);
 
-            // 检查鼠标是否点击了 mybag  
-            if (mybag->getBoundingBox ().containsPoint ( mousePos )) {
-                if (isClick) {
-                    //economicSystem->buyItem ( chosen_Item->GetName () );
-                    int goldAmount = economicSystem->getGoldAmount ();
-                    CCLOG ( "goldAmount: %d , Value: %d" , goldAmount , chosen_Item->GetValue () );
-                    std::string chosen_item_name = chosen_Item->GetName ();
-                    if (goldAmount >= chosen_Item->GetValue ()) {
-                        //若所选物品为动物
-                        if (chosen_item_name.find ( "Animal" )!=std::string::npos) {
-                            std::pair<Rect , bool>* space = nullptr;
+            if (mybag->getBoundingBox().containsPoint(mousePos)) {
+                if (isClick && chosen_Item) {
+                    // 获取单例
+                    auto ecoSystem = EconomicSystem::getInstance();
+                    int goldAmount = ecoSystem->getGoldAmount();
+                    int price = chosen_Item->GetValue();
+                    std::string itemName = chosen_Item->GetName();
+
+                    if (goldAmount >= price) {
+                        bool purchaseSuccess = false;
+
+                        // 动物购买逻辑
+                        if (itemName.find("Animal") != std::string::npos) {
+                            std::pair<Rect, bool>* space = nullptr;
                             for (auto& pair : barn_space) {
-                                //畜棚仍有空间
                                 if (!pair.second) {
                                     space = &pair;
                                     break;
                                 }
                             }
-                            //若有空间
                             if (space != nullptr) {
-                                // 使用Factory Method模式创建动物，替代硬编码的if-else链条
-                                Livestock* livestock = AnimalFactory::getInstance()->createAnimal(chosen_item_name, space->first);
-                                
-                                if (livestock != nullptr) {
+                                Livestock* livestock = AnimalFactory::getInstance()->createAnimal(itemName, space->first);
+                                if (livestock) {
                                     space->second = true;
-                                    livestocks.push_back ( livestock );
-                                    livestock->retain ();
-                                    economicSystem->subtractGold ( chosen_Item->GetValue () );
-                                    updateDisplay ();
-                                    CCLOG ( "Purchased item: %s" , chosen_Item->GetName ().c_str () );
+                                    livestocks.push_back(livestock);
+                                    livestock->retain();
+                                    purchaseSuccess = true;
                                 }
-                                else {
-                                    CCLOG ( "Failed to create animal of type: %s" , chosen_item_name.c_str () );
-                                }
+                            } else {
+                                CCLOG("No space in barn for %s", itemName.c_str());
                             }
-                            else {
-                                CCLOG ( "fail to place %s in your barn" , chosen_item_name.c_str () );
-                            }
-                            
-                        }
+                        } 
+                        // 普通物品购买逻辑
                         else {
-                            economicSystem->subtractGold ( chosen_Item->GetValue () );
-                            _mybag->AddItem ( *chosen_Item );
-                            updateDisplay ();
-                            CCLOG ( "Purchased item: %s" , chosen_Item->GetName ().c_str () );
+                            if (_mybag->AddItem(*chosen_Item)) {
+                                purchaseSuccess = true;
+                            } else {
+                                CCLOG("Inventory full!");
+                            }
                         }
-                    }
-                    else {
-                        CCLOG ( "Not enough gold to buy %s." , chosen_Item->GetName ().c_str () );
+
+                        // 如果购买成功：扣钱
+                        if (purchaseSuccess) {
+                            ecoSystem->subtractGold(price);
+                            CCLOG("Purchased: %s", itemName.c_str());
+                            
+                            // 【关键点】这里删除了 updateDisplay()
+                            // subtractGold -> 触发 onEconomicStateChanged -> 更新钱
+                            // _mybag->AddItem -> 触发 onInventoryStateChanged -> 更新格子
+                        }
+                    } else {
+                        CCLOG("Not enough gold!");
                     }
                     isClick = false;
                     chosen_Item = nullptr;
                 }
             }
-            };
+        };
         _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , mybag );
     }
 
@@ -438,7 +449,7 @@ void StoreUI::moneyDisplay () {
     updateCoordinate ( currentx , currenty );
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
     //金币更新
-    int goldAmount = economicSystem->getGoldAmount ();
+    int goldAmount = EconomicSystem::getInstance()->getGoldAmount ();
     if (Gold_Amount_Label == nullptr) {
         Gold_Amount_Label = Label::createWithSystemFont ( std::to_string ( goldAmount ) , "fonts/Comic Sans MS.ttf" , 45 );
         Gold_Amount_Label->setTextColor ( Color4B::BLACK );
@@ -458,27 +469,20 @@ bool StoreUI::init ( Inventory* mybag , Inventory* goods ) {
 
     _mybag = mybag;
     _goods = goods;
-    economicSystem = std::make_shared<EconomicSystem> ( _mybag , _goods); // 在这里初始化  
-    CCLOG ( "%d" , economicSystem->getGoldAmount () );
-
-    // 注册观察者
-    economicSystem->addObserver(this);
-    if (TimeUI) {
-        economicSystem->addObserver(TimeUI);
+    
+    EconomicSystem::getInstance()->addObserver(this);
+    
+    if (_mybag) {
+        _mybag->addObserver(this);
     }
 
     backgroundcreate ();
-
     ProductDisplay ( mybag , goods );
-
     SliderDisplay ();
-
     Itemblock ( mybag , goods );
 
 
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
-
-  
     if (_itemLabel) {
         _itemLabel->setPosition ( visibleSize.width / 2 , visibleSize.height / 4 );
         this->addChild ( _itemLabel , 10 ); // 添加到层级中  
@@ -638,3 +642,9 @@ void StoreUI::onEconomicStateChanged(int newGoldAmount, int delta) {
         Gold_Amount_Label->setString(std::to_string(newGoldAmount));
     }
 }
+
+void StoreUI::onInventoryStateChanged() {
+    // 监听到背包变化，刷新 UI
+    this->updateDisplay();
+}
+

@@ -208,63 +208,44 @@ GameInteractionFacade::ItemSaleResult
 GameInteractionFacade::sellItem(std::shared_ptr<Item> item, int quantity, mini_bag* miniBag) {
     ItemSaleResult result;
     
-    // 基础验证
     if (!validateItemSale(item, quantity, miniBag)) {
-        result.message = "Invalid item sale parameters";
+        result.message = "Invalid parameters";
         return result;
     }
     
-    // 获取物品信息
     result.itemName = item->GetName();
     result.quantity = quantity;
     int unitValue = item->GetValue();
     result.goldEarned = unitValue * quantity;
     
-    // 检查背包中是否有足够的物品数量
-    // 注意：这里简化处理，实际检查在移除时进行
-    
-    // 执行出售
+    // 1. 从背包移除物品
     bool removedFromInventory = false;
     if (playerInventory) {
-        // 使用Inventory的RemoveItem方法，它会处理数量
         int removeResult = playerInventory->RemoveItem(*item, quantity);
         if (removeResult != -1) {
-            // 成功移除物品（removeResult: 0=部分移除, 1=完全清空槽位）
             removedFromInventory = true;
-        } else {
-            result.message = "Item not found in inventory: " + result.itemName;
-            return result;
         }
     }
     
     if (removedFromInventory) {
-        // 增加金币
-        int oldGold = GoldAmount;
-        GoldAmount += result.goldEarned;
-        result.currentGold = GoldAmount;
+        // 2. 使用单例增加金币
+        // 这会自动触发 onEconomicStateChanged 通知
+        EconomicSystem::getInstance()->addGold(result.goldEarned);
         
-        // 如果有经济系统，也更新它
-        if (economicSystem) {
-            economicSystem->addGold(result.goldEarned);
-        }
+        result.currentGold = EconomicSystem::getInstance()->getGoldAmount();
         
-        // 重置mini_bag选择状态
+        // 3. 重置 UI 状态
         if (miniBag) {
             miniBag->getSelectBack();
         }
         
-        // 更新UI
-        updateEconomicSystemUI();
+        // 注意：无需手动 updateUI，观察者模式会自动处理
         
         result.success = true;
-        result.message = "Sold " + std::to_string(quantity) + "x " + result.itemName + 
-                        " for " + std::to_string(result.goldEarned) + " gold";
-        
-        CCLOG("GameFacade: %s (total gold: %d)", result.message.c_str(), result.currentGold);
+        result.message = "Sold " + std::to_string(quantity) + "x " + result.itemName;
+        CCLOG("Facade: %s", result.message.c_str());
     } else {
-        result.message = "Failed to remove items from inventory";
-        CCLOG("GameFacade: Failed to sell %s - could not remove from inventory", 
-              result.itemName.c_str());
+        result.message = "Failed to remove items";
     }
     
     return result;
@@ -352,10 +333,5 @@ bool GameInteractionFacade::validateItemSale(std::shared_ptr<Item> item, int qua
 }
 
 void GameInteractionFacade::updateEconomicSystemUI() {
-    // 更新经济系统相关的UI显示
-    // 目前金币显示通过TimeUI处理
-    if (TimeUI) {
-        // TimeUI会自动读取GoldAmount全局变量来显示
-        // 如果有特定的更新方法，可以在这里调用
-    }
+    // 留空，由观察者模式处理
 }
