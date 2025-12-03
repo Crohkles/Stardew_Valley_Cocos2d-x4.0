@@ -10,8 +10,9 @@
 USING_NS_CC;
 
 InventoryUI::~InventoryUI() {
-    // 析构函数中不自动重置状态，让UICommand的检查逻辑处理
-    // 这样可以避免UI切换时意外重置状态
+    if (_inventory) {
+        _inventory->removeObserver(this);
+    }
 }
 
 static void problemLoading ( const char* filename )
@@ -113,9 +114,13 @@ void InventoryUI::Itemblock ( Inventory* inventory ) {
     updateCoordinate ( currentx , currenty );
     auto visibleSize = Director::getInstance ()->getVisibleSize ();
     Vec2 origin = Director::getInstance ()->getVisibleOrigin ();
-    _inventory = inventory;
     _selectedSlot = 1; // 默认选中第一个槽位  
 
+    // 清理可能存在的旧格子
+    for(auto slot : _itemSlots) {
+        slot->removeFromParent();
+    }
+    _itemSlots.clear();
 
     // 初始化物品槽 Sprite 
     for (int m = 0; m < 3; m++)
@@ -135,7 +140,7 @@ void InventoryUI::Itemblock ( Inventory* inventory ) {
             float bagWidth = bag->getContentSize ().width;
             float bagHeight = bag->getContentSize ().height;
             slot->setPosition ( currentx - bagWidth * 0.545 + (originalWidth * scale / 16.5 + 5) * i , currenty + bagHeight * 1.73 / 3.643 - m * (originalHeight * scale / 16.5 + 10) ); // 计算槽位位置  
-            slot->setTag ( i + 1 ); // 设置槽位的标签  
+            slot->setTag(i + 1 + m * 12); // 修正 Tag，确保唯一
             this->addChild ( slot , 2 );
 
             _itemSlots.pushBack ( slot );
@@ -147,6 +152,11 @@ void InventoryUI::Itemblock ( Inventory* inventory ) {
 bool InventoryUI::init ( Inventory* inventory , std::string sceneName ) {
     if (!Layer::init ()) {
         return false;
+    }
+
+    _inventory = inventory;
+    if (_inventory) {
+        _inventory->addObserver(this);
     }
 
     SceneName = sceneName;
@@ -212,22 +222,24 @@ void InventoryUI::Buttons_switching () {
         }
         else if (Skillkey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
-            // UI切换时不重置状态，保持UI系统打开
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( SkillTreeUI::create ( nowScene ) , 20 );
+            auto skillTreeUI = SkillTreeUI::create(nowScene);
+            Director::getInstance()->getRunningScene()->addChild(skillTreeUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::SkillTree, skillTreeUI);
+            this->removeFromParent();
         }
         else if (intimacykey->getBoundingBox ().containsPoint ( mousePos )) {
-            // 移除当前的Layer
             std::string nowScene = SceneName;
-            // UI切换时不重置状态，保持UI系统打开
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( intimacyUI::create ( nowScene ) , 20 );
+            auto intimacyUI = intimacyUI::create(nowScene);
+            Director::getInstance()->getRunningScene()->addChild(intimacyUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::Intimacy, intimacyUI);
+            this->removeFromParent();
         }
         else if (quitkey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
-            // UI切换时不重置状态，保持UI系统打开
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( quitUI::create ( nowScene ) , 20 );
+            auto quitUI = quitUI::create(nowScene);
+            Director::getInstance()->getRunningScene()->addChild(quitUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::Quit, quitUI);
+            this->removeFromParent();
         }
         };
     _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , this );
@@ -253,6 +265,10 @@ void InventoryUI::updateDisplay () {
         // 获取当前选择的物品的槽位  
         for (int i = 0; i < kRowSize; ++i) {
             int serial_number = i + m * 12;
+            
+            // 安全检查，防止越界
+            if (serial_number >= _itemSlots.size()) continue;
+            
             auto slot = _itemSlots.at ( serial_number );
             slot->setVisible ( true ); // 确保显示所有槽位  
 
@@ -367,4 +383,8 @@ void InventoryUI::updateDisplay () {
     else {
         CCLOG ( "Warning: _itemLabel is nullptr" );
     }
+}
+
+void InventoryUI::onInventoryStateChanged() {
+    this->updateDisplay();
 }

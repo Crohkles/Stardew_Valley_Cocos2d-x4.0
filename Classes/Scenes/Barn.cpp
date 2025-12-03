@@ -170,13 +170,7 @@ bool Barn::init ()
     }
 
 
-    // 更新物品栏
-    schedule ( [=]( float deltaTime ) {
-        if (inventory->is_updated == true) {
-            miniBag->updateDisplay ();
-            inventory->is_updated = false;
-        }
-        } , 0.1f , "item_update_key" );
+    // 移除更新物品栏轮询，交给Observer
 
     return true;
 }

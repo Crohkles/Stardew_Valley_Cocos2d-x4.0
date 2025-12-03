@@ -277,12 +277,6 @@ bool farm::init ()
         this->addChild ( miniBag , 10 , "mini_bag" );
     }
 
-
-    // 通过 Observer 模式：当背包内容发生变化时自动刷新小背包显示
-    if (inventory && miniBag) {
-        inventory->addObserver(miniBag);
-    }
-
     return true;
 }
 
@@ -373,7 +367,7 @@ void farm::checkPlayerPosition ()
 
     // 剩余时间递增，达到阈值后进入新的一天
     remainingTime++;
-    if (remainingTime == 43200 || strength == 0) {
+    if (remainingTime == 43200 || EnergySystem::getInstance()->getCurrentEnergy() == 0) {
 
         day++;
 
@@ -730,7 +724,7 @@ void farm::performPlantAction() {
             if (point != cropbasicinformation.end()) {
                 CCLOG("find crop");
                 // 满足季节与体力条件时才允许种植
-                if (((cropbasicinformation[TypeName].GetSeason() == Season) || (cropbasicinformation[TypeName].GetSeason() == "All")) && strength >= 10) {
+                if (((cropbasicinformation[TypeName].GetSeason() == Season) || (cropbasicinformation[TypeName].GetSeason() == "All")) && EnergySystem::getInstance()->getCurrentEnergy() >= 10) {
                     inventory->RemoveItem(*temp);
 
                     if (nums == 13 && RainBowfirst) {
@@ -741,8 +735,7 @@ void farm::performPlantAction() {
                         RainBowfirst = false;
                     }
 
-                    strength -= 10;
-                    TimeUI->UpdateEnergy();
+                    EnergySystem::getInstance()->reduceEnergy(10);
 
                     Crop_information.push_back(cropbasicinformation[TypeName].GetCropCopy());
                     Crop_information.back()->plant_day = season[Season] * 7 + day;
@@ -882,7 +875,7 @@ void farm::performHarvestAction() {
 
     for (auto it = Crop_information.begin(); it != Crop_information.end(); /* no increment here */) {
         if ((*it)->nums == nums) {
-            if ((*it)->GetPhase() == Phase::MATURE && strength >= 10) {
+            if ((*it)->GetPhase() == Phase::MATURE && EnergySystem::getInstance()->getCurrentEnergy() >= 10) {
 
                 skill_tree->AddExperience(farming_skill, 10);
 
@@ -892,8 +885,7 @@ void farm::performHarvestAction() {
                     inventory->AddItem(potato);
                 }
 
-                strength -= 10;
-                TimeUI->UpdateEnergy();
+                EnergySystem::getInstance()->reduceEnergy(10);
 
                 // 使用对象池移除作物精灵并替换为土地瓦片
                 auto cropPool = CropSpritePool::getInstance();

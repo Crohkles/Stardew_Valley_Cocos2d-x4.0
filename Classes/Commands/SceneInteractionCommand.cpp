@@ -207,7 +207,7 @@ void FishingCommand::undo() {
 
 bool FishingCommand::canExecute() const {
     return currentScene != nullptr && player != nullptr && 
-           strength >= 10 && 
+           EnergySystem::getInstance()->getCurrentEnergy() >= 10 && 
            !currentScene->getChildByName("FishingGameLayer");
 }
 
@@ -237,10 +237,9 @@ void MiningCommand::execute() {
         float distance = ore->position.distance(playerPos);
         
         // 检查距离、可用性和体力
-        if (distance <= 75 && ore->available && strength >= 10) {
+        if (distance <= 75 && ore->available && EnergySystem::getInstance()->getCurrentEnergy() >= 10) {
             
-            strength -= 10;
-            TimeUI->UpdateEnergy();
+            EnergySystem::getInstance()->reduceEnergy(10);
             
             skill_tree->AddExperience(mining_skill, 10);
             
@@ -351,10 +350,9 @@ void LoggingCommand::execute() {
         float distance = tree->position.distance(playerPos);
         
         // 检查距离、可用性和体力
-        if ((distance <= 250 && tree->available) && strength >= 10) {
+        if ((distance <= 250 && tree->available) && EnergySystem::getInstance()->getCurrentEnergy() >= 10) {
             
-            strength -= 10;
-            TimeUI->UpdateEnergy();
+             EnergySystem::getInstance()->reduceEnergy(10);
             
             // 根据技能等级减少砍伐次数
             if (skill_tree->GetSkillLevels()[foraging_skill] >= 5) {

@@ -1,4 +1,5 @@
 #include "TaskManagement.h"
+#include "EconomicSystem.h"
 
 TaskManagement::TaskManagement () {}
 
@@ -12,48 +13,48 @@ void TaskManagement::AddAcceptTask ( const Task& task ) {
     acceptTasks.push_back ( task );
 }
 
-// 完成任务并获得奖励
-void TaskManagement::completeTask ( const std::string& task_name ) {
-    // 查找已接受的任务
-    auto it = std::find_if ( acceptTasks.begin () , acceptTasks.end () ,
-                            [&task_name]( const Task& task ) {
-                                return task.name == task_name;
-                            } );
+void TaskManagement::completeTask(const std::string& task_name) {
+    auto it = std::find_if(acceptTasks.begin(), acceptTasks.end(),
+        [&task_name](const Task& task) {
+            return task.name == task_name;
+        });
 
-    // 如果找到了任务
-    if (it != acceptTasks.end ()) {
+    if (it != acceptTasks.end()) {
         const Task& task = *it;
 
-        // 根据任务类型增加金币和/或物品
+        // 奖励处理
         if (task.type == NPC_TASK || task.type == SYSTEM_TASK) {
-            GoldAmount += 400; // 假设GoldAmount是类的成员变量
-            for (const auto& requiredItem : task.requiredItems) {
-                inventory->RemoveItem ( requiredItem , 1 ); // 移除物品
+            int reward = (task.rewardCoins > 0) ? task.rewardCoins : 400;
+            
+            // 使用单例发放金币奖励 -> 触发 Observer -> 更新 UI
+            EconomicSystem::getInstance()->addGold(reward);
+            
+            // 移除任务物品
+            if (inventory) {
+                for (const auto& requiredItem : task.requiredItems) {
+                    inventory->RemoveItem(requiredItem, 1);
+                }
             }
         }
 
-        // 如果是NPC任务，增加对应NPC的好感度
         if (task.type == NPC_TASK) {
-            npc_relationship->increaseRelationship ( "player" , task.npcName , task.relationshipPoints );
+            npc_relationship->increaseRelationship("player", task.npcName, task.relationshipPoints);
         }
-        // 如果是节日任务，增加所有NPC的好感度，并处理特殊奖励
         else if (task.type == FESTIVAL_TASK) {
-            for (const Item& item : task.specialRewards) {
-                inventory->AddItem ( item ); // 假设inventory是类的成员变量，需要添加物品
+            if (inventory) {
+                for (const Item& item : task.specialRewards) {
+                    inventory->AddItem(item);
+                }
             }
-            npc_relationship->increaseRelationship ( "player" , "Alex" , task.relationshipPoints );
-            npc_relationship->increaseRelationship ( "player" , "Abigail" , task.relationshipPoints );
-            npc_relationship->increaseRelationship ( "player" , "Caroline" , task.relationshipPoints );
-            npc_relationship->increaseRelationship ( "player" , "Elliott" , task.relationshipPoints );
-            npc_relationship->increaseRelationship ( "player" , "Emily" , task.relationshipPoints );
+            // 增加好感度逻辑
+            npc_relationship->increaseRelationship("player", "Alex", task.relationshipPoints);
+            npc_relationship->increaseRelationship("player", "Abigail", task.relationshipPoints);
+            npc_relationship->increaseRelationship("player", "Caroline", task.relationshipPoints);
+            npc_relationship->increaseRelationship("player", "Elliott", task.relationshipPoints);
+            npc_relationship->increaseRelationship("player", "Emily", task.relationshipPoints);
         }
 
-        // 从已接受的任务列表中移除任务
-        acceptTasks.erase ( it );
-    }
-    else {
-        // 如果没有找到任务，抛出异常
-        // throw std::runtime_error ( "Task not found in accepted tasks." );
+        acceptTasks.erase(it);
     }
 }
 

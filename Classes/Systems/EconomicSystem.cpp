@@ -1,77 +1,57 @@
 #include "EconomicSystem.h"  
-#include "cocos2d.h"  // 确保包含 cocos2d.h 来使用 CCLOG  
-#include <iostream>  
+#include "cocos2d.h"  
 
+// 引用全局变量以保持兼容性
 extern int GoldAmount;
 
-// 构造函数初始化金币数量为4000  
-EconomicSystem::EconomicSystem ( Inventory* mybag , Inventory* goods)
-    : goldAmount (GoldAmount) , _mybag ( mybag ) , _goods ( goods ) {
-    // 初始化代码可以在这里执行  
+EconomicSystem* EconomicSystem::instance = nullptr;
+
+EconomicSystem::EconomicSystem() {
+    // 初始化时同步全局变量
+    this->goldAmount = GoldAmount;
 }
 
-// 析构函数  
-EconomicSystem::~EconomicSystem () {
-    // 清理代码  
-    GoldAmount = goldAmount;
+EconomicSystem::~EconomicSystem() {
+    // 析构时反向同步（保底）
+    GoldAmount = this->goldAmount;
 }
 
-// 增加金币的函数  
-void EconomicSystem::addGold ( int amount ) {
+EconomicSystem* EconomicSystem::getInstance() {
+    if (instance == nullptr) {
+        instance = new EconomicSystem();
+    }
+    return instance;
+}
+
+void EconomicSystem::destroyInstance() {
+    if (instance != nullptr) {
+        delete instance;
+        instance = nullptr;
+    }
+}
+
+void EconomicSystem::addGold(int amount) {
     if (amount > 0) {
         goldAmount += amount;
-        CCLOG ( "Added %d gold. Total: %d gold." , amount , goldAmount );
-        // 通知所有观察者金钱状态变化
+        GoldAmount = goldAmount; // 实时同步
+        CCLOG("EconomicSystem: Added %d gold. Total: %d", amount, goldAmount);
+        // 通知观察者 (Timesystem, StoreUI 等)
         notifyEconomicStateChanged(goldAmount, amount);
     }
-    else {
-        CCLOG ( "Amount to add must be positive." );
-    }
 }
 
-// 减少金币的函数  
-void EconomicSystem::subtractGold ( int amount ) {
+void EconomicSystem::subtractGold(int amount) {
     if (amount > 0 && amount <= goldAmount) {
         goldAmount -= amount;
-        CCLOG ( "Subtracted %d gold. Total: %d gold." , amount , goldAmount );
-        // 通知所有观察者金钱状态变化
+        GoldAmount = goldAmount; // 实时同步
+        CCLOG("EconomicSystem: Subtracted %d gold. Total: %d", amount, goldAmount);
+        // 通知观察者
         notifyEconomicStateChanged(goldAmount, -amount);
-    }
-    else {
-        if (amount > goldAmount) {
-            CCLOG ( "Not enough gold to subtract." );
-        }
-        else {
-            CCLOG ( "Amount to subtract must be positive." );
-        }
+    } else {
+        CCLOG("EconomicSystem: Failed to subtract %d gold. Not enough money.", amount);
     }
 }
 
-// 读取拥有金币数量的函数  
-int EconomicSystem::getGoldAmount () const {
+int EconomicSystem::getGoldAmount() const {
     return goldAmount;
-}
-
-// 购买函数  
-void EconomicSystem::buyItem ( const string& itemName ) {
-    Item item = _goods->GetItemByName ( itemName );
-
-    if (goldAmount >= item.GetValue ()) {
-        subtractGold ( item.GetValue () );
-        _mybag->AddItem ( item );
-        CCLOG ( "Purchased item: %s" , itemName.c_str () );
-    }
-    else {
-        CCLOG ( "Not enough gold to buy %s." , itemName.c_str () );
-    }
-}
-
-// 出售函数  
-void EconomicSystem::sellItem ( const string& itemName , int count) {
-    Item item = _mybag->GetItemByName ( itemName ); // 从背包中获取物品  
-
-    int itemValue = item.GetValue (); // 获取卖出价格  
-    addGold ( itemValue * count );
-    _mybag->RemoveItem ( item , count );
-    CCLOG ( "Sold item: %s for %d gold." , itemName.c_str () , itemValue * count );
 }

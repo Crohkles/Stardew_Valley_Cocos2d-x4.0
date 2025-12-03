@@ -8,6 +8,7 @@
 #include "../Commands/UICommand.h"
 #include "../Commands/GameActionCommand.h"
 #include "../Items/Generaltem.h"  // 引入flyweight物品系统
+#include "../Systems/EnergySystem.h"
 
 
 USING_NS_CC;
@@ -169,13 +170,6 @@ bool Beach::init ()
     }
     if (!this->getChildByName ( "mini_bag" )) {
         this->addChild ( miniBag , 10 , "mini_bag" );
-    }
-
-
-    // 使用Observer模式自动更新物品栏（无需轮询）
-    // 注册观察者
-    if (inventory && miniBag) {
-        inventory->addObserver(miniBag);
     }
 
     if (Festival == "Fishing Festival") {
@@ -370,7 +364,6 @@ bool Beach::init ()
                                 Vec2 playerPos = player1->getPosition();
                                 npc_relationship->increaseRelationship("player", npc->GetName(), 15.2);
                                 inventory->RemoveItem(miniBag->getSelectedSlot());
-                                inventory->is_updated = true;
                                 npc_relationship->AddGiftTime(npc->GetName());
                                 // 这里改成礼物的图
                                 auto ItemClickByminiBag = Sprite::create("npc/gift.png");
@@ -438,7 +431,7 @@ void Beach::CheckPlayerPosition ()
 
     // 更新计时器显示
     remainingTime++;
-    if (remainingTime == 43200 || strength == 0) {
+    if (remainingTime == 43200 || EnergySystem::getInstance()->getCurrentEnergy() == 0) {
 
         day++;
 

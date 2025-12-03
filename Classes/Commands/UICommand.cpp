@@ -14,8 +14,8 @@ USING_NS_CC;
 // ==================== ToggleInventoryCommand 实现 ====================
 
 // 静态成员初始化
-bool ToggleInventoryCommand::isInventoryOpen = false;
-InventoryUI* ToggleInventoryCommand::currentInventoryUI = nullptr;
+ToggleInventoryCommand::UIState ToggleInventoryCommand::currentState = ToggleInventoryCommand::UIState::None;
+cocos2d::Node* ToggleInventoryCommand::currentUI = nullptr;
 
 ToggleInventoryCommand::ToggleInventoryCommand(cocos2d::Node* parent, Inventory* inv, const std::string& scene)
     : parentNode(parent), inventory(inv), sceneType(scene) {
@@ -33,14 +33,14 @@ void ToggleInventoryCommand::execute() {
         return;
     }
     
-    // 检查当前currentInventoryUI是否仍然有效
-    if (currentInventoryUI) {
+    // 检查当前currentUI是否仍然有效
+    if (currentUI) {
         // 使用安全的方法检查UI是否仍在场景中
         bool isValid = false;
         try {
             // 检查引用计数，如果对象已被销毁，这里可能会出现问题
-            if (currentScene && currentInventoryUI->getReferenceCount() > 0) {
-                auto parent = currentInventoryUI->getParent();
+            if (currentScene && currentUI->getReferenceCount() > 0) {
+                auto parent = currentUI->getParent();
                 if (parent == currentScene) {
                     isValid = true;
                 }
@@ -51,32 +51,31 @@ void ToggleInventoryCommand::execute() {
         }
         
         if (!isValid) {
-            // InventoryUI已经无效，重置状态
-            CCLOG("InventoryUI is invalid, resetting state");
-            isInventoryOpen = false;
-            currentInventoryUI = nullptr;
+            // UI已经无效，重置状态
+            CCLOG("UI is invalid, resetting state");
+            currentState = UIState::None;
+            currentUI = nullptr;
         }
     }
     
-    // 如果当前没有打开背包界面，则打开它
-    if (!isInventoryOpen || currentInventoryUI == nullptr) {
-        isInventoryOpen = true;
+    // 如果当前状态为None，则打开背包界面
+    if (currentState == UIState::None) {
         CCLOG("Opening inventory for scene: %s", sceneType.c_str());
         
-        currentInventoryUI = InventoryUI::create(inventory, sceneType);
-        if (currentInventoryUI) {
-            currentScene->addChild(currentInventoryUI, 20);  // 将 InventoryUI 添加到当前场景上层
+        auto inventoryUI = InventoryUI::create(inventory, sceneType);
+        if (inventoryUI) {
+            currentScene->addChild(inventoryUI, 20);  // 将 InventoryUI 添加到当前场景上层
+            updateState(UIState::Inventory, inventoryUI);
         }
     }
-    // 如果已经打开背包界面，则关闭它
+    // 如果状态不为None，则统一关闭当前打开的UI
     else {
-        isInventoryOpen = false;
-        CCLOG("Closing inventory");
+        CCLOG("Closing current UI, state: %d", static_cast<int>(currentState));
         
-        if (currentInventoryUI && currentScene) {
-            currentScene->removeChild(currentInventoryUI, true);  // 从当前场景中移除 InventoryUI
+        if (currentUI && currentScene) {
+            currentScene->removeChild(currentUI, true);  // 从当前场景中移除 UI
         }
-        currentInventoryUI = nullptr;  // 重置指针
+        resetState();
     }
 }
 
@@ -94,16 +93,21 @@ std::string ToggleInventoryCommand::getDescription() const {
 }
 
 void ToggleInventoryCommand::resetState() {
-    isInventoryOpen = false;
-    currentInventoryUI = nullptr;
+    currentState = UIState::None;
+    currentUI = nullptr;
 }
 
-void ToggleInventoryCommand::onInventoryUIDestroyed(InventoryUI* ui) {
-    // 当InventoryUI被外部销毁时，重置静态指针
-    if (currentInventoryUI == ui) {
-        CCLOG("InventoryUI destroyed externally, resetting state");
-        isInventoryOpen = false;
-        currentInventoryUI = nullptr;
+void ToggleInventoryCommand::updateState(UIState newState, cocos2d::Node* ui) {
+    currentState = newState;
+    currentUI = ui;
+    CCLOG("UI State updated to: %d", static_cast<int>(newState));
+}
+
+void ToggleInventoryCommand::onUIDestroyed(cocos2d::Node* ui) {
+    // 当UI被外部销毁时，重置静态指针
+    if (currentUI == ui) {
+        CCLOG("UI destroyed externally, resetting state");
+        resetState();
     }
 }
 

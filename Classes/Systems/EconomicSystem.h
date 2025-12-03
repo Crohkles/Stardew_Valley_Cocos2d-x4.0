@@ -1,41 +1,37 @@
 #ifndef ECONOMIC_SYSTEM_H  
 #define ECONOMIC_SYSTEM_H  
 
-#include <string>  
-#include "../Items/Item.h"
-#include "Inventory.h"
 #include "../Core/GameStateObserver.h"
 
-using namespace std;
+// EconomicSystem 现在是一个纯粹的单例，只负责管理全局金钱状态
+// 移除了 Inventory 指针，解除了循环依赖
 
 class EconomicSystem : public GameStateSubject {
-public:
-    // 构造函数和析构函数  
-    EconomicSystem ( Inventory* mybag , Inventory* goods);
-    ~EconomicSystem ();
-
-    // 增加金币的函数  
-    void addGold ( int amount );
-
-    // 减少金币的函数  
-    void subtractGold ( int amount );
-
-    // 读取拥有金币数量的函数  
-    int getGoldAmount () const;
-
-    // 购买函数  
-    void buyItem ( const string& itemName );
-
-    // 出售函数  
-    void sellItem ( const string& itemName , int count = 1 );
-
 private:
-    // 保存金币数量
+    static EconomicSystem* instance;
     int goldAmount;
 
-    Inventory* _mybag; // 指向自己背包实例的指针  
+    // 私有构造函数
+    EconomicSystem(); 
 
-    Inventory* _goods; // 指向商品实例的指针  
+public:
+    // 禁止拷贝
+    EconomicSystem(const EconomicSystem&) = delete;
+    EconomicSystem& operator=(const EconomicSystem&) = delete;
+
+    ~EconomicSystem();
+
+    // 获取单例
+    static EconomicSystem* getInstance();
+    static void destroyInstance();
+
+    // 核心功能：增减金币并通知
+    void addGold(int amount);
+    void subtractGold(int amount);
+    int getGoldAmount() const;
+    
+    // 注意：原有的 buyItem 和 sellItem 被移除
+    // 购买逻辑移至 StoreUI/Facade，出售逻辑移至 GameInteractionFacade
 };
 
-#endif  // ECONOMIC_SYSTEM_H
+#endif

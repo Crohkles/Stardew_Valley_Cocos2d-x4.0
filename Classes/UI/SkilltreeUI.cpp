@@ -2,6 +2,7 @@
 #include "ui/CocosGUI.h"  
 #include "SkillTreeUI.h"
 #include "quitUI.h"
+#include "../Factories/SceneBoundaryFactory.h"
 
 const int characternum = 5;
 
@@ -15,64 +16,26 @@ static void problemLoading ( const char* filename )
 
 void SkillTreeUI::updateCoordinate ( float& x , float& y ) {
     Vec2 position = player1->getPosition ();
-    float  Leftboundary = -10000.0f , rightboundary = 10000.0f , upperboundary = 10000.0f , lowerboundary = 10000.0f;
-    if (SceneName == "Town") {
-        Leftboundary = -170.0f;
-        rightboundary = 1773.0f;
-        upperboundary = 1498.0f;
-        lowerboundary = -222.0f;
+    
+    // 使用工厂模式获取边界配置
+    auto boundary = SceneBoundaryFactory::getBoundaryConfig(SceneName);
+    
+    // 应用边界限制
+    if (x <= boundary.left) {
+        x = boundary.left;
     }
-    else if (SceneName == "Cave") {
-        Leftboundary = 786.0f;
-        rightboundary = 817.0f;
-        upperboundary = 808.0f;
-        lowerboundary = 460.0f;
-    }
-    else if (SceneName == "Beach") {
-        Leftboundary = -315.0f;
-        rightboundary = 20000.0f;
-        upperboundary = 920.0f;
-        lowerboundary = 360.0f;
-    }
-    else if (SceneName == "Forest") {
-        Leftboundary = -600.0f;
-        rightboundary = 2197.0f;
-        upperboundary = 2200.0f;
-        lowerboundary = -850.0f;
-    }
-    else if (SceneName == "farm") {
-        Leftboundary = 637.0f;
-        rightboundary = 960.0f;
-        upperboundary = 777.0f;
-        lowerboundary = 500.0f;
-    }
-    else if (SceneName == "Barn") {
-        Leftboundary = 805.0f;
-        rightboundary = 805.0f;
-        upperboundary = 569.0f;
-        lowerboundary = 569.0f;
-    }
-    else if (SceneName == "Myhouse") {
-        Leftboundary = 800.0f;
-        rightboundary = 800.0f;
-        upperboundary = 580.0f;
-        lowerboundary = 580.0f;
-    }
-    if (x <= Leftboundary) {
-        x = Leftboundary;
-    }
-    else if (x >= rightboundary) {
-        x = rightboundary;
+    else if (x >= boundary.right) {
+        x = boundary.right;
     }
     else {
         x = position.x;
     }
 
-    if (y >= upperboundary) {
-        y = upperboundary;
+    if (y >= boundary.upper) {
+        y = boundary.upper;
     }
-    else if (y <= lowerboundary) {
-        y = lowerboundary;
+    else if (y <= boundary.lower) {
+        y = boundary.lower;
     }
     else {
         y = position.y;
@@ -211,46 +174,34 @@ void SkillTreeUI::Buttons_switching () {
         mousePos = this->convertToNodeSpace ( mousePos );
         //CCLOG ( "X:%f,Y:%f" , event->getCursorX () , event->getCursorY () );
         if (bagkey->getBoundingBox ().containsPoint ( mousePos )) {
-            // 移除当前的Layer
             std::string nowScene = SceneName;
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( InventoryUI::create ( inventory , nowScene ) , 20 );
+            auto inventoryUI = InventoryUI::create(inventory, nowScene);
+            Director::getInstance()->getRunningScene()->addChild(inventoryUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::Inventory, inventoryUI);
+            this->removeFromParent();
         }
         else if (Skillkey->getBoundingBox ().containsPoint ( mousePos )) {
 
         }
         else if (intimacykey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( intimacyUI::create ( nowScene ) , 20 );
+            auto intimacyUI = intimacyUI::create(nowScene);
+            Director::getInstance()->getRunningScene()->addChild(intimacyUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::Intimacy, intimacyUI);
+            this->removeFromParent();
         }
         else if (quitkey->getBoundingBox ().containsPoint ( mousePos )) {
             std::string nowScene = SceneName;
-            this->removeFromParent ();
-            Director::getInstance ()->getRunningScene ()->addChild ( quitUI::create ( nowScene ) , 20 );
+            auto quitUI = quitUI::create(nowScene);
+            Director::getInstance()->getRunningScene()->addChild(quitUI, 20);
+            ToggleInventoryCommand::updateState(ToggleInventoryCommand::UIState::Quit, quitUI);
+            this->removeFromParent();
         }
         };
     _eventDispatcher->addEventListenerWithSceneGraphPriority ( listener , this );
 }
 
 SkillTreeUI::~SkillTreeUI() {
-    // 清理命令绑定
-    if (escCloseCommand) {
-        auto inputManager = InputManager::getInstance();
-        inputManager->unbindCommand(EventKeyboard::KeyCode::KEY_ESCAPE, escCloseCommand);
-    }
-}
-
-void SkillTreeUI::close () {
-    // 使用Command Pattern绑定ESC键关闭功能
-    auto inputManager = InputManager::getInstance();
-    auto currentScene = Director::getInstance()->getRunningScene();
-    
-    auto closeCommand = std::make_shared<CloseUICommand>(this, currentScene);
-    inputManager->bindPressCommand(EventKeyboard::KeyCode::KEY_ESCAPE, closeCommand);
-    
-    // 保存命令引用以便清理
-    escCloseCommand = closeCommand;
 }
 
 bool SkillTreeUI::init ( std::string sceneName ) {
@@ -261,7 +212,6 @@ bool SkillTreeUI::init ( std::string sceneName ) {
     backgroundcreate ();
 
     Buttons_switching ();
-    close ();
     return true;
 }
 

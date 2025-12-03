@@ -8,6 +8,7 @@
 #include "../Core/InputManager.h"
 #include "../Commands/SceneInteractionCommand.h"
 #include "../Commands/UICommand.h"
+#include "../Systems/EnergySystem.h"
 
 USING_NS_CC;
 
@@ -174,13 +175,7 @@ bool Forest::init()
     }
 
 
-    // 更新物品栏
-    schedule ( [=]( float deltaTime ) {
-        if (inventory->is_updated == true) {
-            miniBag->updateDisplay ();
-            inventory->is_updated = false;
-        }
-        } , 0.1f , "item_update_key" );
+    // 移除更新物品栏轮询，交给Observer
 
     return true;
 }
@@ -254,7 +249,7 @@ void  Forest::checkPlayerPosition()
     
     // 更新计时器显示
     remainingTime++;
-    if (remainingTime == 43200 || strength == 0) {
+    if (remainingTime == 43200 || EnergySystem::getInstance()->getCurrentEnergy() == 0) {
 
         day++;
 

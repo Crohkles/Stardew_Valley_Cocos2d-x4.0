@@ -1,6 +1,7 @@
  #include "ui/CocosGUI.h"  
 #include "mailBoxUI.h"
 #include "DetailedtaskUI.h"
+#include "../Factories/SceneBoundaryFactory.h"
 
 USING_NS_CC;
 
@@ -12,26 +13,25 @@ static void problemLoading ( const char* filename )
 
 void mailBoxUI::updateCoordinate ( float& x , float& y ) {
     Vec2 position = player1->getPosition ();
-    float  Leftboundary = -10000.0f , rightboundary = 10000.0f , upperboundary = 10000.0f , lowerboundary = 10000.0f;
-    Leftboundary = 637.0f;
-    rightboundary = 960.0f;
-    upperboundary = 777.0f;
-    lowerboundary = 500.0f;
-    if (x <= Leftboundary) {
-        x = Leftboundary;
+    
+    // 使用工厂模式获取边界配置 (mailBoxUI 默认在农场使用)
+    auto boundary = SceneBoundaryFactory::getBoundaryConfig("farm");
+    
+    if (x <= boundary.left) {
+        x = boundary.left;
     }
-    else if (x >= rightboundary) {
-        x = rightboundary;
+    else if (x >= boundary.right) {
+        x = boundary.right;
     }
     else {
         x = position.x;
     }
 
-    if (y >= upperboundary) {
-        y = upperboundary;
+    if (y >= boundary.upper) {
+        y = boundary.upper;
     }
-    else if (y <= lowerboundary) {
-        y = lowerboundary;
+    else if (y <= boundary.lower) {
+        y = boundary.lower;
     }
     else {
         y = position.y;
